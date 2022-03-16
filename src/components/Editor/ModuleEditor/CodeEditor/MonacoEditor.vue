@@ -48,6 +48,8 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/assets/styles/mixins.scss";
+
 .monaco-editor-wrapper {
   height: 100%;
 }

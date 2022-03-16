@@ -56,7 +56,7 @@ a,
 
   nav a {
     display: inline-block;
-    padding: 0 1rem;
+    padding: 0 2rem;
     border-left: 1px solid var(--color-border);
   }
 

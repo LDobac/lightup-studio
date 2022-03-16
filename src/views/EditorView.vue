@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from "vue";
-import ModuleEditor from "../components/Editor/ModuleEditor.vue";
+import ModuleEditor from "../components/Editor/ModuleEditor/ModuleEditor.vue";
 import SceneEditor from "../components/Editor/SceneEditor.vue";
 
 const editorView: Ref<HTMLElement | null> = ref(null);
@@ -10,14 +10,14 @@ const leftWindowSize = ref(0);
 const rightWindowSize = ref(0);
 
 onMounted(() => {
-  if (!editorView.value || !resizeBar.value)
-    throw "Can't find resize bar and view!";
+  // if (!editorView.value || !resizeBar.value)
+  //   throw "Can't find resize bar and view!";
 
-  const editorSize = editorView.value.clientWidth;
+  // const editorSize = editorView.value.clientWidth;
 
-  leftWindowSize.value =
-    ((editorSize / 2 - resizeBar.value.clientWidth / 2) / editorSize) * 100;
-  rightWindowSize.value = leftWindowSize.value;
+  // leftWindowSize.value =
+  //   ((editorSize / 2 - resizeBar.value.clientWidth / 2) / editorSize) * 100;
+  // rightWindowSize.value = leftWindowSize.value;
 });
 
 const GetWidthCSS = (width: number) => {
@@ -27,14 +27,19 @@ const GetWidthCSS = (width: number) => {
 
 <template>
   <main ref="editorView" class="editor-view">
-    <ModuleEditor class="resizeable" :style="GetWidthCSS(leftWindowSize)" />
-    <div ref="resizeBar" class="horizontal-split">Horizontal Spliter</div>
-    <SceneEditor class="resizeable" :style="GetWidthCSS(rightWindowSize)" />
+    <div class="module-editor-wrapper">
+      <ModuleEditor class="resizeable module-editor" />
+    </div>
+    <div ref="resizeBar" class="resize-bar">Horizontal Spliter</div>
+    <SceneEditor class="resizeable" />
   </main>
 </template>
 
 <style lang="scss" scoped>
 .editor-view {
+  position: absolute;
+  width: 100%;
+  height: calc(100vh - 56px - 56px);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -43,20 +48,25 @@ const GetWidthCSS = (width: number) => {
   align-items: flex-start;
 }
 
-.horizontal-split {
+.resize-bar {
   width: 20px;
   height: 100%;
-  overflow: hidden;
-  word-break: break-all;
   background-color: black;
   color: white;
+  flex-shrink: 0;
+  word-break: break-all;
 }
 
-.resizeable {
+.module-editor-wrapper {
   height: 100%;
 
-  overflow: hidden;
   flex-shrink: 1;
   flex-grow: 1;
+
+  .module-editor {
+    overflow: hidden;
+    flex-shrink: 1;
+    flex-grow: 1;
+  }
 }
 </style>

@@ -67,7 +67,7 @@ onMounted(() => {
 
 <style lang="scss">
 #babylon-canvas {
-  width: 100%;
-  height: 100%;
+  width: 480px;
+  height: 300px;
 }
 </style>
