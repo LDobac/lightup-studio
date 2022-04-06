@@ -12,9 +12,7 @@ const rightWindowSize = ref(0);
 onMounted(() => {
   // if (!editorView.value || !resizeBar.value)
   //   throw "Can't find resize bar and view!";
-
   // const editorSize = editorView.value.clientWidth;
-
   // leftWindowSize.value =
   //   ((editorSize / 2 - resizeBar.value.clientWidth / 2) / editorSize) * 100;
   // rightWindowSize.value = leftWindowSize.value;

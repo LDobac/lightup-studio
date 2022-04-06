@@ -12,9 +12,7 @@ import Header from "./components/Header.vue";
       <RouterView />
     </div>
     <div class="footer">
-      <footer>
-        Made by yikolden.
-      </footer>
+      <footer>Made by yikolden.</footer>
     </div>
   </div>
 </template>

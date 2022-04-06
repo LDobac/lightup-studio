@@ -3,7 +3,7 @@ import { h, ref } from "vue";
 import { NIcon, NLayout, NLayoutSider, NMenu, NScrollbar } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import { BookmarkOutline, CaretDownOutline } from "@vicons/ionicons5";
-import ModuleConstructor from "./ModuleConstructor.vue";
+import ModuleCanvas from "./ModuleCanvas.vue";
 
 const menuOptions: MenuOption[] = [
   {
@@ -100,7 +100,7 @@ const expandIcon = () => {
 
 <template>
   <div class="visual-module-editor editor">
-    <n-layout has-sider style="height: 100%; flex-grow: 0; flex-shrink: 0;">
+    <n-layout has-sider style="height: 100%; flex-grow: 0; flex-shrink: 0">
       <n-layout-sider
         bordered
         collapse-mode="width"
@@ -111,7 +111,7 @@ const expandIcon = () => {
         @collapse="collapsed = true"
         @expand="collapsed = false"
       >
-        <n-scrollbar style="max-height: 100%;">
+        <n-scrollbar style="max-height: 100%">
           <n-menu
             :collapsed="collapsed"
             :collapsed-width="64"
@@ -124,8 +124,8 @@ const expandIcon = () => {
         </n-scrollbar>
       </n-layout-sider>
     </n-layout>
-    <n-layout style="height: 100%; flex-grow: 1; flex-shrink: 1;">
-      <ModuleConstructor class="board"/>
+    <n-layout style="height: 100%; flex-grow: 1; flex-shrink: 1">
+      <ModuleCanvas class="board" />
     </n-layout>
   </div>
 </template>
