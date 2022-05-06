@@ -20,21 +20,21 @@ const HandleClick = async () => {
   }
 };
 
-const HandleClick2 = () => {
-  if (!monacoEditorManager) return;
+// const HandleClick2 = () => {
+//   if (!monacoEditorManager) return;
 
-  // extra libraries
-  const libSource = [
-    "declare class Facts {",
-    "    /**",
-    "     * Returns the next fact",
-    "     */",
-    "    static next():string",
-    "}",
-  ].join("\n");
-  const libUri = "ts:filename/facts.d.ts";
-  monacoEditorManager.AddLibrary(libSource, libUri);
-}
+//   // extra libraries
+//   const libSource = [
+//     "declare class Facts {",
+//     "    /**",
+//     "     * Returns the next fact",
+//     "     */",
+//     "    static next():string",
+//     "}",
+//   ].join("\n");
+//   const libUri = "ts:filename/facts.d.ts";
+//   monacoEditorManager.AddLibrary(libSource, libUri);
+// };
 </script>
 
 <template>

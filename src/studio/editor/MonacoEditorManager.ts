@@ -1,4 +1,3 @@
-
 // import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 // import "monaco-editor/esm/vs/editor/editor.all.js";
 // import "monaco-editor/esm/vs/editor/editor.main.js";
@@ -11,16 +10,10 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 
-export interface ICompileResult {
-  diagnostic: Array<{
-    position: monaco.Position;
-    message: string | monaco.languages.typescript.DiagnosticMessageChain;
-  }>;
-  js?: string;
-  declaration?: string;
-}
+import { CompileMachine } from "@/studio/core/CompileMachine";
+import type { ICompileResult } from "@/studio/core/CompileMachine";
 
-export default class MonacoEditorManager {
+export default class MonacoEditorManager extends CompileMachine {
   private monacoEditor: monaco.editor.IStandaloneCodeEditor;
 
   private editorOptions: monaco.editor.IStandaloneEditorConstructionOptions;
@@ -28,6 +21,8 @@ export default class MonacoEditorManager {
   private compilerOptions: monaco.languages.typescript.CompilerOptions;
 
   public constructor(element: HTMLElement, defaultSource = "") {
+    super();
+
     // eslint-disable-next-line
     // @ts-ignore
     self.MonacoEnvironment = {
@@ -153,7 +148,7 @@ export default class MonacoEditorManager {
         const diagnostic = diagset[0];
 
         compiledResult.diagnostic.push({
-          position: model.getPositionAt(diagnostic.start!),
+          position: model.getPositionAt(diagnostic.start ?? 0),
           message: diagnostic.messageText,
         });
       }
