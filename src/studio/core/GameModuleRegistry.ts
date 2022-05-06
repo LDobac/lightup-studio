@@ -1,9 +1,13 @@
 import { CompileError, CompileMachine } from "./CompileMachine";
 import type PrototypeGameModule from "./PrototypeGameModule";
+import { Declaration, Lib } from "./runtime/RuntimeLibrary";
 
 export default class GameModuleRegistry {
   private compiler: CompileMachine;
   private modules: Array<PrototypeGameModule>;
+
+  public Lib = Lib;
+  public Declaration = Declaration;
 
   constructor(compiler: CompileMachine) {
     this.compiler = compiler;

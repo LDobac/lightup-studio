@@ -1,8 +1,30 @@
 import { v4 as uuid } from "uuid";
+import type GameModule from "./runtime/GameModule";
+import type { Lib } from "./runtime/RuntimeLibrary";
 
 export interface IGameModuleDeclaration {
   uri: string;
   text: string;
+}
+
+export interface GameModuleConstructor {
+  new (): GameModule;
+}
+
+export interface GameModuleConstructorWrapper {
+  (lib: typeof Lib): GameModuleConstructor;
+}
+
+export class SourceNotValidError extends Error {
+  constructor() {
+    super("Source doesn't vaild!");
+  }
+}
+
+export class NotCompiledError extends Error {
+  constructor() {
+    super("Code doesn't compiled!");
+  }
 }
 
 export default class PrototypeGameModule {
@@ -14,6 +36,12 @@ export default class PrototypeGameModule {
 
   private declaration: string;
 
+  private constructorWrapper: GameModuleConstructorWrapper | null;
+
+  public static GetDefaultSource(name: string): string {
+    return [`class ${name} extends Lib.GameModule`, "{", "\t"].join("\n");
+  }
+
   public constructor(id: string, name: string) {
     this._id = id.length ? id : uuid();
 
@@ -23,6 +51,8 @@ export default class PrototypeGameModule {
     this._compiledSource = "";
 
     this.declaration = "";
+
+    this.constructorWrapper = null;
   }
 
   public get id(): string {
@@ -41,22 +71,34 @@ export default class PrototypeGameModule {
     return this._originSource;
   }
 
-  public set originSource(v: string) {
-    //   Validate code
-    this._originSource = v;
+  public set originSource(source: string) {
+    if (!this.IsSourceValid(source)) {
+      throw new SourceNotValidError();
+    }
+
+    this._originSource = source;
   }
 
   public get compiledSource(): string {
     return this._compiledSource;
   }
 
-  public SetCompiledSource(source: string, declaration: string): void {
-    // Add Stub Code for return constructor
-    this._compiledSource = source;
+  public SetCompiledSource(compiledSource: string, declaration: string): void {
+    if (!this.IsSourceValid(compiledSource)) {
+      throw new SourceNotValidError();
+    }
 
-    // Create Function object to create class
-
+    this._compiledSource = compiledSource;
     this.declaration = declaration;
+
+    const wrapperBody = [compiledSource, `return ${this.GetSafeName()};`].join(
+      "\n"
+    );
+
+    this.constructorWrapper = new Function(
+      "Lib",
+      wrapperBody
+    ) as GameModuleConstructorWrapper;
   }
 
   public GetDeclaration(): IGameModuleDeclaration {
@@ -70,5 +112,28 @@ export default class PrototypeGameModule {
 
   public GetSafeName() {
     return this.name.toLowerCase().replace(/\s/gim, "_");
+  }
+
+  public GetConstructorWrapper(): GameModuleConstructorWrapper {
+    if (!this.constructorWrapper) {
+      throw new NotCompiledError();
+    }
+
+    return this.constructorWrapper;
+  }
+
+  private IsSourceValid(source: string): boolean {
+    const matchValidClassRegex = new RegExp(
+      `\\s*(class)\\s*(${this.GetSafeName()})\\s*(extends\\s*Lib\\.GameModule)`,
+      "gmi"
+    );
+
+    const matchResult = source.match(matchValidClassRegex);
+
+    if (!(matchResult && matchResult.length)) {
+      return false;
+    }
+
+    return true;
   }
 }
