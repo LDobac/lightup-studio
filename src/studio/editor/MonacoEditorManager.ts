@@ -10,7 +10,12 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 
-import { CompileMachine } from "@/studio/core/CompileMachine";
+import { flattenDiagnosticMessageText } from "typescript";
+
+import {
+  CompileMachine,
+  type ITypeDeclaration,
+} from "@/studio/core/CompileMachine";
 import type { ICompileResult } from "@/studio/core/CompileMachine";
 
 export default class MonacoEditorManager extends CompileMachine {
@@ -108,6 +113,22 @@ export default class MonacoEditorManager extends CompileMachine {
     );
   }
 
+  public SetDeclaration(declaration: ITypeDeclaration[]): void {
+    // TODO
+  }
+
+  public AddDeclaration(declaration: ITypeDeclaration): boolean {
+    // TODO
+
+    return false;
+  }
+
+  public RemoveDeclaration(uri: string): boolean {
+    // TODO
+
+    return false;
+  }
+
   public AddLibrary(libSource: string, libUri: string): void {
     monaco.languages.typescript.typescriptDefaults.addExtraLib(
       libSource,
@@ -146,10 +167,18 @@ export default class MonacoEditorManager extends CompileMachine {
     diagnostic.forEach(function (diagset) {
       if (diagset.length) {
         const diagnostic = diagset[0];
+        const position = model.getPositionAt(diagnostic.start ?? 0);
+        const message = flattenDiagnosticMessageText(
+          diagnostic.messageText,
+          "\n"
+        );
 
         compiledResult.diagnostic.push({
-          position: model.getPositionAt(diagnostic.start ?? 0),
-          message: diagnostic.messageText,
+          position: {
+            line: position.lineNumber,
+            column: position.column,
+          },
+          message: message,
         });
       }
     });

@@ -1,8 +1,16 @@
-import type * as monaco from "monaco-editor";
+export interface ITypeDeclaration {
+  uri: string;
+  text: string;
+}
+
+export interface IDiagnosticPosition {
+  line: number;
+  column: number;
+}
 
 export interface IDiagnostic {
-  position: monaco.Position;
-  message: string | monaco.languages.typescript.DiagnosticMessageChain;
+  position: IDiagnosticPosition;
+  message: string;
 }
 
 export interface ICompileResult {
@@ -23,6 +31,10 @@ export class CompileError extends Error {
 }
 
 export abstract class CompileMachine {
+  public abstract SetDeclaration(declarations: Array<ITypeDeclaration>): void;
+  public abstract AddDeclaration(declarations: ITypeDeclaration): boolean;
+  public abstract RemoveDeclaration(uri: string): boolean;
+
   public abstract SetCode(source: string): void;
   public abstract GetCode(): string;
 

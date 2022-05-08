@@ -1,11 +1,7 @@
 import { v4 as uuid } from "uuid";
+import type { ITypeDeclaration } from "./CompileMachine";
 import type GameModule from "./runtime/GameModule";
 import type { Lib } from "./runtime/RuntimeLibrary";
-
-export interface IGameModuleDeclaration {
-  uri: string;
-  text: string;
-}
 
 export interface GameModuleConstructor {
   new (): GameModule;
@@ -101,7 +97,7 @@ export default class PrototypeGameModule {
     ) as GameModuleConstructorWrapper;
   }
 
-  public GetDeclaration(): IGameModuleDeclaration {
+  public GetDeclaration(): ITypeDeclaration {
     const safeName = this.GetSafeName();
 
     return {
