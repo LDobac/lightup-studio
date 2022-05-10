@@ -5,6 +5,7 @@ import PrototypeGameModule, {
 } from "@/studio/core/PrototypeGameModule";
 
 import { Lib } from "@/studio/core/runtime/RuntimeLibrary";
+import GameObject from "@/studio/core/runtime/GameObject";
 
 function NameTest(gm: PrototypeGameModule, expectName: string) {
   gm.name = expectName;
@@ -273,7 +274,7 @@ describe("PrototypeGameModule Unit Test", () => {
     const classConstructor = constructorWrapper(Lib);
     expect(classConstructor).toBeDefined();
 
-    const classInstance = new classConstructor();
+    const classInstance = new classConstructor(new GameObject());
     expect(classInstance).toBeDefined();
     expect(classInstance).toHaveProperty("Start");
     expect(classInstance).toHaveProperty("Update");

@@ -21,6 +21,8 @@ import type { ICompileResult } from "@/studio/core/CompileMachine";
 export default class MonacoEditorManager extends CompileMachine {
   private monacoEditor: monaco.editor.IStandaloneCodeEditor;
 
+  private declarations: Array<{ uri: string; disposable: monaco.IDisposable }>;
+
   private editorOptions: monaco.editor.IStandaloneEditorConstructionOptions;
   private diagnosticsOptions: monaco.languages.typescript.DiagnosticsOptions;
   private compilerOptions: monaco.languages.typescript.CompilerOptions;
@@ -53,6 +55,8 @@ export default class MonacoEditorManager extends CompileMachine {
         }
       },
     };
+
+    this.declarations = [];
 
     this.diagnosticsOptions = {};
     this.SetDiagnosticsOptions({
@@ -114,26 +118,35 @@ export default class MonacoEditorManager extends CompileMachine {
   }
 
   public SetDeclaration(declaration: ITypeDeclaration[]): void {
-    // TODO
+    this.declarations.forEach((v) => {
+      v.disposable.dispose();
+    });
+
+    declaration.forEach((v) => {
+      this.AddDeclaration(v);
+    });
   }
 
-  public AddDeclaration(declaration: ITypeDeclaration): boolean {
-    // TODO
+  public AddDeclaration(declaration: ITypeDeclaration): void {
+    const disposable =
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(
+        declaration.text,
+        declaration.uri
+      );
 
-    return false;
+    this.declarations.push({
+      uri: declaration.uri,
+      disposable: disposable,
+    });
   }
 
-  public RemoveDeclaration(uri: string): boolean {
-    // TODO
+  public RemoveDeclaration(uri: string): void {
+    const index = this.declarations.findIndex((v) => v.uri === uri);
 
-    return false;
-  }
-
-  public AddLibrary(libSource: string, libUri: string): void {
-    monaco.languages.typescript.typescriptDefaults.addExtraLib(
-      libSource,
-      libUri
-    );
+    if (index > -1) {
+      this.declarations[index].disposable.dispose();
+      this.declarations.splice(index, 1);
+    }
   }
 
   public SetCode(newCode: string): void {
