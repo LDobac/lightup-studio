@@ -1,4 +1,3 @@
-// import ts from "typescript";
 import { createProject, ts } from "@ts-morph/bootstrap";
 
 import {
@@ -14,7 +13,7 @@ export default class MockCompiler extends CompileMachine {
 
   private compilerOptions: ts.CompilerOptions;
 
-  private declarations : Array<ITypeDeclaration>;
+  private declarations: Array<ITypeDeclaration>;
 
   constructor() {
     super();
@@ -24,7 +23,7 @@ export default class MockCompiler extends CompileMachine {
     this.declarations = [];
 
     this.compilerOptions = {
-      target: ts.ScriptTarget.ES5,
+      target: ts.ScriptTarget.ESNext,
       module: ts.ModuleKind.AMD,
       allowNonTsExtensions: true,
       declaration: true,
@@ -47,12 +46,12 @@ export default class MockCompiler extends CompileMachine {
     this.declarations = declarations;
   }
 
-  public AddDeclaration(declarations: ITypeDeclaration): boolean {
-    return false;
+  public AddDeclaration(declarations: ITypeDeclaration): void {
+    this.declarations.push(declarations);
   }
 
-  public RemoveDeclaration(uri: string): boolean {
-    return false;
+  public RemoveDeclaration(): void {
+    //
   }
 
   public async GetCompiledCode(): Promise<ICompileResult> {
@@ -61,18 +60,18 @@ export default class MockCompiler extends CompileMachine {
     let sourceWithLib = "";
 
     for (const declaration of this.declarations) {
-      await project.fileSystem.writeFile("/node_modules/typescript/lib" + declaration.uri, declaration.text);
-
-      sourceWithLib += [
+      const libDts = [
         "\n",
         `//------${declaration.uri} Start------`,
         declaration.text,
         `//------${declaration.uri} End------`,
         "\n",
       ].join("\n");
+
+      sourceWithLib += libDts;
     }
 
-    sourceWithLib += this.source;
+    sourceWithLib += "declare let __SPEA__ : number;" + this.source;
 
     const sourceFile = await project.createSourceFile(
       this.filename,
@@ -124,15 +123,17 @@ export default class MockCompiler extends CompileMachine {
     const js = await project.fileSystem.readFile(
       this.filename.replace(".ts", ".js")
     );
-    
+
     const d = await project.fileSystem.readFile(
       this.filename.replace(".ts", ".d.ts")
     );
 
+    const da = d.split("declare let __SPEA__: number;");
+
     return {
       diagnostic: diagnostic,
       js: js,
-      declaration: d,
+      declaration: da[1],
     };
   }
 }

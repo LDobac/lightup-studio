@@ -1,6 +1,12 @@
 import { CompileError, CompileMachine } from "./CompileMachine";
-import PrototypeGameModule from "./PrototypeGameModule";
-import { Declaration, Lib } from "./runtime/RuntimeLibrary";
+import PrototypeGameModule, {
+  type GameModuleConstructor,
+} from "./PrototypeGameModule";
+import {
+  DefaultDeclarations,
+  Lib as DefaultLibrary,
+  type RuntimeDeclarations,
+} from "./runtime/RuntimeLibrary";
 
 export class GameModuleNameDuplicatedError extends Error {
   constructor() {
@@ -18,21 +24,17 @@ export default class GameModuleRegistry {
   private compiler: CompileMachine;
   private modules: Array<PrototypeGameModule>;
 
-  public Lib = Lib;
-  public Declaration = Declaration;
+  public Lib = DefaultLibrary;
+  public Declarations: RuntimeDeclarations = [];
 
   constructor(compiler: CompileMachine) {
     this.compiler = compiler;
     this.modules = [];
+
+    this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
   }
 
   public async RegisterNewModule(name: string): Promise<PrototypeGameModule> {
-    this.modules.forEach((prototypeGameModule) => {
-      if (prototypeGameModule.name === name) {
-        throw new GameModuleNameDuplicatedError();
-      }
-    });
-
     const newPrototypeModule = new PrototypeGameModule("", name);
     newPrototypeModule.originSource = PrototypeGameModule.GetDefaultSource(
       newPrototypeModule.GetSafeName()
@@ -47,12 +49,6 @@ export default class GameModuleRegistry {
     name: string,
     source: string
   ): Promise<PrototypeGameModule> {
-    this.modules.forEach((prototypeGameModule) => {
-      if (prototypeGameModule.name === name) {
-        throw new GameModuleNameDuplicatedError();
-      }
-    });
-
     const newPrototypeModule = new PrototypeGameModule("", name);
     newPrototypeModule.originSource = source;
 
@@ -62,12 +58,6 @@ export default class GameModuleRegistry {
   public RegisterByModule(
     gameModule: PrototypeGameModule
   ): Promise<PrototypeGameModule> {
-    this.modules.forEach((prototypeGameModule) => {
-      if (prototypeGameModule.name === gameModule.name) {
-        throw new GameModuleNameDuplicatedError();
-      }
-    });
-
     return this.AddGameModule(gameModule);
   }
 
@@ -99,36 +89,65 @@ export default class GameModuleRegistry {
     }
   }
 
-  public GetGameModuleByName(name: string): PrototypeGameModule {
-    const deletedModule = this.modules.find((module) => module.name === name);
+  public async ModifyGameModuleByModule(
+    module: PrototypeGameModule,
+    source: string
+  ) {
+    const index = this.modules.findIndex((m) => module === m);
 
-    if (!deletedModule) {
-      throw new GameModuleNotFoundError();
-    }
-
-    return deletedModule;
+    await this.ModifyGameModule(index, source);
   }
 
-  public GetGameModuleById(id: string): PrototypeGameModule {
-    const deletedModule = this.modules.find((module) => module.id === id);
-
-    if (!deletedModule) {
-      throw new GameModuleNotFoundError();
-    }
-
-    return deletedModule;
-  }
-
-  public ModifyGameModuleByName(name: string, source: string) {
+  public async ModifyGameModuleByName(name: string, source: string) {
     const index = this.modules.findIndex((module) => module.name === name);
 
-    this.ModifyGameModule(index, source);
+    await this.ModifyGameModule(index, source);
   }
 
-  public ModifyGameModuleById(id: string, source: string) {
+  public async ModifyGameModuleById(id: string, source: string) {
     const index = this.modules.findIndex((module) => module.id === id);
 
-    this.ModifyGameModule(index, source);
+    await this.ModifyGameModule(index, source);
+  }
+
+  public GetPrototypeGameModuleByName(name: string): PrototypeGameModule {
+    const module = this.modules.find((module) => module.name === name);
+
+    if (!module) {
+      throw new GameModuleNotFoundError();
+    }
+
+    return module;
+  }
+
+  public GetPrototypeGameModuleById(id: string): PrototypeGameModule {
+    const module = this.modules.find((module) => module.id === id);
+
+    if (!module) {
+      throw new GameModuleNotFoundError();
+    }
+
+    return module;
+  }
+
+  public GetGameModuleConstructorByName(name: string): GameModuleConstructor {
+    const module = this.modules.find((module) => module.name === name);
+
+    if (!module) {
+      throw new GameModuleNotFoundError();
+    }
+
+    return this.Lib.modules[module.safeName];
+  }
+
+  public GetGameModuleConstructorById(id: string): GameModuleConstructor {
+    const module = this.modules.find((module) => module.id === id);
+
+    if (!module) {
+      throw new GameModuleNotFoundError();
+    }
+
+    return this.Lib.modules[module.safeName];
   }
 
   private async CompileModule(gameModule: PrototypeGameModule): Promise<void> {
@@ -146,23 +165,100 @@ export default class GameModuleRegistry {
     gameModule.SetCompiledSource(js, declaration);
   }
 
+  private WrapDeclaration(declaration: string) {
+    return [
+      "namespace Lib {",
+      "export namespace modules {",
+      `export ${declaration}`,
+      "}",
+      "}",
+    ].join("\n");
+  }
+
+  private AddLibAndDeclaration(gameModule: PrototypeGameModule) {
+    this.Lib.modules[gameModule.GetSafeName()] =
+      gameModule.GetConstructorWrapper()(this.Lib);
+
+    const moduleDeclaration = gameModule.GetDeclaration();
+    this.Declarations.push({
+      uri: moduleDeclaration.uri,
+      text: this.WrapDeclaration(moduleDeclaration.text),
+    });
+
+    this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
+  }
+
+  private SetLibAndDeclaration(gameModule: PrototypeGameModule) {
+    this.Lib.modules[gameModule.GetSafeName()] =
+      gameModule.GetConstructorWrapper()(this.Lib);
+
+    const moduleDeclaration = gameModule.GetDeclaration();
+
+    const declaration = this.Declarations.find(
+      (d) => d.uri === moduleDeclaration.uri
+    );
+    if (!declaration) {
+      throw new GameModuleNotFoundError();
+    }
+
+    declaration.text = this.WrapDeclaration(moduleDeclaration.text);
+
+    this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
+  }
+
+  private RemoveLibAndDeclaration(deletedModule: PrototypeGameModule) {
+    // Delete declarations
+    const dIndex = this.Declarations.findIndex(
+      (v) => v.uri === deletedModule.GetDeclarationURI()
+    );
+    if (dIndex > -1) {
+      this.Declarations.splice(dIndex, 1);
+    }
+
+    // Delete Lib modules
+    delete this.Lib.modules[deletedModule.safeName];
+
+    this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
+  }
+
   private async AddGameModule(
     gameModule: PrototypeGameModule
   ): Promise<PrototypeGameModule> {
-    // Add Module to list
-    // Add Library
-    // TODO
+    for (const prototypeGameModule of this.modules) {
+      if (prototypeGameModule.name === gameModule.name) {
+        throw new GameModuleNameDuplicatedError();
+      }
+    }
 
-    return new Promise(() => {
-      //
-    });
+    await this.CompileModule(gameModule);
+
+    // Add Module to list
+    this.modules.push(gameModule);
+
+    // Add Library and Declaration
+    this.AddLibAndDeclaration(gameModule);
+
+    return gameModule;
   }
 
   private RemoveGameModule(index: number): void {
-    // TODO
+    // Delete modules
+    const deletedModule = this.modules.splice(index, 1)[0];
+
+    this.RemoveLibAndDeclaration(deletedModule);
   }
 
-  private ModifyGameModule(index: number, source: string): void {
-    // TODO
+  private async ModifyGameModule(index: number, source: string): Promise<void> {
+    if (index < 0) {
+      throw new GameModuleNotFoundError();
+    }
+
+    const modifiedModule = this.modules[index];
+
+    modifiedModule.originSource = source;
+
+    await this.CompileModule(modifiedModule);
+
+    this.SetLibAndDeclaration(modifiedModule);
   }
 }

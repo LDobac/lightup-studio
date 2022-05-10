@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 
 import MonacoEditorManager from "@/studio/editor/MonacoEditorManager";
+import PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 
 const monacoEditorWrapper = ref<HTMLElement | null>(null);
 let monacoEditorManager: MonacoEditorManager | null = null;
@@ -9,7 +10,10 @@ let monacoEditorManager: MonacoEditorManager | null = null;
 onMounted(() => {
   if (!monacoEditorWrapper.value) throw "Can't find monaco editor container";
 
-  monacoEditorManager = new MonacoEditorManager(monacoEditorWrapper.value);
+  monacoEditorManager = new MonacoEditorManager(
+    monacoEditorWrapper.value,
+    PrototypeGameModule.GetDefaultSource("test_gamemodule")
+  );
 });
 
 const HandleClick = async () => {

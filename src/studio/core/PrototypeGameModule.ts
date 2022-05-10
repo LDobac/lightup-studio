@@ -1,10 +1,11 @@
 import { v4 as uuid } from "uuid";
 import type { ITypeDeclaration } from "./CompileMachine";
 import type GameModule from "./runtime/GameModule";
+import type GameObject from "./runtime/GameObject";
 import type { Lib } from "./runtime/RuntimeLibrary";
 
 export interface GameModuleConstructor {
-  new (): GameModule;
+  new (gameObject: GameObject): GameModule;
 }
 
 export interface GameModuleConstructorWrapper {
@@ -35,7 +36,13 @@ export default class PrototypeGameModule {
   private constructorWrapper: GameModuleConstructorWrapper | null;
 
   public static GetDefaultSource(name: string): string {
-    return [`class ${name} extends Lib.GameModule`, "{", "\t"].join("\n");
+    return [
+      `class ${name} extends Lib.GameModule`,
+      "{",
+      "\tpublic Start() {}",
+      "\tpublic Update(deltaTime:number) {}",
+      "}",
+    ].join("\n");
   }
 
   public constructor(id: string, name: string) {
@@ -98,16 +105,22 @@ export default class PrototypeGameModule {
   }
 
   public GetDeclaration(): ITypeDeclaration {
-    const safeName = this.GetSafeName();
-
     return {
-      uri: safeName + ".d.ts",
+      uri: this.GetDeclarationURI(),
       text: this.declaration,
     };
   }
 
   public GetSafeName() {
     return this.name.toLowerCase().replace(/\s/gim, "_");
+  }
+
+  public get safeName(): string {
+    return this.GetSafeName();
+  }
+
+  public GetDeclarationURI() {
+    return this.GetSafeName() + ".d.ts";
   }
 
   public GetConstructorWrapper(): GameModuleConstructorWrapper {

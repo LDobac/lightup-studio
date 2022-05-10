@@ -61,7 +61,7 @@ describe("MockCompiler Test", () => {
       " console.log(str);",
       " Facts.next();",
       "}",
-      "x('abc');"
+      "x('abc');",
     ].join("\n");
 
     compiler.SetCode(expectCode);
@@ -73,7 +73,7 @@ describe("MockCompiler Test", () => {
     expect(result.declaration?.length).toBeGreaterThan(0);
     expect(result.js?.length).toBeGreaterThan(0);
 
-      // extra libraries
+    // extra libraries
     const libSource = [
       "declare class Facts {",
       "    /**",
@@ -86,9 +86,9 @@ describe("MockCompiler Test", () => {
 
     compiler.SetDeclaration([
       {
-        uri : libUri,
-        text : libSource,
-      }
+        uri: libUri,
+        text: libSource,
+      },
     ]);
 
     result = await compiler.GetCompiledCode();

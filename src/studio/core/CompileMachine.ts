@@ -32,8 +32,8 @@ export class CompileError extends Error {
 
 export abstract class CompileMachine {
   public abstract SetDeclaration(declarations: Array<ITypeDeclaration>): void;
-  public abstract AddDeclaration(declarations: ITypeDeclaration): boolean;
-  public abstract RemoveDeclaration(uri: string): boolean;
+  public abstract AddDeclaration(declarations: ITypeDeclaration): void;
+  public abstract RemoveDeclaration(uri: string): void;
 
   public abstract SetCode(source: string): void;
   public abstract GetCode(): string;
