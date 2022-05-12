@@ -1,4 +1,6 @@
-import GameModuleRegistry, { GameModuleNotFoundError } from "@/studio/core/GameModuleRegistry";
+import GameModuleRegistry, {
+  GameModuleNotFoundError,
+} from "@/studio/core/GameModuleRegistry";
 import GameModule from "@/studio/core/runtime/GameModule";
 import GameObject from "@/studio/core/runtime/GameObject";
 import { describe, it, expect } from "vitest";
@@ -9,10 +11,17 @@ describe("GameObjectTest", async () => {
   const gameModuleRegistry = new GameModuleRegistry(compiler);
 
   class class_counter extends GameModule {
-    public count : number = 0;
-    public Start() {}
-    public Update() {}
-    public Count() : number {this.count++; return this.count;}
+    public count = 0;
+    public Start() {
+      /** Empty */
+    }
+    public Update() {
+      /** Empty */
+    }
+    public Count(): number {
+      this.count++;
+      return this.count;
+    }
   }
   const counterModule = await gameModuleRegistry.RegisterBySource(
     "Counter",
@@ -27,10 +36,17 @@ describe("GameObjectTest", async () => {
   );
 
   class class_counta extends GameModule {
-     public a : string = '';
-     public Start() {}
-     public Update() {}
-     public GetA() : string {this.a += 'a'; return this.a;}
+    public a = "";
+    public Start() {
+      /** Empty */
+    }
+    public Update() {
+      /** Empty */
+    }
+    public GetA(): string {
+      this.a += "a";
+      return this.a;
+    }
   }
   const countAModule = await gameModuleRegistry.RegisterBySource(
     "CountA",
@@ -85,9 +101,13 @@ describe("GameObjectTest", async () => {
     gameObject.RemovePrototypeGameModuleByUid(instantiableProtoGM.uid);
 
     expect(gameObject.prototypeGameModule.length).toEqual(1);
-    
-    expect(gameObject.prototypeGameModule[0].uid).toEqual(remainInstProtoGM.uid);
-    expect(gameObject.prototypeGameModule[0].module).toEqual(remainInstProtoGM.module);
+
+    expect(gameObject.prototypeGameModule[0].uid).toEqual(
+      remainInstProtoGM.uid
+    );
+    expect(gameObject.prototypeGameModule[0].module).toEqual(
+      remainInstProtoGM.module
+    );
   });
 
   it("RemovePrototypeGameModuleByUid all modules by manually test", () => {
@@ -108,7 +128,9 @@ describe("GameObjectTest", async () => {
     gameObject.AddPrototypeGameModule(counterModule);
     gameObject.AddPrototypeGameModule(countAModule);
 
-    expect(() => gameObject.RemovePrototypeGameModuleByUid("asdasdasd")).toThrow(GameModuleNotFoundError);
+    expect(() =>
+      gameObject.RemovePrototypeGameModuleByUid("asdasdasd")
+    ).toThrow(GameModuleNotFoundError);
 
     expect(gameObject.prototypeGameModule.length).toEqual(2);
   });
@@ -137,11 +159,23 @@ describe("GameObjectTest", async () => {
 
     expect(runtimeGameModule.length).toBe(2);
 
-    expect(runtimeGameModule.findIndex(v => v.prototypeId === instProtoGM1.module.id)).toBeGreaterThan(-1);
-    expect(runtimeGameModule.findIndex(v => v.prototypeId === instProtoGM2.module.id)).toBeGreaterThan(-1);
+    expect(
+      runtimeGameModule.findIndex(
+        (v) => v.prototypeId === instProtoGM1.module.id
+      )
+    ).toBeGreaterThan(-1);
+    expect(
+      runtimeGameModule.findIndex(
+        (v) => v.prototypeId === instProtoGM2.module.id
+      )
+    ).toBeGreaterThan(-1);
 
-    expect(runtimeGameModule.findIndex(v => v.uid === instProtoGM1.uid)).toBeGreaterThan(-1);
-    expect(runtimeGameModule.findIndex(v => v.uid === instProtoGM2.uid)).toBeGreaterThan(-1);
+    expect(
+      runtimeGameModule.findIndex((v) => v.uid === instProtoGM1.uid)
+    ).toBeGreaterThan(-1);
+    expect(
+      runtimeGameModule.findIndex((v) => v.uid === instProtoGM2.uid)
+    ).toBeGreaterThan(-1);
 
     for (const gameModule of runtimeGameModule) {
       expect(gameModule.gameObject).toEqual(gameObject);
@@ -160,14 +194,18 @@ describe("GameObjectTest", async () => {
 
     expect(runtimeGameModule.length).toBe(2);
 
-    let counterInst = runtimeGameModule.find(v => v.prototypeId === instProtoGM1.module.id);
-    let countaInst = runtimeGameModule.find(v => v.prototypeId === instProtoGM2.module.id);
+    const counterInst = runtimeGameModule.find(
+      (v) => v.prototypeId === instProtoGM1.module.id
+    );
+    const countaInst = runtimeGameModule.find(
+      (v) => v.prototypeId === instProtoGM2.module.id
+    );
 
     expect(counterInst).toBeDefined();
     expect(countaInst).toBeDefined();
-    
-    const counter = (counterInst as class_counter);
-    const counta = (countaInst as class_counta);
+
+    const counter = counterInst as class_counter;
+    const counta = countaInst as class_counta;
 
     expect(counter.count).toEqual(0);
     expect(counta.a).toEqual("");
@@ -188,11 +226,15 @@ describe("GameObjectTest", async () => {
 
     const runtimeGameModule = gameObject.runtimeGameModule;
 
-    let counterInst = runtimeGameModule.find(v => v.prototypeId === instProtoGM1.module.id);
-    let countaInst = runtimeGameModule.find(v => v.prototypeId === instProtoGM2.module.id);
-    
-    const counter = (counterInst as class_counter);
-    const counta = (countaInst as class_counta);
+    const counterInst = runtimeGameModule.find(
+      (v) => v.prototypeId === instProtoGM1.module.id
+    );
+    const countaInst = runtimeGameModule.find(
+      (v) => v.prototypeId === instProtoGM2.module.id
+    );
+
+    const counter = counterInst as class_counter;
+    const counta = countaInst as class_counta;
 
     gameObject.Start();
 
@@ -214,11 +256,15 @@ describe("GameObjectTest", async () => {
 
     const runtimeGameModule = gameObject.runtimeGameModule;
 
-    let counterInst = runtimeGameModule.find(v => v.prototypeId === instProtoGM1.module.id);
-    let countaInst = runtimeGameModule.find(v => v.prototypeId === instProtoGM2.module.id);
-    
-    const counter = (counterInst as class_counter);
-    const counta = (countaInst as class_counta);
+    const counterInst = runtimeGameModule.find(
+      (v) => v.prototypeId === instProtoGM1.module.id
+    );
+    const countaInst = runtimeGameModule.find(
+      (v) => v.prototypeId === instProtoGM2.module.id
+    );
+
+    const counter = counterInst as class_counter;
+    const counta = countaInst as class_counta;
 
     gameObject.Start();
 

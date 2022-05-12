@@ -54,31 +54,32 @@ export default class GameObject {
     });
   }
 
-  public Finish()
-  {
+  public Finish() {
     this._gameModule = [];
   }
 
-  public AddPrototypeGameModule(newModule: PrototypeGameModule) : InstantiableProtoGM {
+  public AddPrototypeGameModule(
+    newModule: PrototypeGameModule
+  ): InstantiableProtoGM {
     const instantiablePrototypeGameModule = {
       uid: uuid(),
       module: newModule,
     };
-    
+
     this._prototypeGameModule.push(instantiablePrototypeGameModule);
 
     return instantiablePrototypeGameModule;
   }
 
-  public RemovePrototypeGameModuleByUid(uid: InstantiableProtoGMID) : PrototypeGameModule {
-    const index = this._prototypeGameModule.findIndex(
-      (v) => v.uid === uid
-    );
+  public RemovePrototypeGameModuleByUid(
+    uid: InstantiableProtoGMID
+  ): PrototypeGameModule {
+    const index = this._prototypeGameModule.findIndex((v) => v.uid === uid);
 
     if (!(index > -1)) {
       throw new GameModuleNotFoundError();
     }
-    
+
     return this._prototypeGameModule.splice(index, 1)[0].module;
   }
 
