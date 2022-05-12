@@ -1,10 +1,16 @@
 import type GameObject from "./GameObject";
 
 export default abstract class GameModule {
+  private _prototypeId: string;
+  private _uid: string;
+
   private _gameObject: GameObject;
 
-  constructor(gameObject: GameObject) {
+  constructor(gameObject: GameObject, prototypeId: string, uid: string) {
     this._gameObject = gameObject;
+
+    this._prototypeId = prototypeId;
+    this._uid = uid;
   }
 
   public abstract Start(): void;
@@ -15,8 +21,11 @@ export default abstract class GameModule {
     return this._gameObject;
   }
 
-  public set gameObject(v: GameObject) {
-    // TODO : 기존 GameObject 커넥션 정리, 삭제 함수 호출
-    this._gameObject = v;
+  public get prototypeId(): string {
+    return this._prototypeId;
+  }
+
+  public get uid(): string {
+    return this._uid;
   }
 }

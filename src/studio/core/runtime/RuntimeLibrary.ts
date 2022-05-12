@@ -36,11 +36,10 @@ export const DefaultDeclarations: RuntimeDeclarations = [
 
       "export declare abstract class GameModule {",
       "    private _gameObject;",
-      "    constructor(gameObject: GameObject);",
+      "    constructor(gameObject: GameObject, prototypeId: string, uid: string);",
       "    abstract Start(): void;",
       "    abstract Update(deltaTime: number): void;",
       "    get gameObject(): GameObject;",
-      "    set gameObject(v: GameObject);",
       "}",
 
       "}",

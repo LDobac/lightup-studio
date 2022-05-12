@@ -274,7 +274,7 @@ describe("PrototypeGameModule Unit Test", () => {
     const classConstructor = constructorWrapper(Lib);
     expect(classConstructor).toBeDefined();
 
-    const classInstance = new classConstructor(new GameObject());
+    const classInstance = new classConstructor(new GameObject(), gm.id, "");
     expect(classInstance).toBeDefined();
     expect(classInstance).toHaveProperty("Start");
     expect(classInstance).toHaveProperty("Update");

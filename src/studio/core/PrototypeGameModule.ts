@@ -5,7 +5,7 @@ import type GameObject from "./runtime/GameObject";
 import type { Lib } from "./runtime/RuntimeLibrary";
 
 export interface GameModuleConstructor {
-  new (gameObject: GameObject): GameModule;
+  new (gameObject: GameObject, prototypeId: string, uid: string): GameModule;
 }
 
 export interface GameModuleConstructorWrapper {

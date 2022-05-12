@@ -330,18 +330,25 @@ describe("GameModuleRegistry Test", () => {
     const moduleSource2 = [
       "class test_gamemodule extends Lib.GameModule {",
       " Start() : string {",
-      "   const gm = new Lib.modules.lib_gamemodule(this.gameObject);",
+      "   const gm = new Lib.modules.lib_gamemodule(this.gameObject, '', '');",
       `   return gm.CustomFunc('${inputMessage}');`,
       "}",
       " Update(deltaTime : number) {}",
       "}",
     ].join("\n");
-    await gameModuleRegistry.RegisterBySource("test_gamemodule", moduleSource2);
+    const prototypeModule = await gameModuleRegistry.RegisterBySource(
+      "test_gamemodule",
+      moduleSource2
+    );
 
     const TestGamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("test_gamemodule");
 
-    const instance = new TestGamemodule(new GameObject());
+    const instance = new TestGamemodule(
+      new GameObject(),
+      prototypeModule.id,
+      ""
+    );
 
     const result: string = (instance.Start as () => string)();
 
@@ -620,7 +627,11 @@ describe("GameModuleRegistry Test", () => {
 
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    let gmInstance = new lib_gamemodule(new GameObject());
+    let gmInstance = new lib_gamemodule(
+      new GameObject(),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -643,7 +654,7 @@ describe("GameModuleRegistry Test", () => {
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    gmInstance = new lib_gamemodule(new GameObject());
+    gmInstance = new lib_gamemodule(new GameObject(), prototypeModule.id, "");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -688,7 +699,11 @@ describe("GameModuleRegistry Test", () => {
 
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    const gmInstance = new lib_gamemodule(new GameObject());
+    const gmInstance = new lib_gamemodule(
+      new GameObject(),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -733,7 +748,11 @@ describe("GameModuleRegistry Test", () => {
 
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    let gmInstance = new lib_gamemodule(new GameObject());
+    let gmInstance = new lib_gamemodule(
+      new GameObject(),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -756,7 +775,7 @@ describe("GameModuleRegistry Test", () => {
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    gmInstance = new lib_gamemodule(new GameObject());
+    gmInstance = new lib_gamemodule(new GameObject(), prototypeModule.id, "");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -801,7 +820,11 @@ describe("GameModuleRegistry Test", () => {
 
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    const gmInstance = new lib_gamemodule(new GameObject());
+    const gmInstance = new lib_gamemodule(
+      new GameObject(),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -846,7 +869,11 @@ describe("GameModuleRegistry Test", () => {
 
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    let gmInstance = new lib_gamemodule(new GameObject());
+    let gmInstance = new lib_gamemodule(
+      new GameObject(),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -869,7 +896,7 @@ describe("GameModuleRegistry Test", () => {
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    gmInstance = new lib_gamemodule(new GameObject());
+    gmInstance = new lib_gamemodule(new GameObject(), prototypeModule.id, "");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -914,7 +941,11 @@ describe("GameModuleRegistry Test", () => {
 
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    const gmInstance = new lib_gamemodule(new GameObject());
+    const gmInstance = new lib_gamemodule(
+      new GameObject(),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
