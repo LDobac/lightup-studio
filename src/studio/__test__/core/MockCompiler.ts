@@ -31,6 +31,8 @@ export default class MockCompiler extends CompileMachine {
       strict: false,
       alwaysStrict: false,
       strictFunctionTypes: false,
+      experimentalDecorators: true,
+      emitDecoratorMetadata: true,
     };
   }
 

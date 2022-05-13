@@ -1,9 +1,9 @@
+import { describe, it, expect } from "vitest";
 import GameModuleRegistry, {
   GameModuleNotFoundError,
 } from "@/studio/core/GameModuleRegistry";
 import GameModule from "@/studio/core/runtime/GameModule";
 import GameObject from "@/studio/core/runtime/GameObject";
-import { describe, it, expect } from "vitest";
 import MockCompiler from "../core/MockCompiler";
 
 describe("GameObjectTest", async () => {
