@@ -42,8 +42,8 @@ describe("Expose decorator test", async () => {
   );
 
   class NewType {
-   public str = 'str_value'
-  };
+    public str = "str_value";
+  }
   const extraTypeModule = await gameModuleRegistry.RegisterBySource(
     "ExtraType",
     [
@@ -133,68 +133,70 @@ describe("Expose decorator test", async () => {
 
   it("Test Metadata have correct types 1", () => {
     const counterConstructor = gameModuleRegistry.GetGameModuleConstructorById(
-        counterModule.id
-      );
-  
-      const rawMetadata = Reflect.getMetadata(
-        KEY_EXPOSE_META,
-        counterConstructor.prototype
-      );
-  
-      expect(rawMetadata).toBeDefined();
-  
-      const metadata = rawMetadata as IExposeMetadata;
-  
-      expect(metadata["count"].paramtypes).toBeUndefined();
-      expect(metadata["count"].returntype).toBeUndefined();
-      expect(metadata["count"].type).toEqual(Number);
+      counterModule.id
+    );
 
-      expect(metadata["Count"].paramtypes).toEqual([]);
-      expect(metadata["Count"].returntype).toEqual(Number);
-      expect(metadata["Count"].type).toEqual(Function);
+    const rawMetadata = Reflect.getMetadata(
+      KEY_EXPOSE_META,
+      counterConstructor.prototype
+    );
+
+    expect(rawMetadata).toBeDefined();
+
+    const metadata = rawMetadata as IExposeMetadata;
+
+    expect(metadata["count"].paramtypes).toBeUndefined();
+    expect(metadata["count"].returntype).toBeUndefined();
+    expect(metadata["count"].type).toEqual(Number);
+
+    expect(metadata["Count"].paramtypes).toEqual([]);
+    expect(metadata["Count"].returntype).toEqual(Number);
+    expect(metadata["Count"].type).toEqual(Function);
   });
 
   it("Test Metadata have correct types 2", () => {
     const countAConstructor = gameModuleRegistry.GetGameModuleConstructorById(
-        countAModule.id
-      );
-  
-      const rawMetadata = Reflect.getMetadata(
-        KEY_EXPOSE_META,
-        countAConstructor.prototype
-      );
-  
-      expect(rawMetadata).toBeDefined();
-  
-      const metadata = rawMetadata as IExposeMetadata;
-  
-      expect(metadata["a"].paramtypes).toBeUndefined();
-      expect(metadata["a"].returntype).toBeUndefined();
-      expect(metadata["a"].type).toEqual(String);
+      countAModule.id
+    );
 
-      expect(metadata["GetA"].paramtypes).toEqual([]);
-      expect(metadata["GetA"].returntype).toEqual(String);
-      expect(metadata["GetA"].type).toEqual(Function);
+    const rawMetadata = Reflect.getMetadata(
+      KEY_EXPOSE_META,
+      countAConstructor.prototype
+    );
+
+    expect(rawMetadata).toBeDefined();
+
+    const metadata = rawMetadata as IExposeMetadata;
+
+    expect(metadata["a"].paramtypes).toBeUndefined();
+    expect(metadata["a"].returntype).toBeUndefined();
+    expect(metadata["a"].type).toEqual(String);
+
+    expect(metadata["GetA"].paramtypes).toEqual([]);
+    expect(metadata["GetA"].returntype).toEqual(String);
+    expect(metadata["GetA"].type).toEqual(Function);
   });
 
   it("Test Metadata have correct types 3", () => {
     const moduleConstructor = gameModuleRegistry.GetGameModuleConstructorById(
-        extraTypeModule.id
-      );
-  
-      const rawMetadata = Reflect.getMetadata(
-        KEY_EXPOSE_META,
-        moduleConstructor.prototype
-      );
-  
-      expect(rawMetadata).toBeDefined();
-  
-      const metadata = rawMetadata as IExposeMetadata;
-  
-      expect(metadata["obj"].paramtypes).toBeUndefined();
-      expect(metadata["obj"].returntype).toBeUndefined();
-      
-      const objectPrototype = (metadata["obj"].type as Record<string, unknown> /** Same as 'any' type */)["prototype"]
-      expect(objectPrototype).toEqual(NewType.prototype);
+      extraTypeModule.id
+    );
+
+    const rawMetadata = Reflect.getMetadata(
+      KEY_EXPOSE_META,
+      moduleConstructor.prototype
+    );
+
+    expect(rawMetadata).toBeDefined();
+
+    const metadata = rawMetadata as IExposeMetadata;
+
+    expect(metadata["obj"].paramtypes).toBeUndefined();
+    expect(metadata["obj"].returntype).toBeUndefined();
+
+    const objectPrototype = (
+      metadata["obj"].type as Record<string, unknown>
+    ) /** Same as 'any' type */["prototype"];
+    expect(objectPrototype).toEqual(NewType.prototype);
   });
 });

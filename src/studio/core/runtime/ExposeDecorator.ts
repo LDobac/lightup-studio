@@ -21,8 +21,16 @@ export function Expose() {
       {}) as IExposeMetadata;
 
     const type = Reflect.getMetadata("design:type", target, propertyKey);
-    const paramtypes = Reflect.getMetadata("design:paramtypes", target, propertyKey);
-    const returntype = Reflect.getMetadata("design:returntype", target, propertyKey);
+    const paramtypes = Reflect.getMetadata(
+      "design:paramtypes",
+      target,
+      propertyKey
+    );
+    const returntype = Reflect.getMetadata(
+      "design:returntype",
+      target,
+      propertyKey
+    );
 
     const newItem: IExposeMetadataItem = {
       type,
