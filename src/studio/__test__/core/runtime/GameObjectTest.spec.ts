@@ -4,7 +4,7 @@ import GameModuleRegistry, {
 } from "@/studio/core/GameModuleRegistry";
 import GameModule from "@/studio/core/runtime/GameModule";
 import GameObject from "@/studio/core/runtime/GameObject";
-import MockCompiler from "../core/MockCompiler";
+import MockCompiler from "../MockCompiler";
 
 describe("GameObjectTest", async () => {
   const compiler = new MockCompiler();

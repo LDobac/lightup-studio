@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import type { ITypeDeclaration } from "./CompileMachine";
+import type { IExposeMetadata } from "./runtime/ExposeDecorator";
 import type GameModule from "./runtime/GameModule";
 import type GameObject from "./runtime/GameObject";
 import type { Lib } from "./runtime/RuntimeLibrary";
@@ -33,6 +34,8 @@ export default class PrototypeGameModule {
 
   private declaration: string;
 
+  private _exposeMetadata: IExposeMetadata;
+
   private constructorWrapper: GameModuleConstructorWrapper | null;
 
   public static GetDefaultSource(name: string): string {
@@ -54,6 +57,8 @@ export default class PrototypeGameModule {
     this._compiledSource = "";
 
     this.declaration = "";
+
+    this._exposeMetadata = {};
 
     this.constructorWrapper = null;
   }
@@ -129,6 +134,14 @@ export default class PrototypeGameModule {
     }
 
     return this.constructorWrapper;
+  }
+
+  public get exposeMetadata(): IExposeMetadata {
+    return this._exposeMetadata;
+  }
+
+  public set exposeMetadata(v: IExposeMetadata) {
+    this._exposeMetadata = v;
   }
 
   private IsSourceValid(source: string): boolean {

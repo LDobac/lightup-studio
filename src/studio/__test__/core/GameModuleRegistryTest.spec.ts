@@ -970,3 +970,49 @@ describe("GameModuleRegistry Test", () => {
     ).rejects.toThrow(SourceNotValidError);
   });
 });
+
+describe("GameModuleRegistry GameModule ExposeMetadata inject Test", async () => {
+  const compiler: CompileMachine = new MockCompiler();
+  let gameModuleRegistry = new GameModuleRegistry(compiler);
+
+  afterEach(() => {
+    gameModuleRegistry.Lib.modules = {};
+    gameModuleRegistry.Declarations = [];
+
+    gameModuleRegistry = new GameModuleRegistry(compiler);
+  });
+
+  it("Test Empty GameModule expose metadata value", async () => {
+    const module = await gameModuleRegistry.RegisterNewModule(
+      "Test GameModule"
+    );
+
+    expect(module.exposeMetadata).toEqual({});
+  });
+
+  it("Test Successfully GameModule Metadata injected", async () => {
+    const counterModule = await gameModuleRegistry.RegisterBySource(
+      "Counter",
+      [
+        "class counter extends Lib.GameModule {",
+        "   @Lib.Expose()",
+        "   public count : number = 0;",
+        "   public Start() { this.count = 10; }",
+        "   public Update(deltaTime : number) { this.Count(); }",
+        "   @Lib.Expose()",
+        "   public Count() : number {this.count++; return this.count;}",
+        "}",
+      ].join("\n")
+    );
+
+    expect(counterModule.exposeMetadata).not.toEqual({});
+    expect(counterModule.exposeMetadata).toHaveProperty("count");
+    expect(counterModule.exposeMetadata).toHaveProperty("Count");
+
+    expect(counterModule.exposeMetadata.count.type).toEqual(Number);
+
+    expect(counterModule.exposeMetadata.Count.type).toEqual(Function);
+    expect(counterModule.exposeMetadata.Count.paramtypes).toEqual([]);
+    expect(counterModule.exposeMetadata.Count.returntype).toEqual(Number);
+  });
+});

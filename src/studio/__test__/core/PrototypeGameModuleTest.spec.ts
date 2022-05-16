@@ -6,6 +6,7 @@ import PrototypeGameModule, {
 
 import { Lib } from "@/studio/core/runtime/RuntimeLibrary";
 import GameObject from "@/studio/core/runtime/GameObject";
+import type { IExposeMetadata } from "@/studio/core/runtime/ExposeDecorator";
 
 function NameTest(gm: PrototypeGameModule, expectName: string) {
   gm.name = expectName;
@@ -302,5 +303,29 @@ describe("PrototypeGameModule Unit Test", () => {
     expect(declaration).toBeDefined();
     expect(declaration).toHaveProperty("uri", gm.GetSafeName() + ".d.ts");
     expect(declaration).toHaveProperty("text", testedData[1]);
+  });
+});
+
+describe("PrototypeGameModule ExposeMetadata Test", () => {
+  it("Initialized metadata value test", () => {
+    const gm = new PrototypeGameModule("", "Test GameModule");
+
+    expect(gm.exposeMetadata).toEqual({});
+  });
+
+  it("Get/Set metadata test", () => {
+    const gm = new PrototypeGameModule("", "Test GameModule");
+
+    const data: IExposeMetadata = {
+      Test: {
+        type: "this is type",
+        paramtypes: ["this", "is", "param"],
+        returntype: "this is return type",
+      },
+    };
+
+    gm.exposeMetadata = data;
+
+    expect(gm.exposeMetadata).toEqual(data);
   });
 });

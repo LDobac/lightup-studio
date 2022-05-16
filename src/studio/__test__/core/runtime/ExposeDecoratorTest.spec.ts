@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import "reflect-metadata";
 
 import GameModuleRegistry from "@/studio/core/GameModuleRegistry";
-import MockCompiler from "../core/MockCompiler";
+import MockCompiler from "../MockCompiler";
 import {
   KEY_EXPOSE_META,
   type IExposeMetadata,

@@ -1,7 +1,12 @@
+import "reflect-metadata";
 import { CompileError, CompileMachine } from "./CompileMachine";
 import PrototypeGameModule, {
   type GameModuleConstructor,
 } from "./PrototypeGameModule";
+import {
+  KEY_EXPOSE_META,
+  type IExposeMetadata,
+} from "./runtime/ExposeDecorator";
 import {
   DefaultDeclarations,
   Lib as DefaultLibrary,
@@ -21,6 +26,9 @@ export class GameModuleNotFoundError extends Error {
 }
 
 export default class GameModuleRegistry {
+  // NOTE : 현재 모듈, Lib 등 Array 타입으로 되어 있어 탐색시 O(n)임.
+  // 추가적인 최적화가 필요하면 Key:Value 타입으로 변경
+
   private compiler: CompileMachine;
   private modules: Array<PrototypeGameModule>;
 
@@ -175,10 +183,8 @@ export default class GameModuleRegistry {
     ].join("\n");
   }
 
-  private AddLibAndDeclaration(gameModule: PrototypeGameModule) {
-    this.Lib.modules[gameModule.GetSafeName()] =
-      gameModule.GetConstructorWrapper()(this.Lib);
-
+  // Add new game module
+  private AddDeclaration(gameModule: PrototypeGameModule) {
     const moduleDeclaration = gameModule.GetDeclaration();
     this.Declarations.push({
       uri: moduleDeclaration.uri,
@@ -188,10 +194,8 @@ export default class GameModuleRegistry {
     this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
   }
 
-  private SetLibAndDeclaration(gameModule: PrototypeGameModule) {
-    this.Lib.modules[gameModule.GetSafeName()] =
-      gameModule.GetConstructorWrapper()(this.Lib);
-
+  // Modify and Set exists game module
+  private ModifyDeclaration(gameModule: PrototypeGameModule) {
     const moduleDeclaration = gameModule.GetDeclaration();
 
     const declaration = this.Declarations.find(
@@ -204,6 +208,27 @@ export default class GameModuleRegistry {
     declaration.text = this.WrapDeclaration(moduleDeclaration.text);
 
     this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
+  }
+
+  private AddGameModuleToLibrary(gameModule: PrototypeGameModule) {
+    this.Lib.modules[gameModule.GetSafeName()] =
+      gameModule.GetConstructorWrapper()(this.Lib);
+
+    this.SetMetadata(gameModule, this.Lib.modules[gameModule.GetSafeName()]);
+  }
+
+  private SetMetadata(
+    gameModule: PrototypeGameModule,
+    constructor: GameModuleConstructor
+  ) {
+    const rawMetadata = Reflect.getMetadata(
+      KEY_EXPOSE_META,
+      constructor.prototype
+    );
+
+    const metadata = (rawMetadata ?? {}) as IExposeMetadata;
+
+    gameModule.exposeMetadata = metadata;
   }
 
   private RemoveLibAndDeclaration(deletedModule: PrototypeGameModule) {
@@ -232,11 +257,10 @@ export default class GameModuleRegistry {
 
     await this.CompileModule(gameModule);
 
-    // Add Module to list
     this.modules.push(gameModule);
 
-    // Add Library and Declaration
-    this.AddLibAndDeclaration(gameModule);
+    this.AddDeclaration(gameModule);
+    this.AddGameModuleToLibrary(gameModule);
 
     return gameModule;
   }
@@ -259,6 +283,7 @@ export default class GameModuleRegistry {
 
     await this.CompileModule(modifiedModule);
 
-    this.SetLibAndDeclaration(modifiedModule);
+    this.ModifyDeclaration(modifiedModule);
+    this.AddGameModuleToLibrary(modifiedModule);
   }
 }
