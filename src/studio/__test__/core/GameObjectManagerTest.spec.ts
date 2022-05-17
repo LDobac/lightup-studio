@@ -4,11 +4,15 @@ import GameModuleRegistry, {
 } from "@/studio/core/GameModuleRegistry";
 import MockCompiler from "./MockCompiler";
 import GameObjectManager, {
+  FailedToResolveExposeData,
   GameNotRunningError,
   GameObjectDuplicatedError,
   GameObjectNotFoundError,
+  KEY_INJECTION_META,
+  type IInjectionMetadata,
 } from "@/studio/core/GameObjectManager";
 import GameObject from "@/studio/core/runtime/GameObject";
+import type GameModule from "@/studio/core/runtime/GameModule";
 
 const compiler = new MockCompiler();
 const gameModuleRegistry = new GameModuleRegistry(compiler);
@@ -303,7 +307,7 @@ describe("GameObjectManagerTest", () => {
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
 
-    const exposedValues = gameObjectManager.AcquireExposeData(exposeList[0]);
+    const exposedValues = gameObjectManager.AcquireExposeValue(exposeList[0]);
 
     expect(exposedValues.length).toEqual(1);
 
@@ -320,7 +324,7 @@ describe("GameObjectManagerTest", () => {
     const gm = newGameObject.runtimeGameModule.find(
       (v) => v.uid === exposeValue.gameModuleUid
     );
-    const CountFunc = (exposeValue.value as () => number).bind(gm);
+    const CountFunc = (exposeValue.GetValue() as () => number).bind(gm);
 
     let result = CountFunc();
     expect(result).toEqual(11);
@@ -339,7 +343,7 @@ describe("GameObjectManagerTest", () => {
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
 
-    const exposedValues = gameObjectManager.AcquireExposeData(exposeList[0]);
+    const exposedValues = gameObjectManager.AcquireExposeValue(exposeList[0]);
     expect(exposedValues.length).toEqual(2);
   });
 
@@ -349,8 +353,643 @@ describe("GameObjectManagerTest", () => {
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
 
-    expect(() => gameObjectManager.AcquireExposeData(exposeList[0])).toThrow(
+    expect(() => gameObjectManager.AcquireExposeValue(exposeList[0])).toThrow(
       GameNotRunningError
     );
+  });
+
+  it("AcquireExposeData GetValue/SetValue Test", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const exposeList = gameObjectManager.QueryExposeData(Number);
+
+    const exposeValue = gameObjectManager.AcquireExposeValue(exposeList[0])[0];
+
+    const GetCountVal = () => exposeValue.GetValue() as number;
+
+    expect(GetCountVal()).toEqual(10);
+
+    exposeValue.SetValue(123);
+    expect(GetCountVal()).toEqual(123);
+  });
+});
+
+describe("GameObjectManager Value Injection Test", () => {
+  let gameObjectManager = new GameObjectManager();
+
+  afterEach(() => {
+    gameObjectManager = new GameObjectManager();
+  });
+
+  it("Value Injection Test", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Number);
+
+    const expose = exposeList[0];
+    const countMeta = expose.modules[0];
+
+    const expectNum = 998822;
+
+    gameObjectManager.AddValueInjection(expectNum, {
+      gameObjectId: expose.gameObjectId,
+      gameModuleUid: countMeta.gameModuleUid,
+      propertyKey: "count",
+    });
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+
+    const exposeValue = gameObjectManager.AcquireExposeValue(expose)[0];
+
+    const GetCountVal = () => exposeValue.GetValue() as number;
+
+    expect(GetCountVal()).toEqual(expectNum);
+
+    // Counter 모듈의 Start 함수는 count를 10으로 변경함
+    gameObjectManager.GameStart();
+
+    expect(GetCountVal()).toEqual(10);
+  });
+
+  it("Value Injection invalid game object id test", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    const AddInjectionFunc = () => {
+      gameObjectManager.AddValueInjection(1, {
+        gameObjectId: "invalid game object",
+        gameModuleUid: "invalid game module",
+        propertyKey: "count",
+      });
+    };
+
+    expect(AddInjectionFunc).toThrow(GameObjectNotFoundError);
+  });
+
+  it("Value Injection invalid game module id test", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Number);
+
+    const expose = exposeList[0];
+
+    const AddInjectionFunc = () => {
+      gameObjectManager.AddValueInjection(1, {
+        gameObjectId: expose.gameObjectId,
+        gameModuleUid: "invalid game module",
+        propertyKey: "count",
+      });
+    };
+
+    expect(AddInjectionFunc).toThrow(GameModuleNotFoundError);
+  });
+
+  it("Value Injection invalid metadata test", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Number);
+
+    const expose = exposeList[0];
+    const countMeta = expose.modules[0];
+
+    const expectNum = 998822;
+
+    gameObjectManager.AddValueInjection(expectNum, {
+      gameObjectId: expose.gameObjectId,
+      gameModuleUid: countMeta.gameModuleUid,
+      propertyKey: "invalid_field",
+    });
+
+    expect(() => gameObjectManager.GameSetup(gameModuleRegistry)).toThrow(
+      FailedToResolveExposeData
+    );
+  });
+
+  it("Value Injection Remove Test", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Number);
+
+    const expose = exposeList[0];
+    const countMeta = expose.modules[0];
+
+    const handler = gameObjectManager.AddValueInjection(1, {
+      gameObjectId: expose.gameObjectId,
+      gameModuleUid: countMeta.gameModuleUid,
+      propertyKey: "count",
+    });
+
+    gameObjectManager.RemoveInjection(handler);
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+
+    const exposeValue = gameObjectManager.AcquireExposeValue(expose)[0];
+
+    const GetCountVal = () => exposeValue.GetValue() as number;
+
+    // Counter 모듈은 생성자에서 0으로 값을 초기화
+    expect(GetCountVal()).toEqual(0);
+
+    // Counter 모듈의 Start 함수는 count를 10으로 변경함
+    gameObjectManager.GameStart();
+    expect(GetCountVal()).toEqual(10);
+  });
+});
+
+describe("GameObjectManager Dependency Injection Test", () => {
+  const GetRuntimeGM = (
+    gameObject: GameObject,
+    gameModuleUid: string
+  ): GameModule => {
+    const rtGameModule = gameObject.runtimeGameModule.find(
+      (v) => v.uid === gameModuleUid
+    );
+
+    if (!rtGameModule) {
+      throw new GameModuleNotFoundError();
+    }
+
+    return rtGameModule;
+  };
+
+  const PrepareTwoObj = () => {
+    const gameObject1 = gameObjectManager.CreateGameObject();
+    const gameObject2 = gameObjectManager.CreateGameObject();
+
+    gameObject1.AddPrototypeGM(counterModule);
+    gameObject2.AddPrototypeGM(counterModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Number);
+
+    const obj1Expose = exposeList.find(
+      (v) => v.gameObjectId === gameObject1.id
+    );
+    const obj2Expose = exposeList.find(
+      (v) => v.gameObjectId === gameObject2.id
+    );
+
+    if (!obj1Expose || !obj2Expose) throw "Cannot find Metadata.";
+
+    return {
+      gameObject1,
+      gameObject2,
+      obj1Expose,
+      obj2Expose,
+    };
+  };
+
+  let gameObjectManager = new GameObjectManager();
+
+  afterEach(() => {
+    gameObjectManager = new GameObjectManager();
+  });
+
+  it("Dependency Injection Test", () => {
+    const { gameObject1, gameObject2, obj1Expose, obj2Expose } =
+      PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj1Expose.gameObjectId,
+        gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const obj1CounterModule = GetRuntimeGM(
+      gameObject1,
+      obj1Expose.modules[0].gameModuleUid
+    );
+    const obj2CounterModule = GetRuntimeGM(
+      gameObject2,
+      obj2Expose.modules[0].gameModuleUid
+    );
+
+    const obj1Proxy = (
+      Reflect.getMetadata(
+        KEY_INJECTION_META,
+        obj1CounterModule
+      ) as IInjectionMetadata
+    ).proxyModule;
+    const obj2Proxy = (
+      Reflect.getMetadata(
+        KEY_INJECTION_META,
+        obj2CounterModule
+      ) as IInjectionMetadata
+    ).proxyModule;
+
+    let obj1CountValue = Reflect.get(obj1Proxy, "count");
+    let obj2CountValue = Reflect.get(obj2Proxy, "count");
+
+    expect(obj1CountValue).toEqual(10);
+    expect(obj2CountValue).toEqual(10);
+
+    Reflect.set(obj1Proxy, "count", 100);
+
+    obj1CountValue = Reflect.get(obj1Proxy, "count");
+    obj2CountValue = Reflect.get(obj2Proxy, "count");
+
+    expect(obj1CountValue).toEqual(100);
+    expect(obj2CountValue).toEqual(100);
+  });
+
+  it("Dependency Injection Test with inner modules", () => {
+    const gameObject = gameObjectManager.CreateGameObject();
+
+    gameObject.AddPrototypeGM(counterModule);
+    gameObject.AddPrototypeGM(counterModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Number);
+
+    const mod1Expose = exposeList[0].modules[0];
+    const mod2Expose = exposeList[0].modules[1];
+
+    //             Send
+    // obj1.count ------> obj2.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: gameObject.id,
+        gameModuleUid: mod1Expose.gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: gameObject.id,
+        gameModuleUid: mod2Expose.gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const obj1CounterModule = GetRuntimeGM(
+      gameObject,
+      mod1Expose.gameModuleUid
+    );
+    const obj2CounterModule = GetRuntimeGM(
+      gameObject,
+      mod2Expose.gameModuleUid
+    );
+
+    const obj1Proxy = (
+      Reflect.getMetadata(
+        KEY_INJECTION_META,
+        obj1CounterModule
+      ) as IInjectionMetadata
+    ).proxyModule;
+    const obj2Proxy = (
+      Reflect.getMetadata(
+        KEY_INJECTION_META,
+        obj2CounterModule
+      ) as IInjectionMetadata
+    ).proxyModule;
+
+    let obj1CountValue = Reflect.get(obj1Proxy, "count");
+    let obj2CountValue = Reflect.get(obj2Proxy, "count");
+
+    expect(obj1CountValue).toEqual(10);
+    expect(obj2CountValue).toEqual(10);
+
+    Reflect.set(obj1Proxy, "count", 100);
+
+    obj1CountValue = Reflect.get(obj1Proxy, "count");
+    obj2CountValue = Reflect.get(obj2Proxy, "count");
+
+    expect(obj1CountValue).toEqual(100);
+    expect(obj2CountValue).toEqual(100);
+  });
+
+  it("Dependency Injection Test With AcquireExposeValue Func", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj1Expose.gameObjectId,
+        gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
+    const obj2Count = gameObjectManager.AcquireExposeValue(obj2Expose)[0];
+
+    expect(obj1Count.GetValue()).toEqual(10);
+    expect(obj2Count.GetValue()).toEqual(10);
+
+    obj1Count.SetValue(100);
+    expect(obj1Count.GetValue()).toEqual(100);
+    expect(obj2Count.GetValue()).toEqual(100);
+
+    obj2Count.SetValue(200);
+    expect(obj1Count.GetValue()).toEqual(100);
+    expect(obj2Count.GetValue()).toEqual(200);
+  });
+
+  it("Dependency Injection Test invalid source game object id test", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    const AddInjectionFunc = () => {
+      gameObjectManager.AddDependencyInjection(
+        {
+          gameObjectId: "invalid source id",
+          gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+          propertyKey: "count",
+        },
+        {
+          gameObjectId: obj2Expose.gameObjectId,
+          gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+          propertyKey: "count",
+        }
+      );
+    };
+
+    expect(AddInjectionFunc).toThrow(GameObjectNotFoundError);
+  });
+
+  it("Dependency Injection Test invalid source game module uid test", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    const AddInjectionFunc = () => {
+      gameObjectManager.AddDependencyInjection(
+        {
+          gameObjectId: obj1Expose.gameObjectId,
+          gameModuleUid: "invalid game module uid",
+          propertyKey: "count",
+        },
+        {
+          gameObjectId: obj2Expose.gameObjectId,
+          gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+          propertyKey: "count",
+        }
+      );
+    };
+
+    expect(AddInjectionFunc).toThrow(GameModuleNotFoundError);
+  });
+
+  it("Dependency Injection Test invalid source property test", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj1Expose.gameObjectId,
+        gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+        propertyKey: "invalid_count",
+      },
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    expect(() => gameObjectManager.GameSetup(gameModuleRegistry)).toThrow(
+      FailedToResolveExposeData
+    );
+  });
+
+  it("Dependency Injection Test invalid target game object id test", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    const AddInjectionFunc = () => {
+      gameObjectManager.AddDependencyInjection(
+        {
+          gameObjectId: obj1Expose.gameObjectId,
+          gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+          propertyKey: "count",
+        },
+        {
+          gameObjectId: "invalid source id",
+          gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+          propertyKey: "count",
+        }
+      );
+    };
+
+    expect(AddInjectionFunc).toThrow(GameObjectNotFoundError);
+  });
+
+  it("Dependency Injection Test invalid target game module uid test", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    const AddInjectionFunc = () => {
+      gameObjectManager.AddDependencyInjection(
+        {
+          gameObjectId: obj1Expose.gameObjectId,
+          gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+          propertyKey: "count",
+        },
+        {
+          gameObjectId: obj2Expose.gameObjectId,
+          gameModuleUid: "invalid game module uid",
+          propertyKey: "count",
+        }
+      );
+    };
+
+    expect(AddInjectionFunc).toThrow(GameModuleNotFoundError);
+  });
+
+  it("Dependency Injection Test invalid target property test", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj1Expose.gameObjectId,
+        gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "invalid_count",
+      }
+    );
+
+    expect(() => gameObjectManager.GameSetup(gameModuleRegistry)).toThrow(
+      FailedToResolveExposeData
+    );
+  });
+
+  it("Dependency Injection Remove Test", () => {
+    const { gameObject1, gameObject2, obj1Expose, obj2Expose } =
+      PrepareTwoObj();
+
+    //             Send
+    // obj1.count ------> obj2.count
+    const handler = gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj1Expose.gameObjectId,
+        gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const obj1CounterModule = GetRuntimeGM(
+      gameObject1,
+      obj1Expose.modules[0].gameModuleUid
+    );
+    const obj2CounterModule = GetRuntimeGM(
+      gameObject2,
+      obj2Expose.modules[0].gameModuleUid
+    );
+
+    const obj1Proxy = (
+      Reflect.getMetadata(
+        KEY_INJECTION_META,
+        obj1CounterModule
+      ) as IInjectionMetadata
+    ).proxyModule;
+    const obj2Proxy = (
+      Reflect.getMetadata(
+        KEY_INJECTION_META,
+        obj2CounterModule
+      ) as IInjectionMetadata
+    ).proxyModule;
+
+    expect(Reflect.get(obj1Proxy, "count")).toEqual(10);
+    expect(Reflect.get(obj2Proxy, "count")).toEqual(10);
+
+    Reflect.set(obj1Proxy, "count", 100);
+
+    expect(Reflect.get(obj1Proxy, "count")).toEqual(100);
+    expect(Reflect.get(obj2Proxy, "count")).toEqual(100);
+
+    // Remove dependency injection
+    gameObjectManager.RemoveInjection(handler);
+
+    Reflect.set(obj1Proxy, "count", 500);
+
+    expect(Reflect.get(obj1Proxy, "count")).toEqual(500);
+    expect(Reflect.get(obj2Proxy, "count")).toEqual(100);
+  });
+
+  it("Dependency Injection chaning test", () => {
+    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose : obj3Expose, obj2Expose : obj4Expose } = PrepareTwoObj();
+
+    // obj1.count ------> obj2.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj1Expose.gameObjectId,
+        gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    // obj2.count ------> obj3.count
+    const secToThirdhandle = gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj3Expose.gameObjectId,
+        gameModuleUid: obj3Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    // obj3.count ------> obj4.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj3Expose.gameObjectId,
+        gameModuleUid: obj3Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj4Expose.gameObjectId,
+        gameModuleUid: obj4Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      }
+    );
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
+    const obj2Count = gameObjectManager.AcquireExposeValue(obj2Expose)[0];
+    const obj3Count = gameObjectManager.AcquireExposeValue(obj3Expose)[0];
+    const obj4Count = gameObjectManager.AcquireExposeValue(obj4Expose)[0];
+
+    expect(obj1Count.GetValue()).toEqual(10);
+    expect(obj2Count.GetValue()).toEqual(10);
+    expect(obj3Count.GetValue()).toEqual(10);
+    expect(obj4Count.GetValue()).toEqual(10);
+
+    obj1Count.SetValue(100);
+    expect(obj1Count.GetValue()).toEqual(100);
+    expect(obj2Count.GetValue()).toEqual(100);
+    expect(obj3Count.GetValue()).toEqual(100);
+    expect(obj4Count.GetValue()).toEqual(100);
+
+    // Remove dependency obj2 -> obj3
+    gameObjectManager.RemoveInjection(secToThirdhandle);
+
+    obj1Count.SetValue(500);
+    expect(obj1Count.GetValue()).toEqual(500);
+    expect(obj2Count.GetValue()).toEqual(500);
+    expect(obj3Count.GetValue()).toEqual(100);
+    expect(obj4Count.GetValue()).toEqual(100);
+
+    obj3Count.SetValue(250);
+    expect(obj1Count.GetValue()).toEqual(500);
+    expect(obj2Count.GetValue()).toEqual(500);
+    expect(obj3Count.GetValue()).toEqual(250);
+    expect(obj4Count.GetValue()).toEqual(250);
   });
 });

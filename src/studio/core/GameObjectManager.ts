@@ -1,3 +1,5 @@
+import { v4 as uuid } from "uuid";
+import "reflect-metadata";
 import type GameModuleRegistry from "./GameModuleRegistry";
 import {
   GameModuleNameDuplicatedError,
@@ -5,6 +7,7 @@ import {
 } from "./GameModuleRegistry";
 import type { IExposeMetadata } from "./runtime/ExposeDecorator";
 import GameObject from "./runtime/GameObject";
+import type GameModule from "./runtime/GameModule";
 
 export class GameObjectNotFoundError extends Error {
   constructor() {
@@ -48,17 +51,62 @@ export interface IExposedValue {
   type: unknown;
   propertyKey: string;
 
-  value: unknown;
+  GetValue: () => unknown;
+  SetValue: (val: unknown) => void;
+}
+
+export interface IInjectionInfo {
+  gameObjectId: string;
+  gameModuleUid: string;
+
+  propertyKey: string;
+}
+
+export type InjectionDisposeHandle = string;
+
+export const KEY_INJECTION_META = "KEY_EXPOSE_INJECTION_META";
+
+export interface IInjectionMetadata {
+  proxyModule: object;
+  handlers: Record<
+    // PropertyKey
+    string | symbol,
+    Array<{
+      handle: InjectionDisposeHandle;
+      callback: (v: unknown) => void;
+    }>
+  >;
 }
 
 export default class GameObjectManager {
   // NOTE : 최적화를 위해서 gameObjects 변수를 Key:Value 컨테이너로 교체?
   private _gameObjects: Array<GameObject>;
 
+  private valueInjections: Record<
+    InjectionDisposeHandle,
+    {
+      target: IInjectionInfo;
+      value: unknown;
+    }
+  >;
+
+  private dependencyInjections: Record<
+    InjectionDisposeHandle,
+    {
+      target: IInjectionInfo;
+      source: IInjectionInfo;
+    }
+  >;
+
+  // private runtimeDI
+
   private running: boolean;
 
   public constructor() {
     this._gameObjects = [];
+
+    this.valueInjections = {};
+    this.dependencyInjections = {};
 
     this.running = false;
   }
@@ -157,7 +205,7 @@ export default class GameObjectManager {
     return exposedValues;
   }
 
-  public AcquireExposeData(metadata: IGameObjectExposedData): IExposedValue[] {
+  public AcquireExposeValue(metadata: IGameObjectExposedData): IExposedValue[] {
     if (!this.running) {
       throw new GameNotRunningError();
     }
@@ -189,10 +237,17 @@ export default class GameObjectManager {
           throw new FailedToResolveExposeData();
         }
 
+        const proxyModule = this.GetInjectionMetadata(
+          metadata.gameObjectId,
+          module.gameModuleUid
+        ).proxyModule;
+
         result.push({
           gameObjectId: metadata.gameObjectId,
           gameModuleUid: module.gameModuleUid,
-          value: value,
+          GetValue: () => Reflect.get(proxyModule, propertyKey),
+          SetValue: (val: unknown) =>
+            Reflect.set(proxyModule, propertyKey, val),
           type: exposeMetadata[propertyKey].type,
           propertyKey: propertyKey,
         });
@@ -202,15 +257,92 @@ export default class GameObjectManager {
     return result;
   }
 
-  public GameSetup(gameModuleRegistry: GameModuleRegistry) {
-    this._gameObjects.forEach((go) => {
-      go.Setup(gameModuleRegistry);
+  public AddValueInjection(
+    value: unknown,
+    target: IInjectionInfo
+  ): InjectionDisposeHandle {
+    const handle = uuid();
+
+    // Validation of game object/game module exists
+    const targetObject = this.GetGameObjectById(target.gameObjectId);
+    targetObject.GetProtoGMByUid(target.gameModuleUid);
+
+    this.valueInjections[handle] = {
+      value: value,
+      target: target,
+    };
+
+    return handle;
+  }
+
+  public AddDependencyInjection(
+    source: IInjectionInfo,
+    target: IInjectionInfo
+  ): InjectionDisposeHandle {
+    const handle = uuid();
+
+    // Validation of game object/game module exists
+    const sourceObject = this.GetGameObjectById(source.gameObjectId);
+    sourceObject.GetProtoGMByUid(source.gameModuleUid);
+
+    const targetObject = this.GetGameObjectById(target.gameObjectId);
+    targetObject.GetProtoGMByUid(target.gameModuleUid);
+
+    this.dependencyInjections[handle] = {
+      source: source,
+      target: target,
+    };
+
+    return handle;
+  }
+
+  public RemoveInjection(handle: InjectionDisposeHandle) {
+    if (Reflect.has(this.valueInjections, handle)) {
+      delete this.valueInjections[handle];
+    } else if (Reflect.has(this.dependencyInjections, handle)) {
+      const injection = this.dependencyInjections[handle];
+
+      const gameObjId = injection.source.gameObjectId;
+      const gameModuleId = injection.source.gameModuleUid;
+      const propertyKey = injection.source.propertyKey;
+
+      const injectionMeta = this.GetInjectionMetadata(gameObjId, gameModuleId);
+
+      const index = injectionMeta.handlers[propertyKey].findIndex(
+        (v) => v.handle === handle
+      );
+      if (index > -1) {
+        injectionMeta.handlers[propertyKey].splice(index, 1);
+      }
+
+      delete this.dependencyInjections[handle];
+    }
+  }
+
+  private ClearValueInjection() {
+    Object.keys(this.valueInjections).forEach((handle) => {
+      this.RemoveInjection(handle);
     });
   }
 
-  public GameStart() {
+  private ClearDependencyInjection() {
+    Object.keys(this.dependencyInjections).forEach((handle) => {
+      this.RemoveInjection(handle);
+    });
+  }
+
+  public GameSetup(gameModuleRegistry: GameModuleRegistry) {
     this.running = true;
 
+    this._gameObjects.forEach((go) => {
+      go.Setup(gameModuleRegistry);
+    });
+
+    this.SetupDependencyInjection();
+    this.SetupValueInjection();
+  }
+
+  public GameStart() {
     this._gameObjects.forEach((go) => {
       go.Start();
     });
@@ -234,6 +366,73 @@ export default class GameObjectManager {
     return this._gameObjects;
   }
 
+  private SetupValueInjection() {
+    for (const handle in this.valueInjections) {
+      const injection = this.valueInjections[handle];
+
+      const target = injection.target;
+      const value = injection.value;
+
+      const injectionMetadata = this.GetInjectionMetadata(
+        target.gameObjectId,
+        target.gameModuleUid
+      );
+
+      if (!Reflect.has(injectionMetadata.proxyModule, target.propertyKey)) {
+        throw new FailedToResolveExposeData();
+      }
+
+      Reflect.set(injectionMetadata.proxyModule, target.propertyKey, value);
+    }
+  }
+
+  private SetupDependencyInjection() {
+    for (const handle in this.dependencyInjections) {
+      const injection = this.dependencyInjections[handle];
+
+      const source = injection.source;
+      const target = injection.target;
+
+      const sourceDIMetadata = this.GetInjectionMetadata(
+        source.gameObjectId,
+        source.gameModuleUid
+      );
+      const targetDIMetadata = this.GetInjectionMetadata(
+        target.gameObjectId,
+        target.gameModuleUid
+      );
+
+      if (!sourceDIMetadata.handlers[source.propertyKey]) {
+        sourceDIMetadata.handlers[source.propertyKey] = [];
+      }
+
+      // Register Observer handler
+      const valueChangedHandler = (v: unknown) => {
+        Reflect.set(targetDIMetadata.proxyModule, target.propertyKey, v);
+      };
+
+      sourceDIMetadata.handlers[source.propertyKey].push({
+        handle: handle,
+        callback: valueChangedHandler,
+      });
+
+      // Initailize value
+      if (!Reflect.has(sourceDIMetadata.proxyModule, source.propertyKey)) {
+        throw new FailedToResolveExposeData();
+      }
+
+      if (!Reflect.has(targetDIMetadata.proxyModule, target.propertyKey)) {
+        throw new FailedToResolveExposeData();
+      }
+
+      const initValue = Reflect.get(
+        sourceDIMetadata.proxyModule,
+        source.propertyKey
+      );
+      Reflect.set(targetDIMetadata.proxyModule, target.propertyKey, initValue);
+    }
+  }
+
   private IsDuplicated(gameObject: GameObject): boolean {
     for (const go of this._gameObjects) {
       if (go.id === gameObject.id) {
@@ -242,5 +441,63 @@ export default class GameObjectManager {
     }
 
     return false;
+  }
+
+  private GetInjectionMetadata(
+    gameObjectId: string,
+    gameModuleUid: string
+  ): IInjectionMetadata {
+    const CreateInjectionMetadata = (gameModule: GameModule) => {
+      const proxyModule = new Proxy(gameModule, {
+        set: (target: GameModule, prop: string | symbol, value: unknown) => {
+          Reflect.set(target, prop, value);
+
+          const injectionMeta = Reflect.getMetadata(
+            KEY_INJECTION_META,
+            target
+          ) as IInjectionMetadata;
+
+          if (injectionMeta.handlers[prop]) {
+            injectionMeta.handlers[prop].forEach((handler) => {
+              handler.callback(value);
+            });
+          }
+
+          return true;
+        },
+      });
+
+      const metadata: IInjectionMetadata = {
+        proxyModule: proxyModule,
+        handlers: {},
+      };
+
+      Reflect.defineMetadata(KEY_INJECTION_META, metadata, gameModule);
+    };
+
+    const GetRuntimeGM = (
+      gameObjectId: string,
+      gameModuleUid: string
+    ): GameModule => {
+      const gameObject = this.GetGameObjectById(gameObjectId);
+
+      const rtGameModule = gameObject.runtimeGameModule.find(
+        (v) => v.uid === gameModuleUid
+      );
+
+      if (!rtGameModule) {
+        throw new GameModuleNotFoundError();
+      }
+
+      return rtGameModule;
+    };
+
+    const gameModule = GetRuntimeGM(gameObjectId, gameModuleUid);
+
+    if (!Reflect.hasMetadata(KEY_INJECTION_META, gameModule)) {
+      CreateInjectionMetadata(gameModule);
+    }
+
+    return Reflect.getMetadata(KEY_INJECTION_META, gameModule);
   }
 }
