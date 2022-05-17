@@ -1,7 +1,10 @@
 import { describe, it, expect, afterEach } from "vitest";
-import GameModuleRegistry from "@/studio/core/GameModuleRegistry";
+import GameModuleRegistry, {
+  GameModuleNotFoundError,
+} from "@/studio/core/GameModuleRegistry";
 import MockCompiler from "./MockCompiler";
 import GameObjectManager, {
+  GameNotRunningError,
   GameObjectDuplicatedError,
   GameObjectNotFoundError,
 } from "@/studio/core/GameObjectManager";
@@ -176,7 +179,7 @@ describe("GameObjectManagerTest", () => {
   it("Query Types only single game object Test 1", () => {
     const newGameObject = gameObjectManager.CreateGameObject();
 
-    newGameObject.AddPrototypeGameModule(counterModule);
+    newGameObject.AddPrototypeGM(counterModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
 
@@ -200,7 +203,7 @@ describe("GameObjectManagerTest", () => {
   it("Query Types only single game object Test 2", () => {
     const newGameObject = gameObjectManager.CreateGameObject();
 
-    newGameObject.AddPrototypeGameModule(counterModule);
+    newGameObject.AddPrototypeGM(counterModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
 
@@ -225,11 +228,11 @@ describe("GameObjectManagerTest", () => {
     const gameObject1 = gameObjectManager.CreateGameObject();
     const gameObject2 = gameObjectManager.CreateGameObject();
 
-    gameObject1.AddPrototypeGameModule(counterModule);
-    gameObject1.AddPrototypeGameModule(countAModule);
+    gameObject1.AddPrototypeGM(counterModule);
+    gameObject1.AddPrototypeGM(countAModule);
 
-    gameObject2.AddPrototypeGameModule(counterModule);
-    gameObject2.AddPrototypeGameModule(countAModule);
+    gameObject2.AddPrototypeGM(counterModule);
+    gameObject2.AddPrototypeGM(countAModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
 
@@ -249,9 +252,11 @@ describe("GameObjectManagerTest", () => {
   it("Query Types ignore test 1", () => {
     const newGameObject = gameObjectManager.CreateGameObject();
 
-    newGameObject.AddPrototypeGameModule(counterModule);
+    newGameObject.AddPrototypeGM(counterModule);
 
-    const exposeList = gameObjectManager.QueryExposeData(Number, [newGameObject]);
+    const exposeList = gameObjectManager.QueryExposeData(Number, [
+      newGameObject,
+    ]);
 
     expect(exposeList.length).toEqual(0);
   });
@@ -260,11 +265,11 @@ describe("GameObjectManagerTest", () => {
     const gameObject1 = gameObjectManager.CreateGameObject();
     const gameObject2 = gameObjectManager.CreateGameObject();
 
-    gameObject1.AddPrototypeGameModule(counterModule);
-    gameObject1.AddPrototypeGameModule(countAModule);
+    gameObject1.AddPrototypeGM(counterModule);
+    gameObject1.AddPrototypeGM(countAModule);
 
-    gameObject2.AddPrototypeGameModule(counterModule);
-    gameObject2.AddPrototypeGameModule(countAModule);
+    gameObject2.AddPrototypeGM(counterModule);
+    gameObject2.AddPrototypeGM(countAModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Number, [gameObject2]);
 
@@ -275,18 +280,77 @@ describe("GameObjectManagerTest", () => {
     const gameObject1 = gameObjectManager.CreateGameObject();
     const gameObject2 = gameObjectManager.CreateGameObject();
 
-    gameObject1.AddPrototypeGameModule(counterModule);
-    gameObject1.AddPrototypeGameModule(countAModule);
+    gameObject1.AddPrototypeGM(counterModule);
+    gameObject1.AddPrototypeGM(countAModule);
 
-    gameObject2.AddPrototypeGameModule(counterModule);
-    gameObject2.AddPrototypeGameModule(countAModule);
+    gameObject2.AddPrototypeGM(counterModule);
+    gameObject2.AddPrototypeGM(countAModule);
 
-    const exposeList = gameObjectManager.QueryExposeData(Number, [gameObject1, gameObject2]);
+    const exposeList = gameObjectManager.QueryExposeData(Number, [
+      gameObject1,
+      gameObject2,
+    ]);
 
     expect(exposeList.length).toEqual(0);
   });
 
-  // TODO
-  // Get Value by query types when game started
-  // Have to failed getting get value by query types when game does not started.
+  it("AcquireExposeData Test", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const exposeList = gameObjectManager.QueryExposeData(Function);
+
+    const exposedValues = gameObjectManager.AcquireExposeData(exposeList[0]);
+
+    expect(exposedValues.length).toEqual(1);
+
+    const exposeValue = exposedValues[0];
+
+    expect(exposeValue.gameObjectId).toEqual(newGameObject.id);
+    expect(() =>
+      newGameObject.GetProtoGMByUid(exposeValue.gameModuleUid)
+    ).not.toThrow(GameModuleNotFoundError);
+
+    expect(exposeValue.propertyKey).toEqual("Count");
+    expect(exposeValue.type).toEqual(Function);
+
+    const gm = newGameObject.runtimeGameModule.find(
+      (v) => v.uid === exposeValue.gameModuleUid
+    );
+    const CountFunc = (exposeValue.value as () => number).bind(gm);
+
+    let result = CountFunc();
+    expect(result).toEqual(11);
+
+    result = CountFunc();
+    expect(result).toEqual(12);
+  });
+
+  it("AcquireExposeData Test2", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+    newGameObject.AddPrototypeGM(countAModule);
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const exposeList = gameObjectManager.QueryExposeData(Function);
+
+    const exposedValues = gameObjectManager.AcquireExposeData(exposeList[0]);
+    expect(exposedValues.length).toEqual(2);
+  });
+
+  it("AcquireExposeData Failed test when game does not start", () => {
+    const newGameObject = gameObjectManager.CreateGameObject();
+    newGameObject.AddPrototypeGM(counterModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Function);
+
+    expect(() => gameObjectManager.AcquireExposeData(exposeList[0])).toThrow(
+      GameNotRunningError
+    );
+  });
 });

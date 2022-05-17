@@ -1,4 +1,8 @@
 import type GameModuleRegistry from "./GameModuleRegistry";
+import {
+  GameModuleNameDuplicatedError,
+  GameModuleNotFoundError,
+} from "./GameModuleRegistry";
 import type { IExposeMetadata } from "./runtime/ExposeDecorator";
 import GameObject from "./runtime/GameObject";
 
@@ -14,13 +18,37 @@ export class GameObjectDuplicatedError extends Error {
   }
 }
 
-export interface IExposedValue {
+export class GameNotRunningError extends Error {
+  constructor() {
+    super("Game Doesn't Start!");
+  }
+}
+
+export class FailedToResolveExposeData extends Error {
+  constructor() {
+    super("Failed to resolve expose data from game module!");
+  }
+}
+
+export interface IGameModuleExposedData {
+  gameModuleUid: string;
+  metadata: IExposeMetadata;
+}
+
+export interface IGameObjectExposedData {
   gameObjectId: string;
 
-  modules: Array<{
-    gameModuleUid: string;
-    metadata: IExposeMetadata;
-  }>;
+  modules: Array<IGameModuleExposedData>;
+}
+
+export interface IExposedValue {
+  gameObjectId: string;
+  gameModuleUid: string;
+
+  type: unknown;
+  propertyKey: string;
+
+  value: unknown;
 }
 
 export default class GameObjectManager {
@@ -84,15 +112,15 @@ export default class GameObjectManager {
   public QueryExposeData(
     type: unknown,
     ignoreList: GameObject[] = []
-  ): IExposedValue[] {
-    const exposedValues: IExposedValue[] = [];
+  ): IGameObjectExposedData[] {
+    const exposedValues: IGameObjectExposedData[] = [];
 
     for (const gameObject of this._gameObjects) {
       if (ignoreList.includes(gameObject)) {
         continue;
       }
 
-      const exposeValue: IExposedValue = {
+      const exposeValue: IGameObjectExposedData = {
         gameObjectId: gameObject.id,
         modules: [],
       };
@@ -127,6 +155,51 @@ export default class GameObjectManager {
     }
 
     return exposedValues;
+  }
+
+  public AcquireExposeData(metadata: IGameObjectExposedData): IExposedValue[] {
+    if (!this.running) {
+      throw new GameNotRunningError();
+    }
+
+    const result: Array<IExposedValue> = [];
+
+    const gameObject = this.GetGameObjectById(metadata.gameObjectId);
+
+    for (const module of metadata.modules) {
+      gameObject.prototypeGameModule;
+
+      const runtimeGMs = gameObject.runtimeGameModule.filter(
+        (v) => v.uid === module.gameModuleUid
+      );
+
+      if (runtimeGMs.length < 1) {
+        throw new GameModuleNotFoundError();
+      } else if (runtimeGMs.length > 1) {
+        throw new GameModuleNameDuplicatedError();
+      }
+
+      const runtimeGM = runtimeGMs[0];
+      const exposeMetadata = module.metadata;
+
+      for (const propertyKey of Object.keys(exposeMetadata)) {
+        const value: unknown = Reflect.get(runtimeGM, propertyKey);
+
+        if (value === undefined) {
+          throw new FailedToResolveExposeData();
+        }
+
+        result.push({
+          gameObjectId: metadata.gameObjectId,
+          gameModuleUid: module.gameModuleUid,
+          value: value,
+          type: exposeMetadata[propertyKey].type,
+          propertyKey: propertyKey,
+        });
+      }
+    }
+
+    return result;
   }
 
   public GameSetup(gameModuleRegistry: GameModuleRegistry) {

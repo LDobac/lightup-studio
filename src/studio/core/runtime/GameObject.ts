@@ -58,9 +58,7 @@ export default class GameObject {
     this._gameModule = [];
   }
 
-  public AddPrototypeGameModule(
-    newModule: PrototypeGameModule
-  ): InstantiableProtoGM {
+  public AddPrototypeGM(newModule: PrototypeGameModule): InstantiableProtoGM {
     const instantiablePrototypeGameModule = {
       uid: uuid(),
       module: newModule,
@@ -71,9 +69,7 @@ export default class GameObject {
     return instantiablePrototypeGameModule;
   }
 
-  public RemovePrototypeGameModuleByUid(
-    uid: InstantiableProtoGMID
-  ): PrototypeGameModule {
+  public RemoveProtoGMByUid(uid: InstantiableProtoGMID): PrototypeGameModule {
     const index = this._prototypeGameModule.findIndex((v) => v.uid === uid);
 
     if (!(index > -1)) {
@@ -81,6 +77,16 @@ export default class GameObject {
     }
 
     return this._prototypeGameModule.splice(index, 1)[0].module;
+  }
+
+  public GetProtoGMByUid(uid: InstantiableProtoGMID): InstantiableProtoGM {
+    const protoGM = this._prototypeGameModule.find((v) => v.uid === uid);
+
+    if (!protoGM) {
+      throw new GameModuleNotFoundError();
+    }
+
+    return protoGM;
   }
 
   public get id(): string {

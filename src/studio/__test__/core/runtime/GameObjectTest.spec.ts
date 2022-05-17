@@ -60,45 +60,45 @@ describe("GameObjectTest", async () => {
     ].join("\n")
   );
 
-  it("AddPrototypeGameModule Test add one module", () => {
+  it("AddPrototypeGM Test add one module", () => {
     const gameObject = new GameObject();
 
-    gameObject.AddPrototypeGameModule(counterModule);
+    gameObject.AddPrototypeGM(counterModule);
 
     expect(gameObject.prototypeGameModule.length).toEqual(1);
   });
 
-  it("AddPrototypeGameModule Test add extra module", () => {
+  it("AddPrototypeGM Test add extra module", () => {
     const gameObject = new GameObject();
 
-    gameObject.AddPrototypeGameModule(counterModule);
+    gameObject.AddPrototypeGM(counterModule);
 
     expect(gameObject.prototypeGameModule.length).toEqual(1);
 
-    gameObject.AddPrototypeGameModule(countAModule);
+    gameObject.AddPrototypeGM(countAModule);
 
     expect(gameObject.prototypeGameModule.length).toEqual(2);
   });
 
-  it("AddPrototypeGameModule Test add same module", () => {
+  it("AddPrototypeGM Test add same module", () => {
     const gameObject = new GameObject();
 
-    gameObject.AddPrototypeGameModule(counterModule);
+    gameObject.AddPrototypeGM(counterModule);
 
     expect(gameObject.prototypeGameModule.length).toEqual(1);
 
-    gameObject.AddPrototypeGameModule(counterModule);
+    gameObject.AddPrototypeGM(counterModule);
 
     expect(gameObject.prototypeGameModule.length).toEqual(2);
   });
 
-  it("RemovePrototypeGameModuleByUid test", () => {
+  it("RemoveProtoGMByUid test", () => {
     const gameObject = new GameObject();
 
-    const remainInstProtoGM = gameObject.AddPrototypeGameModule(counterModule);
-    const instantiableProtoGM = gameObject.AddPrototypeGameModule(countAModule);
+    const remainInstProtoGM = gameObject.AddPrototypeGM(counterModule);
+    const instantiableProtoGM = gameObject.AddPrototypeGM(countAModule);
 
-    gameObject.RemovePrototypeGameModuleByUid(instantiableProtoGM.uid);
+    gameObject.RemoveProtoGMByUid(instantiableProtoGM.uid);
 
     expect(gameObject.prototypeGameModule.length).toEqual(1);
 
@@ -110,27 +110,27 @@ describe("GameObjectTest", async () => {
     );
   });
 
-  it("RemovePrototypeGameModuleByUid all modules by manually test", () => {
+  it("RemoveProtoGMByUid all modules by manually test", () => {
     const gameObject = new GameObject();
 
-    const instProtoGM1 = gameObject.AddPrototypeGameModule(counterModule);
-    const instProtoGM2 = gameObject.AddPrototypeGameModule(countAModule);
+    const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
+    const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
-    gameObject.RemovePrototypeGameModuleByUid(instProtoGM1.uid);
-    gameObject.RemovePrototypeGameModuleByUid(instProtoGM2.uid);
+    gameObject.RemoveProtoGMByUid(instProtoGM1.uid);
+    gameObject.RemoveProtoGMByUid(instProtoGM2.uid);
 
     expect(gameObject.prototypeGameModule.length).toEqual(0);
   });
 
-  it("RemovePrototypeGameModuleByUid try delete not exists module.", () => {
+  it("RemoveProtoGMByUid try delete not exists module.", () => {
     const gameObject = new GameObject();
 
-    gameObject.AddPrototypeGameModule(counterModule);
-    gameObject.AddPrototypeGameModule(countAModule);
+    gameObject.AddPrototypeGM(counterModule);
+    gameObject.AddPrototypeGM(countAModule);
 
-    expect(() =>
-      gameObject.RemovePrototypeGameModuleByUid("asdasdasd")
-    ).toThrow(GameModuleNotFoundError);
+    expect(() => gameObject.RemoveProtoGMByUid("asdasdasd")).toThrow(
+      GameModuleNotFoundError
+    );
 
     expect(gameObject.prototypeGameModule.length).toEqual(2);
   });
@@ -138,8 +138,8 @@ describe("GameObjectTest", async () => {
   it("Remove all prototype gamemodule by 'Clear' function", () => {
     const gameObject = new GameObject();
 
-    gameObject.AddPrototypeGameModule(counterModule);
-    gameObject.AddPrototypeGameModule(countAModule);
+    gameObject.AddPrototypeGM(counterModule);
+    gameObject.AddPrototypeGM(countAModule);
 
     gameObject.Clear();
 
@@ -150,8 +150,8 @@ describe("GameObjectTest", async () => {
   it("Test Runtime GameModule successfully created by 'Setup' Function", () => {
     const gameObject = new GameObject();
 
-    const instProtoGM1 = gameObject.AddPrototypeGameModule(counterModule);
-    const instProtoGM2 = gameObject.AddPrototypeGameModule(countAModule);
+    const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
+    const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
     gameObject.Setup(gameModuleRegistry);
 
@@ -185,8 +185,8 @@ describe("GameObjectTest", async () => {
   it("Test every gamemodule have to successfully call 'Start' Function", () => {
     const gameObject = new GameObject();
 
-    const instProtoGM1 = gameObject.AddPrototypeGameModule(counterModule);
-    const instProtoGM2 = gameObject.AddPrototypeGameModule(countAModule);
+    const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
+    const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
     gameObject.Setup(gameModuleRegistry);
 
@@ -219,8 +219,8 @@ describe("GameObjectTest", async () => {
   it("Test every gamemodule have to successfully call 'Update' function", () => {
     const gameObject = new GameObject();
 
-    const instProtoGM1 = gameObject.AddPrototypeGameModule(counterModule);
-    const instProtoGM2 = gameObject.AddPrototypeGameModule(countAModule);
+    const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
+    const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
     gameObject.Setup(gameModuleRegistry);
 
@@ -249,8 +249,8 @@ describe("GameObjectTest", async () => {
   it("Test Finish function", () => {
     const gameObject = new GameObject();
 
-    const instProtoGM1 = gameObject.AddPrototypeGameModule(counterModule);
-    const instProtoGM2 = gameObject.AddPrototypeGameModule(countAModule);
+    const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
+    const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
     gameObject.Setup(gameModuleRegistry);
 
@@ -278,5 +278,25 @@ describe("GameObjectTest", async () => {
     gameObject.Finish();
 
     expect(gameObject.runtimeGameModule.length).toEqual(0);
+  });
+
+  it("GetProtoGMByUid Test", () => {
+    const gameObject = new GameObject();
+
+    const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
+    const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
+
+    expect(gameObject.GetProtoGMByUid(instProtoGM1.uid)).toEqual(instProtoGM1);
+    expect(gameObject.GetProtoGMByUid(instProtoGM2.uid)).toEqual(instProtoGM2);
+  });
+
+  it("GetProtoGMByUid Not exists Test", () => {
+    const gameObject = new GameObject();
+
+    gameObject.AddPrototypeGM(counterModule);
+
+    expect(() => gameObject.GetProtoGMByUid("asdsad")).toThrow(
+      GameModuleNotFoundError
+    );
   });
 });
