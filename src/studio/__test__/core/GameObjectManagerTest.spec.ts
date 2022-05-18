@@ -13,6 +13,7 @@ import GameObjectManager, {
 } from "@/studio/core/GameObjectManager";
 import GameObject from "@/studio/core/runtime/GameObject";
 import type GameModule from "@/studio/core/runtime/GameModule";
+import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 
 const compiler = new MockCompiler();
 const gameModuleRegistry = new GameModuleRegistry(compiler);
@@ -41,6 +42,20 @@ const countAModule = await gameModuleRegistry.RegisterBySource(
     "   public Update(deltaTime : number) { this.GetA() }",
     "   @Lib.Expose()",
     "   public GetA() : string {this.a += 'a'; return this.a;}",
+    "}",
+  ].join("\n")
+);
+
+const doublingModule = await gameModuleRegistry.RegisterBySource(
+  "Doubling",
+  [
+    "class doubling extends Lib.GameModule {",
+    "   @Lib.Expose()",
+    "   public doublingNumber : number = 0;",
+    "   public Start() { }",
+    "   public Update(deltaTime : number) { }",
+    "   @Lib.Expose()",
+    "   public GetDouble() : number { return this.doublingNumber * 2; }",
     "}",
   ].join("\n")
 );
@@ -520,12 +535,15 @@ describe("GameObjectManager Dependency Injection Test", () => {
     return rtGameModule;
   };
 
-  const PrepareTwoObj = () => {
+  const PrepareTwoObjAndGetNumberExpose = (
+    module1: PrototypeGameModule,
+    module2: PrototypeGameModule
+  ) => {
     const gameObject1 = gameObjectManager.CreateGameObject();
     const gameObject2 = gameObjectManager.CreateGameObject();
 
-    gameObject1.AddPrototypeGM(counterModule);
-    gameObject2.AddPrototypeGM(counterModule);
+    gameObject1.AddPrototypeGM(module1);
+    gameObject2.AddPrototypeGM(module2);
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
 
@@ -554,7 +572,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
 
   it("Dependency Injection Test", () => {
     const { gameObject1, gameObject2, obj1Expose, obj2Expose } =
-      PrepareTwoObj();
+      PrepareTwoObjAndGetNumberExpose(counterModule, counterModule);
 
     //             Send
     // obj1.count ------> obj2.count
@@ -678,7 +696,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test With AcquireExposeValue Func", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
 
     //             Send
     // obj1.count ------> obj2.count
@@ -714,7 +735,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test invalid source game object id test", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
 
     //             Send
     // obj1.count ------> obj2.count
@@ -737,7 +761,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test invalid source game module uid test", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
 
     //             Send
     // obj1.count ------> obj2.count
@@ -760,7 +787,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test invalid source property test", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
 
     //             Send
     // obj1.count ------> obj2.count
@@ -783,7 +813,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test invalid target game object id test", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
 
     //             Send
     // obj1.count ------> obj2.count
@@ -806,7 +839,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test invalid target game module uid test", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
 
     //             Send
     // obj1.count ------> obj2.count
@@ -829,7 +865,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test invalid target property test", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
 
     //             Send
     // obj1.count ------> obj2.count
@@ -853,7 +892,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
 
   it("Dependency Injection Remove Test", () => {
     const { gameObject1, gameObject2, obj1Expose, obj2Expose } =
-      PrepareTwoObj();
+      PrepareTwoObjAndGetNumberExpose(counterModule, counterModule);
 
     //             Send
     // obj1.count ------> obj2.count
@@ -913,8 +952,12 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection chaning test", () => {
-    const { obj1Expose, obj2Expose } = PrepareTwoObj();
-    const { obj1Expose : obj3Expose, obj2Expose : obj4Expose } = PrepareTwoObj();
+    const { obj1Expose, obj2Expose } = PrepareTwoObjAndGetNumberExpose(
+      counterModule,
+      counterModule
+    );
+    const { obj1Expose: obj3Expose, obj2Expose: obj4Expose } =
+      PrepareTwoObjAndGetNumberExpose(counterModule, counterModule);
 
     // obj1.count ------> obj2.count
     gameObjectManager.AddDependencyInjection(
@@ -991,5 +1034,60 @@ describe("GameObjectManager Dependency Injection Test", () => {
     expect(obj2Count.GetValue()).toEqual(500);
     expect(obj3Count.GetValue()).toEqual(250);
     expect(obj4Count.GetValue()).toEqual(250);
+  });
+
+  it("Dependency Injection in module action have to change injection value successfully test", () => {
+    const { obj1Expose, gameObject2, obj2Expose } =
+      PrepareTwoObjAndGetNumberExpose(counterModule, doublingModule);
+
+    const exposeList = gameObjectManager.QueryExposeData(Function);
+    const obj2FuncExpose = exposeList.find(
+      (v) => v.gameObjectId === gameObject2.id
+    );
+    if (!obj2FuncExpose) throw "Unknown Testing Error";
+
+    //             Send
+    // obj1.count ------> obj2.count
+    gameObjectManager.AddDependencyInjection(
+      {
+        gameObjectId: obj1Expose.gameObjectId,
+        gameModuleUid: obj1Expose.modules[0].gameModuleUid,
+        propertyKey: "count",
+      },
+      {
+        gameObjectId: obj2Expose.gameObjectId,
+        gameModuleUid: obj2Expose.modules[0].gameModuleUid,
+        propertyKey: "doublingNumber",
+      }
+    );
+
+    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameStart();
+
+    const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
+    const obj2GetDoubledCountFunc =
+      gameObjectManager.AcquireExposeValue(obj2FuncExpose)[0];
+
+    const obj2GetDoubledCount = () => {
+      const gameModule = gameObject2.runtimeGameModule.find(
+        (gm) => gm.uid === obj2FuncExpose.modules[0].gameModuleUid
+      );
+      return (obj2GetDoubledCountFunc.GetValue() as () => number).bind(
+        gameModule
+      )();
+    };
+
+    expect(obj1Count.GetValue()).toEqual(10);
+    expect(obj2GetDoubledCount()).toEqual(20);
+
+    gameObjectManager.GameUpdate(-1);
+
+    expect(obj1Count.GetValue()).toEqual(11);
+    expect(obj2GetDoubledCount()).toEqual(22);
+
+    obj1Count.SetValue(123);
+
+    expect(obj1Count.GetValue()).toEqual(123);
+    expect(obj2GetDoubledCount()).toEqual(246);
   });
 });

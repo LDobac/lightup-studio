@@ -65,6 +65,7 @@ export interface IInjectionInfo {
 export type InjectionDisposeHandle = string;
 
 export const KEY_INJECTION_META = "KEY_EXPOSE_INJECTION_META";
+export const KEY_PROXY_GAMEMODULE_META = "KEY_PROXY_GAMEMODULE_META";
 
 export interface IInjectionMetadata {
   proxyModule: object;
@@ -447,14 +448,42 @@ export default class GameObjectManager {
     gameObjectId: string,
     gameModuleUid: string
   ): IInjectionMetadata {
-    const CreateInjectionMetadata = (gameModule: GameModule) => {
+    const gameObject = this.GetGameObjectById(gameObjectId);
+
+    const gameModuleIdx = gameObject.runtimeGameModule.findIndex(
+      (v) => v.uid === gameModuleUid
+    );
+
+    if (gameModuleIdx < 0) {
+      throw new GameModuleNotFoundError();
+    }
+
+    let gameModule = gameObject.runtimeGameModule[gameModuleIdx];
+
+    if (!Reflect.hasMetadata(KEY_INJECTION_META, gameModule)) {
+      // Create Injection Metadata and replace game module in game object.
+
+      // TODO : 추후 개선 시 Dependency Injection 추가 시 Proxy를 생성하는 것이 아닌, 애초에 Proxy 객체를 생성하여서 처리하도록 변경
+      // 현재 문제점은 game module을 가져와서 hold한 후 조작 시 이후에 만약 해당 game module이 proxy 객체가 되면 hold 된 객체를
+      //  수정해도 변화가 발생하지 않음
+      //  따라서 무조건 GetInjectionMetadata.proxyModule로 가져오는게 가장 안전함
+      //  위 방법으로 계속 가져오면 혼란도 있고 불편함도 있으니 수정 필요
+      //  또한 replace 과정을 거쳐주지 않으면 게임 모듈 내부에서 this로 함수 호출하여 값 변경 시 Proxy set 함수가 호출되지 않음
+
+      // NOTE : Proxy로 생성된 객체의 경우 dangling이 되면 자동으로 가비지 컬렉팅 되는지 확인 필요
+      // 만약 되지 않는다면 recovable Proxy 객체로 변경 필요
+      // 해당 부분 수정하려면 위 TODO를 먼저 수행해야 함
+
       const proxyModule = new Proxy(gameModule, {
         set: (target: GameModule, prop: string | symbol, value: unknown) => {
           Reflect.set(target, prop, value);
 
           const injectionMeta = Reflect.getMetadata(
             KEY_INJECTION_META,
-            target
+            // "target" is original game module, so it does not have
+            // metadata for dependency injectcion
+            // use proxyModule cause I set Injection Metadata to proxyModule only.
+            proxyModule
           ) as IInjectionMetadata;
 
           if (injectionMeta.handlers[prop]) {
@@ -472,30 +501,20 @@ export default class GameObjectManager {
         handlers: {},
       };
 
-      Reflect.defineMetadata(KEY_INJECTION_META, metadata, gameModule);
-    };
-
-    const GetRuntimeGM = (
-      gameObjectId: string,
-      gameModuleUid: string
-    ): GameModule => {
-      const gameObject = this.GetGameObjectById(gameObjectId);
-
-      const rtGameModule = gameObject.runtimeGameModule.find(
-        (v) => v.uid === gameModuleUid
+      // Set metadata proxy to original game module
+      Reflect.defineMetadata(
+        KEY_PROXY_GAMEMODULE_META,
+        proxyModule,
+        gameModule
       );
 
-      if (!rtGameModule) {
-        throw new GameModuleNotFoundError();
-      }
+      // Set metadata proxy and handler to proxy game module
+      Reflect.defineMetadata(KEY_INJECTION_META, metadata, proxyModule);
 
-      return rtGameModule;
-    };
+      // Replace Game Module to Proxy Game Module
+      gameObject.runtimeGameModule[gameModuleIdx] = proxyModule;
 
-    const gameModule = GetRuntimeGM(gameObjectId, gameModuleUid);
-
-    if (!Reflect.hasMetadata(KEY_INJECTION_META, gameModule)) {
-      CreateInjectionMetadata(gameModule);
+      gameModule = proxyModule;
     }
 
     return Reflect.getMetadata(KEY_INJECTION_META, gameModule);
