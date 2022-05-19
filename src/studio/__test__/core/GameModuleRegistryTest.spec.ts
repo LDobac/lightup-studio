@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-
+import { Engine } from "babylonjs";
 import type { CompileMachine } from "@/studio/core/CompileMachine";
 import GameModuleRegistry, {
   GameModuleNameDuplicatedError,
@@ -10,6 +10,12 @@ import PrototypeGameModule, {
   SourceNotValidError,
 } from "@/studio/core/PrototypeGameModule";
 import GameObject from "@/studio/core/runtime/GameObject";
+import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
+
+const dummyScene: ISceneObject = new SceneObject(
+  "DummyScene",
+  new Engine(null)
+);
 
 function CheckModuleExists(
   registry: GameModuleRegistry,
@@ -345,7 +351,7 @@ describe("GameModuleRegistry Test", () => {
       gameModuleRegistry.GetGameModuleConstructorByName("test_gamemodule");
 
     const instance = new TestGamemodule(
-      new GameObject(),
+      new GameObject("", dummyScene),
       prototypeModule.id,
       ""
     );
@@ -628,7 +634,7 @@ describe("GameModuleRegistry Test", () => {
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     let gmInstance = new lib_gamemodule(
-      new GameObject(),
+      new GameObject("", dummyScene),
       prototypeModule.id,
       ""
     );
@@ -654,7 +660,11 @@ describe("GameModuleRegistry Test", () => {
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    gmInstance = new lib_gamemodule(new GameObject(), prototypeModule.id, "");
+    gmInstance = new lib_gamemodule(
+      new GameObject("", dummyScene),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -700,7 +710,7 @@ describe("GameModuleRegistry Test", () => {
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     const gmInstance = new lib_gamemodule(
-      new GameObject(),
+      new GameObject("", dummyScene),
       prototypeModule.id,
       ""
     );
@@ -749,7 +759,7 @@ describe("GameModuleRegistry Test", () => {
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     let gmInstance = new lib_gamemodule(
-      new GameObject(),
+      new GameObject("", dummyScene),
       prototypeModule.id,
       ""
     );
@@ -775,7 +785,11 @@ describe("GameModuleRegistry Test", () => {
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    gmInstance = new lib_gamemodule(new GameObject(), prototypeModule.id, "");
+    gmInstance = new lib_gamemodule(
+      new GameObject("", dummyScene),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -821,7 +835,7 @@ describe("GameModuleRegistry Test", () => {
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     const gmInstance = new lib_gamemodule(
-      new GameObject(),
+      new GameObject("", dummyScene),
       prototypeModule.id,
       ""
     );
@@ -870,7 +884,7 @@ describe("GameModuleRegistry Test", () => {
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     let gmInstance = new lib_gamemodule(
-      new GameObject(),
+      new GameObject("", dummyScene),
       prototypeModule.id,
       ""
     );
@@ -896,7 +910,11 @@ describe("GameModuleRegistry Test", () => {
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
-    gmInstance = new lib_gamemodule(new GameObject(), prototypeModule.id, "");
+    gmInstance = new lib_gamemodule(
+      new GameObject("", dummyScene),
+      prototypeModule.id,
+      ""
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((gmInstance as any).CustomFunc(inputMessage)).toEqual(expectMessage);
@@ -942,7 +960,7 @@ describe("GameModuleRegistry Test", () => {
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     const gmInstance = new lib_gamemodule(
-      new GameObject(),
+      new GameObject("", dummyScene),
       prototypeModule.id,
       ""
     );

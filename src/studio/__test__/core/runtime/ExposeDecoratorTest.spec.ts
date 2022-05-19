@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import "reflect-metadata";
+import { Engine } from "babylonjs";
 
 import GameModuleRegistry from "@/studio/core/GameModuleRegistry";
 import MockCompiler from "../MockCompiler";
@@ -8,6 +9,12 @@ import {
   type IExposeMetadata,
 } from "@/studio/core/runtime/ExposeDecorator";
 import GameObject from "@/studio/core/runtime/GameObject";
+import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
+
+const dummyScene: ISceneObject = new SceneObject(
+  "DummyScene",
+  new Engine(null)
+);
 
 describe("Expose decorator test", async () => {
   const compiler = new MockCompiler();
@@ -102,7 +109,11 @@ describe("Expose decorator test", async () => {
 
     const rawMetadata = Reflect.getMetadata(
       KEY_EXPOSE_META,
-      new counterConstructor(new GameObject(), counterModule.id, "")
+      new counterConstructor(
+        new GameObject("", dummyScene),
+        counterModule.id,
+        ""
+      )
     );
 
     expect(rawMetadata).toBeDefined();
@@ -120,7 +131,7 @@ describe("Expose decorator test", async () => {
 
     const rawMetadata = Reflect.getMetadata(
       KEY_EXPOSE_META,
-      new countAConstructor(new GameObject(), countAModule.id, "")
+      new countAConstructor(new GameObject("", dummyScene), countAModule.id, "")
     );
 
     expect(rawMetadata).toBeDefined();

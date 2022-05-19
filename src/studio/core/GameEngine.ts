@@ -4,8 +4,7 @@ import GameModuleRegistry from "./GameModuleRegistry";
 import SceneManager, { type ISceneObject } from "./SceneManager";
 
 export class GameEngineAlreadyRunning extends Error {
-  constructor()
-  {
+  constructor() {
     super("Game Engine already running.");
   }
 }
@@ -36,35 +35,30 @@ export default class GameEngine {
     this._gameModuleRegistry = new GameModuleRegistry(compiler);
   }
 
-  public Start(scene? : ISceneObject) {
-    if (!this._isRunning)
-    {
+  public Start(scene?: ISceneObject) {
+    if (!this._isRunning) {
       this._sceneManager.StartScene(scene);
-  
+
       this._babylonEngine.runRenderLoop(this.RenderingLoop.bind(this));
-  
+
       this._isRunning = true;
-    }
-    else
-    {
+    } else {
       throw new GameEngineAlreadyRunning();
     }
   }
 
   public Stop() {
-    if (this._isRunning)
-    {
+    if (this._isRunning) {
       this._isRunning = false;
     }
   }
 
   public Finalize() {
-    if (this._isRunning)
-    {
+    if (this._isRunning) {
       this._isRunning = false;
-  
+
       this._babylonEngine.stopRenderLoop();
-  
+
       this._sceneManager.FinishCurrentScene();
     }
   }

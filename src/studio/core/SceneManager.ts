@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { Scene } from "babylonjs";
+import { Engine, Scene } from "babylonjs";
 import type GameEngine from "./GameEngine";
 import GameObjectManager from "./GameObjectManager";
 
@@ -8,6 +8,20 @@ export interface ISceneObject {
   name: string;
   scene: Scene;
   gameObjectManager: GameObjectManager;
+}
+
+export class SceneObject implements ISceneObject {
+  public id: string;
+  public name: string;
+  public scene: Scene;
+  public gameObjectManager: GameObjectManager;
+
+  constructor(name: string, engine: Engine) {
+    this.id = uuid();
+    this.name = name;
+    this.scene = new Scene(engine);
+    this.gameObjectManager = new GameObjectManager(this);
+  }
 }
 
 export class SceneNotFoundError extends Error {
@@ -65,12 +79,7 @@ export default class SceneManager {
       throw new SceneNameDuplicated();
     }
 
-    const newSceneObj: ISceneObject = {
-      id: uuid(),
-      name: name,
-      scene: new Scene(this.gameEngine.babylonEngine),
-      gameObjectManager: new GameObjectManager(),
-    };
+    const newSceneObj = new SceneObject(name, this.gameEngine.babylonEngine);
 
     this.scenes.push(newSceneObj);
 
@@ -168,15 +177,15 @@ export default class SceneManager {
     this._currentScene.gameObjectManager.GameUpdate(deltaTime);
   }
 
-  public set defaultScene(scene : ISceneObject | undefined) {
+  public set defaultScene(scene: ISceneObject | undefined) {
     if (scene && !this.scenes.find((s) => s.id === scene.id)) {
       throw new SceneNotFoundError();
     }
 
     this._defaultScene = scene;
   }
-  
-  public get defaultScene() : ISceneObject | undefined {
+
+  public get defaultScene(): ISceneObject | undefined {
     return this._defaultScene;
   }
 

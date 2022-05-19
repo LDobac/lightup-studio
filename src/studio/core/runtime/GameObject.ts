@@ -2,6 +2,7 @@ import { v4 as uuid } from "uuid";
 import type GameModuleRegistry from "../GameModuleRegistry";
 import { GameModuleNotFoundError } from "../GameModuleRegistry";
 import type PrototypeGameModule from "../PrototypeGameModule";
+import type { ISceneObject } from "../SceneManager";
 import type GameModule from "./GameModule";
 
 export type InstantiableProtoGMID = string;
@@ -16,7 +17,9 @@ export default class GameObject {
   private _prototypeGameModule: Array<InstantiableProtoGM>;
   private _gameModule: Array<GameModule>;
 
-  constructor(id = "") {
+  private _scene: ISceneObject;
+
+  constructor(id = "", scene: ISceneObject) {
     if (id.length) {
       this._id = id;
     } else {
@@ -25,6 +28,8 @@ export default class GameObject {
 
     this._prototypeGameModule = [];
     this._gameModule = [];
+
+    this._scene = scene;
   }
 
   public Setup(gameModuleRegistry: GameModuleRegistry) {
@@ -99,5 +104,9 @@ export default class GameObject {
 
   public get prototypeGameModule(): Array<InstantiableProtoGM> {
     return this._prototypeGameModule;
+  }
+
+  public get scene(): ISceneObject {
+    return this._scene;
   }
 }

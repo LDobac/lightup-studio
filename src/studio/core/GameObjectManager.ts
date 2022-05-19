@@ -8,6 +8,7 @@ import {
 import type { IExposeMetadata } from "./runtime/ExposeDecorator";
 import GameObject from "./runtime/GameObject";
 import type GameModule from "./runtime/GameModule";
+import type { ISceneObject } from "./SceneManager";
 
 export class GameObjectNotFoundError extends Error {
   constructor() {
@@ -99,21 +100,23 @@ export default class GameObjectManager {
     }
   >;
 
-  // private runtimeDI
-
   private running: boolean;
 
-  public constructor() {
+  private _scene: ISceneObject;
+
+  public constructor(scene: ISceneObject) {
     this._gameObjects = [];
 
     this.valueInjections = {};
     this.dependencyInjections = {};
 
     this.running = false;
+
+    this._scene = scene;
   }
 
   public CreateGameObject(id = ""): GameObject {
-    const newGameObject = new GameObject(id);
+    const newGameObject = new GameObject(id, this._scene);
 
     this._gameObjects.push(newGameObject);
 
@@ -365,6 +368,10 @@ export default class GameObjectManager {
 
   public get gameObjects(): Array<GameObject> {
     return this._gameObjects;
+  }
+
+  public get scene(): ISceneObject {
+    return this._scene;
   }
 
   private SetupValueInjection() {

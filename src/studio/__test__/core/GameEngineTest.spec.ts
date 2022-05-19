@@ -54,7 +54,7 @@ describe("GameEngine Test", () => {
     expect(gameEngine.isEditing).toBeFalsy();
 
     expect(gameEngine.sceneManager.currentScene).toBeDefined();
-  })
+  });
 
   it("Finlize successfully", () => {
     const sceneObj = gameEngine.sceneManager.NewScene("New Scene");

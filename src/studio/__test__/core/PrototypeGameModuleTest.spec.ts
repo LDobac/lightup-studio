@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-
+import { Engine } from "babylonjs";
 import PrototypeGameModule, {
   SourceNotValidError,
 } from "@/studio/core/PrototypeGameModule";
@@ -7,6 +7,12 @@ import PrototypeGameModule, {
 import { Lib } from "@/studio/core/runtime/RuntimeLibrary";
 import GameObject from "@/studio/core/runtime/GameObject";
 import type { IExposeMetadata } from "@/studio/core/runtime/ExposeDecorator";
+import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
+
+const dummyScene: ISceneObject = new SceneObject(
+  "DummyScene",
+  new Engine(null)
+);
 
 function NameTest(gm: PrototypeGameModule, expectName: string) {
   gm.name = expectName;
@@ -275,7 +281,11 @@ describe("PrototypeGameModule Unit Test", () => {
     const classConstructor = constructorWrapper(Lib);
     expect(classConstructor).toBeDefined();
 
-    const classInstance = new classConstructor(new GameObject(), gm.id, "");
+    const classInstance = new classConstructor(
+      new GameObject("", dummyScene),
+      gm.id,
+      ""
+    );
     expect(classInstance).toBeDefined();
     expect(classInstance).toHaveProperty("Start");
     expect(classInstance).toHaveProperty("Update");

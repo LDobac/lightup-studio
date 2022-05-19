@@ -262,7 +262,9 @@ describe("SceneManager Test", () => {
     sceneManager.StartScene(scene1);
     expect(sceneManager.currentScene).toEqual(scene1);
 
-    expect(() => sceneManager.SwapById("Not exists id")).toThrow(SceneNotFoundError);
+    expect(() => sceneManager.SwapById("Not exists id")).toThrow(
+      SceneNotFoundError
+    );
 
     expect(sceneManager.currentScene).toEqual(scene1);
   });
@@ -296,7 +298,9 @@ describe("SceneManager Test", () => {
     sceneManager.StartScene(scene1);
     expect(sceneManager.currentScene).toEqual(scene1);
 
-    expect(() => sceneManager.SwapByName("Not exists name")).toThrow(SceneNotFoundError);
+    expect(() => sceneManager.SwapByName("Not exists name")).toThrow(
+      SceneNotFoundError
+    );
 
     expect(sceneManager.currentScene).toEqual(scene1);
   });
@@ -316,6 +320,8 @@ describe("SceneManager Test", () => {
 
     expect(sceneManager.defaultScene).toBeUndefined();
 
-    expect(() => sceneManager.defaultScene = scene1).toThrow(SceneNotFoundError);
+    expect(() => (sceneManager.defaultScene = scene1)).toThrow(
+      SceneNotFoundError
+    );
   });
 });

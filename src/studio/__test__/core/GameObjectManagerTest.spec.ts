@@ -1,3 +1,4 @@
+import { Engine } from "babylonjs";
 import { describe, it, expect, afterEach } from "vitest";
 import GameModuleRegistry, {
   GameModuleNotFoundError,
@@ -14,9 +15,15 @@ import GameObjectManager, {
 import GameObject from "@/studio/core/runtime/GameObject";
 import type GameModule from "@/studio/core/runtime/GameModule";
 import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
+import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
 
 const compiler = new MockCompiler();
 const gameModuleRegistry = new GameModuleRegistry(compiler);
+
+const dummyScene: ISceneObject = new SceneObject(
+  "DummyScene",
+  new Engine(null)
+);
 
 const counterModule = await gameModuleRegistry.RegisterBySource(
   "Counter",
@@ -61,10 +68,10 @@ const doublingModule = await gameModuleRegistry.RegisterBySource(
 );
 
 describe("GameObjectManagerTest", () => {
-  let gameObjectManager = new GameObjectManager();
+  let gameObjectManager = new GameObjectManager(dummyScene);
 
   afterEach(() => {
-    gameObjectManager = new GameObjectManager();
+    gameObjectManager = new GameObjectManager(dummyScene);
   });
 
   it("Create GameObject Test", () => {
@@ -98,7 +105,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Add GameObject test", () => {
-    const newGameObject = new GameObject();
+    const newGameObject = new GameObject("", dummyScene);
 
     const gameObject = gameObjectManager.AddGameObject(newGameObject);
 
@@ -108,7 +115,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Add GameObject Duplicate Test", () => {
-    const newGameObject = new GameObject();
+    const newGameObject = new GameObject("", dummyScene);
 
     gameObjectManager.AddGameObject(newGameObject);
     expect(gameObjectManager.gameObjects.length).toEqual(1);
@@ -141,7 +148,7 @@ describe("GameObjectManagerTest", () => {
   it("RemoveGameObject Not exists module", () => {
     gameObjectManager.CreateGameObject();
 
-    const notExistsObject = new GameObject();
+    const notExistsObject = new GameObject("", dummyScene);
 
     expect(() => gameObjectManager.RemoveGameObject(notExistsObject)).toThrow(
       GameObjectNotFoundError
@@ -170,7 +177,7 @@ describe("GameObjectManagerTest", () => {
   it("RemoveGameObjectById Not exists module", () => {
     gameObjectManager.CreateGameObject();
 
-    const notExistsObject = new GameObject();
+    const notExistsObject = new GameObject("", dummyScene);
 
     expect(() =>
       gameObjectManager.RemoveGameObjectById(notExistsObject.id)
@@ -391,13 +398,17 @@ describe("GameObjectManagerTest", () => {
     exposeValue.SetValue(123);
     expect(GetCountVal()).toEqual(123);
   });
+
+  it("Get Scene test", () => {
+    expect(gameObjectManager.scene).toEqual(dummyScene);
+  });
 });
 
 describe("GameObjectManager Value Injection Test", () => {
-  let gameObjectManager = new GameObjectManager();
+  let gameObjectManager = new GameObjectManager(dummyScene);
 
   afterEach(() => {
-    gameObjectManager = new GameObjectManager();
+    gameObjectManager = new GameObjectManager(dummyScene);
   });
 
   it("Value Injection Test", () => {
@@ -564,10 +575,10 @@ describe("GameObjectManager Dependency Injection Test", () => {
     };
   };
 
-  let gameObjectManager = new GameObjectManager();
+  let gameObjectManager = new GameObjectManager(dummyScene);
 
   afterEach(() => {
-    gameObjectManager = new GameObjectManager();
+    gameObjectManager = new GameObjectManager(dummyScene);
   });
 
   it("Dependency Injection Test", () => {
