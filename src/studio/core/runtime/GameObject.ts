@@ -1,6 +1,8 @@
+import { TransformNode } from "babylonjs";
 import { v4 as uuid } from "uuid";
 import type GameModuleRegistry from "../GameModuleRegistry";
 import { GameModuleNotFoundError } from "../GameModuleRegistry";
+import { GameNotRunningError } from "../GameObjectManager";
 import type PrototypeGameModule from "../PrototypeGameModule";
 import type { ISceneObject } from "../SceneManager";
 import type GameModule from "./GameModule";
@@ -14,25 +16,36 @@ export interface InstantiableProtoGM {
 
 export default class GameObject {
   private _id: string;
+  private _name: string;
+
   private _prototypeGameModule: Array<InstantiableProtoGM>;
   private _gameModule: Array<GameModule>;
 
   private _scene: ISceneObject;
 
-  constructor(id = "", scene: ISceneObject) {
+  private _node: TransformNode | null;
+
+  constructor(scene: ISceneObject, name: string, id = "") {
     if (id.length) {
       this._id = id;
     } else {
       this._id = uuid();
     }
 
+    this._name = name;
+
     this._prototypeGameModule = [];
     this._gameModule = [];
 
     this._scene = scene;
+
+    this._node = null;
   }
 
   public Setup(gameModuleRegistry: GameModuleRegistry) {
+    this._node = new TransformNode(this._name, this._scene.scene);
+    this._node.id = this._id;
+
     this._prototypeGameModule.forEach((v) => {
       const Constructor = gameModuleRegistry.GetGameModuleConstructorById(
         v.module.id
@@ -45,6 +58,8 @@ export default class GameObject {
   public Clear() {
     this._gameModule = [];
     this._prototypeGameModule = [];
+
+    this._node = null;
   }
 
   public Start() {
@@ -61,6 +76,8 @@ export default class GameObject {
 
   public Finish() {
     this._gameModule = [];
+
+    this._node = null;
   }
 
   public AddPrototypeGM(newModule: PrototypeGameModule): InstantiableProtoGM {
@@ -98,12 +115,24 @@ export default class GameObject {
     return this._id;
   }
 
+  public get name(): string {
+    return this._name;
+  }
+
   public get runtimeGameModule(): Array<GameModule> {
     return this._gameModule;
   }
 
   public get prototypeGameModule(): Array<InstantiableProtoGM> {
     return this._prototypeGameModule;
+  }
+
+  public get node(): TransformNode {
+    if (!this._node) {
+      throw new GameNotRunningError();
+    }
+
+    return this._node;
   }
 
   public get scene(): ISceneObject {

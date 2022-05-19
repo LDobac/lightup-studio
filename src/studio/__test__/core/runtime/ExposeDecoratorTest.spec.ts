@@ -110,7 +110,7 @@ describe("Expose decorator test", async () => {
     const rawMetadata = Reflect.getMetadata(
       KEY_EXPOSE_META,
       new counterConstructor(
-        new GameObject("", dummyScene),
+        new GameObject(dummyScene, "GameObject Test Name"),
         counterModule.id,
         ""
       )
@@ -131,7 +131,11 @@ describe("Expose decorator test", async () => {
 
     const rawMetadata = Reflect.getMetadata(
       KEY_EXPOSE_META,
-      new countAConstructor(new GameObject("", dummyScene), countAModule.id, "")
+      new countAConstructor(
+        new GameObject(dummyScene, "GameObject Test Name"),
+        countAModule.id,
+        ""
+      )
     );
 
     expect(rawMetadata).toBeDefined();

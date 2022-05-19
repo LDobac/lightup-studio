@@ -115,8 +115,8 @@ export default class GameObjectManager {
     this._scene = scene;
   }
 
-  public CreateGameObject(id = ""): GameObject {
-    const newGameObject = new GameObject(id, this._scene);
+  public CreateGameObject(name: string, id = ""): GameObject {
+    const newGameObject = new GameObject(this._scene, name, id);
 
     this._gameObjects.push(newGameObject);
 

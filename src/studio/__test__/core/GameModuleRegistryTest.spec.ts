@@ -351,7 +351,7 @@ describe("GameModuleRegistry Test", () => {
       gameModuleRegistry.GetGameModuleConstructorByName("test_gamemodule");
 
     const instance = new TestGamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -634,7 +634,7 @@ describe("GameModuleRegistry Test", () => {
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     let gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -661,7 +661,7 @@ describe("GameModuleRegistry Test", () => {
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -710,7 +710,7 @@ describe("GameModuleRegistry Test", () => {
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     const gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -759,7 +759,7 @@ describe("GameModuleRegistry Test", () => {
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     let gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -786,7 +786,7 @@ describe("GameModuleRegistry Test", () => {
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -835,7 +835,7 @@ describe("GameModuleRegistry Test", () => {
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     const gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -884,7 +884,7 @@ describe("GameModuleRegistry Test", () => {
     let lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     let gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -911,7 +911,7 @@ describe("GameModuleRegistry Test", () => {
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );
@@ -960,7 +960,7 @@ describe("GameModuleRegistry Test", () => {
     const lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
     const gmInstance = new lib_gamemodule(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       prototypeModule.id,
       ""
     );

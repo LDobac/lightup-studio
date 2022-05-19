@@ -7,6 +7,7 @@ import GameObject from "@/studio/core/runtime/GameObject";
 import MockCompiler from "../MockCompiler";
 import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
 import { Engine } from "babylonjs";
+import { GameNotRunningError } from "@/studio/core/GameObjectManager";
 
 const dummyScene: ISceneObject = new SceneObject(
   "DummyScene",
@@ -68,7 +69,7 @@ describe("GameObjectTest", async () => {
   );
 
   it("AddPrototypeGM Test add one module", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     gameObject.AddPrototypeGM(counterModule);
 
@@ -76,7 +77,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("AddPrototypeGM Test add extra module", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     gameObject.AddPrototypeGM(counterModule);
 
@@ -88,7 +89,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("AddPrototypeGM Test add same module", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     gameObject.AddPrototypeGM(counterModule);
 
@@ -100,7 +101,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("RemoveProtoGMByUid test", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const remainInstProtoGM = gameObject.AddPrototypeGM(counterModule);
     const instantiableProtoGM = gameObject.AddPrototypeGM(countAModule);
@@ -118,7 +119,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("RemoveProtoGMByUid all modules by manually test", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
@@ -130,7 +131,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("RemoveProtoGMByUid try delete not exists module.", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     gameObject.AddPrototypeGM(counterModule);
     gameObject.AddPrototypeGM(countAModule);
@@ -143,7 +144,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("Remove all prototype gamemodule by 'Clear' function", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     gameObject.AddPrototypeGM(counterModule);
     gameObject.AddPrototypeGM(countAModule);
@@ -155,7 +156,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("Test Runtime GameModule successfully created by 'Setup' Function", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
@@ -190,7 +191,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("Test every gamemodule have to successfully call 'Start' Function", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
@@ -224,7 +225,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("Test every gamemodule have to successfully call 'Update' function", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
@@ -254,7 +255,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("Test Finish function", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
@@ -288,7 +289,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("GetProtoGMByUid Test", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
@@ -298,7 +299,7 @@ describe("GameObjectTest", async () => {
   });
 
   it("GetProtoGMByUid Not exists Test", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     gameObject.AddPrototypeGM(counterModule);
 
@@ -308,8 +309,36 @@ describe("GameObjectTest", async () => {
   });
 
   it("Get Scene Test", () => {
-    const gameObject = new GameObject("", dummyScene);
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     expect(gameObject.scene).toEqual(dummyScene);
+  });
+
+  it("GameObject Name Test", () => {
+    const expectName = "Expect Name";
+    const gameObject = new GameObject(dummyScene, expectName);
+
+    gameObject.Setup(gameModuleRegistry);
+
+    expect(gameObject.node.name).toEqual(expectName);
+    expect(gameObject.name).toEqual(expectName);
+  });
+
+  it("Get Node Test when game not started", () => {
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
+
+    expect(() => gameObject.node).toThrow(GameNotRunningError);
+  });
+
+  it("Get Node Test successfully", () => {
+    const gameObject = new GameObject(dummyScene, "GameObject Test Name");
+
+    gameObject.Setup(gameModuleRegistry);
+
+    expect(() => gameObject.node).not.toThrow(GameNotRunningError);
+
+    gameObject.Finish();
+
+    expect(() => gameObject.node).toThrow(GameNotRunningError);
   });
 });

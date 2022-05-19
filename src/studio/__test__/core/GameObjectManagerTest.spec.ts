@@ -75,7 +75,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Create GameObject Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     expect(newGameObject).toBeDefined();
     expect(newGameObject.prototypeGameModule.length).toEqual(0);
@@ -85,7 +85,8 @@ describe("GameObjectManagerTest", () => {
 
   it("Create GameObject multiple times", () => {
     for (let i = 0; i < 10; i++) {
-      const newGameObject = gameObjectManager.CreateGameObject();
+      const newGameObject =
+        gameObjectManager.CreateGameObject("Test GameObject");
 
       expect(newGameObject).toBeDefined();
       expect(newGameObject.prototypeGameModule.length).toEqual(0);
@@ -97,7 +98,10 @@ describe("GameObjectManagerTest", () => {
   it("Create Gameobject given id Test", () => {
     const expectId = "Given GameObject Id";
 
-    const newGameObject = gameObjectManager.CreateGameObject(expectId);
+    const newGameObject = gameObjectManager.CreateGameObject(
+      "Test GameObject",
+      expectId
+    );
 
     expect(newGameObject.id).toEqual(expectId);
 
@@ -105,7 +109,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Add GameObject test", () => {
-    const newGameObject = new GameObject("", dummyScene);
+    const newGameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     const gameObject = gameObjectManager.AddGameObject(newGameObject);
 
@@ -115,7 +119,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Add GameObject Duplicate Test", () => {
-    const newGameObject = new GameObject("", dummyScene);
+    const newGameObject = new GameObject(dummyScene, "GameObject Test Name");
 
     gameObjectManager.AddGameObject(newGameObject);
     expect(gameObjectManager.gameObjects.length).toEqual(1);
@@ -127,7 +131,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("RemoveGameObject Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     expect(gameObjectManager.gameObjects.length).toEqual(1);
 
     gameObjectManager.RemoveGameObject(newGameObject);
@@ -135,7 +139,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("RemoveGameObject twice to same object", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     gameObjectManager.RemoveGameObject(newGameObject);
     expect(gameObjectManager.gameObjects.length).toEqual(0);
@@ -146,9 +150,9 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("RemoveGameObject Not exists module", () => {
-    gameObjectManager.CreateGameObject();
+    gameObjectManager.CreateGameObject("Test GameObject");
 
-    const notExistsObject = new GameObject("", dummyScene);
+    const notExistsObject = new GameObject(dummyScene, "GameObject Test Name");
 
     expect(() => gameObjectManager.RemoveGameObject(notExistsObject)).toThrow(
       GameObjectNotFoundError
@@ -156,7 +160,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("RemoveGameObjectById Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     expect(gameObjectManager.gameObjects.length).toEqual(1);
 
     gameObjectManager.RemoveGameObjectById(newGameObject.id);
@@ -164,7 +168,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("RemoveGameObjectById twice to same object", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     gameObjectManager.RemoveGameObjectById(newGameObject.id);
     expect(gameObjectManager.gameObjects.length).toEqual(0);
@@ -175,9 +179,9 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("RemoveGameObjectById Not exists module", () => {
-    gameObjectManager.CreateGameObject();
+    gameObjectManager.CreateGameObject("Test GameObject");
 
-    const notExistsObject = new GameObject("", dummyScene);
+    const notExistsObject = new GameObject(dummyScene, "GameObject Test Name");
 
     expect(() =>
       gameObjectManager.RemoveGameObjectById(notExistsObject.id)
@@ -185,7 +189,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("GetGameObjectById Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     const findGameObject = gameObjectManager.GetGameObjectById(
       newGameObject.id
@@ -195,7 +199,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("GetGameObjectById Not exists test", () => {
-    gameObjectManager.CreateGameObject();
+    gameObjectManager.CreateGameObject("Test GameObject");
 
     expect(() =>
       gameObjectManager.GetGameObjectById("Not exists game module id ")
@@ -203,7 +207,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Query Types only single game object Test 1", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     newGameObject.AddPrototypeGM(counterModule);
 
@@ -227,7 +231,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Query Types only single game object Test 2", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     newGameObject.AddPrototypeGM(counterModule);
 
@@ -251,8 +255,8 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Query types multiple object Test", () => {
-    const gameObject1 = gameObjectManager.CreateGameObject();
-    const gameObject2 = gameObjectManager.CreateGameObject();
+    const gameObject1 = gameObjectManager.CreateGameObject("Test GameObject");
+    const gameObject2 = gameObjectManager.CreateGameObject("Test GameObject");
 
     gameObject1.AddPrototypeGM(counterModule);
     gameObject1.AddPrototypeGM(countAModule);
@@ -276,7 +280,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Query Types ignore test 1", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     newGameObject.AddPrototypeGM(counterModule);
 
@@ -288,8 +292,8 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Query Types ignore test 2", () => {
-    const gameObject1 = gameObjectManager.CreateGameObject();
-    const gameObject2 = gameObjectManager.CreateGameObject();
+    const gameObject1 = gameObjectManager.CreateGameObject("Test GameObject");
+    const gameObject2 = gameObjectManager.CreateGameObject("Test GameObject");
 
     gameObject1.AddPrototypeGM(counterModule);
     gameObject1.AddPrototypeGM(countAModule);
@@ -303,8 +307,8 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("Query Types ignore test 3", () => {
-    const gameObject1 = gameObjectManager.CreateGameObject();
-    const gameObject2 = gameObjectManager.CreateGameObject();
+    const gameObject1 = gameObjectManager.CreateGameObject("Test GameObject");
+    const gameObject2 = gameObjectManager.CreateGameObject("Test GameObject");
 
     gameObject1.AddPrototypeGM(counterModule);
     gameObject1.AddPrototypeGM(countAModule);
@@ -321,7 +325,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("AcquireExposeData Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     gameObjectManager.GameSetup(gameModuleRegistry);
@@ -356,7 +360,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("AcquireExposeData Test2", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
     newGameObject.AddPrototypeGM(countAModule);
 
@@ -370,7 +374,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("AcquireExposeData Failed test when game does not start", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
@@ -381,7 +385,7 @@ describe("GameObjectManagerTest", () => {
   });
 
   it("AcquireExposeData GetValue/SetValue Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     gameObjectManager.GameSetup(gameModuleRegistry);
@@ -412,7 +416,7 @@ describe("GameObjectManager Value Injection Test", () => {
   });
 
   it("Value Injection Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
@@ -443,7 +447,7 @@ describe("GameObjectManager Value Injection Test", () => {
   });
 
   it("Value Injection invalid game object id test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     const AddInjectionFunc = () => {
@@ -458,7 +462,7 @@ describe("GameObjectManager Value Injection Test", () => {
   });
 
   it("Value Injection invalid game module id test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
@@ -477,7 +481,7 @@ describe("GameObjectManager Value Injection Test", () => {
   });
 
   it("Value Injection invalid metadata test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
@@ -499,7 +503,7 @@ describe("GameObjectManager Value Injection Test", () => {
   });
 
   it("Value Injection Remove Test", () => {
-    const newGameObject = gameObjectManager.CreateGameObject();
+    const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
@@ -550,8 +554,8 @@ describe("GameObjectManager Dependency Injection Test", () => {
     module1: PrototypeGameModule,
     module2: PrototypeGameModule
   ) => {
-    const gameObject1 = gameObjectManager.CreateGameObject();
-    const gameObject2 = gameObjectManager.CreateGameObject();
+    const gameObject1 = gameObjectManager.CreateGameObject("Test GameObject");
+    const gameObject2 = gameObjectManager.CreateGameObject("Test GameObject");
 
     gameObject1.AddPrototypeGM(module1);
     gameObject2.AddPrototypeGM(module2);
@@ -641,7 +645,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
   });
 
   it("Dependency Injection Test with inner modules", () => {
-    const gameObject = gameObjectManager.CreateGameObject();
+    const gameObject = gameObjectManager.CreateGameObject("Test GameObject");
 
     gameObject.AddPrototypeGM(counterModule);
     gameObject.AddPrototypeGM(counterModule);

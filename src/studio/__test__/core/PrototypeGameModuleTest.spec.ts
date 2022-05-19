@@ -282,7 +282,7 @@ describe("PrototypeGameModule Unit Test", () => {
     expect(classConstructor).toBeDefined();
 
     const classInstance = new classConstructor(
-      new GameObject("", dummyScene),
+      new GameObject(dummyScene, "GameObject Test Name"),
       gm.id,
       ""
     );
