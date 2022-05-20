@@ -1,11 +1,11 @@
 import { TransformNode } from "babylonjs";
 import { v4 as uuid } from "uuid";
-import type GameModuleRegistry from "../GameModuleRegistry";
 import { GameModuleNotFoundError } from "../GameModuleRegistry";
 import { GameNotRunningError } from "../GameObjectManager";
 import type PrototypeGameModule from "../PrototypeGameModule";
 import type { ISceneObject } from "../SceneManager";
 import type GameModule from "./GameModule";
+import { Lib } from "./RuntimeLibrary";
 
 export type InstantiableProtoGMID = string;
 
@@ -42,14 +42,12 @@ export default class GameObject {
     this._node = null;
   }
 
-  public Setup(gameModuleRegistry: GameModuleRegistry) {
+  public Setup() {
     this._node = new TransformNode(this._name, this._scene.scene);
     this._node.id = this._id;
 
     this._prototypeGameModule.forEach((v) => {
-      const Constructor = gameModuleRegistry.GetGameModuleConstructorById(
-        v.module.id
-      );
+      const Constructor = v.module.GetConstructorWrapper()(Lib);
 
       this._gameModule.push(new Constructor(this, v.module.id, v.uid));
     });

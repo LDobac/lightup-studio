@@ -1,6 +1,4 @@
 import { Engine } from "babylonjs";
-import type { CompileMachine } from "./CompileMachine";
-import GameModuleRegistry from "./GameModuleRegistry";
 import SceneManager, { type ISceneObject } from "./SceneManager";
 
 export class GameEngineAlreadyRunning extends Error {
@@ -16,11 +14,10 @@ export default class GameEngine {
   private _babylonEngine: Engine;
 
   private _sceneManager: SceneManager;
-  private _gameModuleRegistry: GameModuleRegistry;
 
   private canvasEl: HTMLCanvasElement | null;
 
-  constructor(canvasEl: HTMLCanvasElement | null, compiler: CompileMachine) {
+  constructor(canvasEl: HTMLCanvasElement | null) {
     this._isRunning = false;
     this._isEditing = false;
 
@@ -32,7 +29,6 @@ export default class GameEngine {
     });
 
     this._sceneManager = new SceneManager(this);
-    this._gameModuleRegistry = new GameModuleRegistry(compiler);
   }
 
   public Start(scene?: ISceneObject) {
@@ -72,10 +68,6 @@ export default class GameEngine {
 
   public get sceneManager(): SceneManager {
     return this._sceneManager;
-  }
-
-  public get gameModuleRegistry(): GameModuleRegistry {
-    return this._gameModuleRegistry;
   }
 
   public get babylonEngine(): Engine {

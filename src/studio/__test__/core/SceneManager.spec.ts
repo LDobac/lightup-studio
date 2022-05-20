@@ -8,11 +8,9 @@ import SceneManager, {
   SceneNotFoundError,
 } from "@/studio/core/SceneManager";
 import GameEngine from "@/studio/core/GameEngine";
-import MockCompiler from "./MockCompiler";
 
 describe("SceneManager Test", () => {
-  const mockCompiler = new MockCompiler();
-  const gameEngine = new GameEngine(null, mockCompiler);
+  const gameEngine = new GameEngine(null);
 
   let sceneManager = new SceneManager(gameEngine);
 

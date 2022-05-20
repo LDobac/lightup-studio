@@ -11,6 +11,7 @@ import PrototypeGameModule, {
 } from "@/studio/core/PrototypeGameModule";
 import GameObject from "@/studio/core/runtime/GameObject";
 import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
+import { Lib } from "@/studio/core/runtime/RuntimeLibrary";
 
 const dummyScene: ISceneObject = new SceneObject(
   "DummyScene",
@@ -48,13 +49,11 @@ function CheckLib(
   registry: GameModuleRegistry,
   createdModules: Array<PrototypeGameModule>
 ) {
-  expect(Object.keys(registry.Lib.modules).length).toEqual(
-    createdModules.length
-  );
+  expect(Object.keys(Lib.modules).length).toEqual(createdModules.length);
 
   createdModules.forEach((module) => {
-    const expectClass = registry.Lib.modules[module.GetSafeName()].name;
-    const answerClass = module.GetConstructorWrapper()(registry.Lib).name;
+    const expectClass = Lib.modules[module.GetSafeName()].name;
+    const answerClass = module.GetConstructorWrapper()(Lib).name;
 
     expect(expectClass).toEqual(answerClass);
   });
@@ -88,7 +87,7 @@ describe("GameModuleRegistry Test", () => {
   let gameModuleRegistry = new GameModuleRegistry(compiler);
 
   afterEach(() => {
-    gameModuleRegistry.Lib.modules = {};
+    Lib.modules = {};
     gameModuleRegistry.Declarations = [];
 
     gameModuleRegistry = new GameModuleRegistry(compiler);
@@ -221,7 +220,7 @@ describe("GameModuleRegistry Test", () => {
       gameModuleRegistry.RegisterBySource(moduleName, source)
     ).rejects.toThrow(SourceNotValidError);
 
-    expect(Object.keys(gameModuleRegistry.Lib.modules).length).toEqual(0);
+    expect(Object.keys(Lib.modules).length).toEqual(0);
     expect(gameModuleRegistry.Declarations.length).toEqual(0);
   });
 
@@ -292,7 +291,7 @@ describe("GameModuleRegistry Test", () => {
       SourceNotValidError
     );
 
-    expect(Object.keys(gameModuleRegistry.Lib.modules).length).toEqual(0);
+    expect(Object.keys(Lib.modules).length).toEqual(0);
     expect(gameModuleRegistry.Declarations.length).toEqual(0);
   });
 
@@ -315,7 +314,7 @@ describe("GameModuleRegistry Test", () => {
       GameModuleNameDuplicatedError
     );
 
-    expect(Object.keys(gameModuleRegistry.Lib.modules).length).toEqual(1);
+    expect(Object.keys(Lib.modules).length).toEqual(1);
     expect(gameModuleRegistry.Declarations.length).toEqual(1);
   });
 
@@ -994,7 +993,7 @@ describe("GameModuleRegistry GameModule ExposeMetadata inject Test", async () =>
   let gameModuleRegistry = new GameModuleRegistry(compiler);
 
   afterEach(() => {
-    gameModuleRegistry.Lib.modules = {};
+    Lib.modules = {};
     gameModuleRegistry.Declarations = [];
 
     gameModuleRegistry = new GameModuleRegistry(compiler);

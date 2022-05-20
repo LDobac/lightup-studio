@@ -1,14 +1,11 @@
 import GameEngine, { GameEngineAlreadyRunning } from "@/studio/core/GameEngine";
 import { describe, it, expect, afterEach } from "vitest";
-import MockCompiler from "./MockCompiler";
-
-const mockCompiler = new MockCompiler();
 
 describe("GameEngine Test", () => {
-  let gameEngine = new GameEngine(null, mockCompiler);
+  let gameEngine = new GameEngine(null);
 
   afterEach(() => {
-    gameEngine = new GameEngine(null, mockCompiler);
+    gameEngine = new GameEngine(null);
   });
 
   it("Start without any scene have to throw", () => {

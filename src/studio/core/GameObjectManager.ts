@@ -1,6 +1,5 @@
 import { v4 as uuid } from "uuid";
 import "reflect-metadata";
-import type GameModuleRegistry from "./GameModuleRegistry";
 import {
   GameModuleNameDuplicatedError,
   GameModuleNotFoundError,
@@ -335,11 +334,11 @@ export default class GameObjectManager {
     });
   }
 
-  public GameSetup(gameModuleRegistry: GameModuleRegistry) {
+  public GameSetup() {
     this.running = true;
 
     this._gameObjects.forEach((go) => {
-      go.Setup(gameModuleRegistry);
+      go.Setup();
     });
 
     this.SetupDependencyInjection();

@@ -9,7 +9,7 @@ import {
 } from "./runtime/ExposeDecorator";
 import {
   DefaultDeclarations,
-  Lib as DefaultLibrary,
+  Lib,
   type RuntimeDeclarations,
 } from "./runtime/RuntimeLibrary";
 
@@ -32,14 +32,13 @@ export default class GameModuleRegistry {
   private compiler: CompileMachine;
   private modules: Array<PrototypeGameModule>;
 
-  public Lib = DefaultLibrary;
   public Declarations: RuntimeDeclarations = [];
 
   constructor(compiler: CompileMachine) {
     this.compiler = compiler;
     this.modules = [];
 
-    this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
+    this.SetCompilerDeclarations();
   }
 
   public async RegisterNewModule(name: string): Promise<PrototypeGameModule> {
@@ -145,7 +144,7 @@ export default class GameModuleRegistry {
       throw new GameModuleNotFoundError();
     }
 
-    return this.Lib.modules[module.safeName];
+    return Lib.modules[module.safeName];
   }
 
   public GetGameModuleConstructorById(id: string): GameModuleConstructor {
@@ -155,7 +154,7 @@ export default class GameModuleRegistry {
       throw new GameModuleNotFoundError();
     }
 
-    return this.Lib.modules[module.safeName];
+    return Lib.modules[module.safeName];
   }
 
   private async CompileModule(gameModule: PrototypeGameModule): Promise<void> {
@@ -191,7 +190,7 @@ export default class GameModuleRegistry {
       text: this.WrapDeclaration(moduleDeclaration.text),
     });
 
-    this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
+    this.SetCompilerDeclarations();
   }
 
   // Modify and Set exists game module
@@ -207,14 +206,18 @@ export default class GameModuleRegistry {
 
     declaration.text = this.WrapDeclaration(moduleDeclaration.text);
 
+    this.SetCompilerDeclarations();
+  }
+
+  private SetCompilerDeclarations() {
     this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
   }
 
   private AddGameModuleToLibrary(gameModule: PrototypeGameModule) {
-    this.Lib.modules[gameModule.GetSafeName()] =
-      gameModule.GetConstructorWrapper()(this.Lib);
+    Lib.modules[gameModule.GetSafeName()] =
+      gameModule.GetConstructorWrapper()(Lib);
 
-    this.SetMetadata(gameModule, this.Lib.modules[gameModule.GetSafeName()]);
+    this.SetMetadata(gameModule, Lib.modules[gameModule.GetSafeName()]);
   }
 
   private SetMetadata(
@@ -241,9 +244,9 @@ export default class GameModuleRegistry {
     }
 
     // Delete Lib modules
-    delete this.Lib.modules[deletedModule.safeName];
+    delete Lib.modules[deletedModule.safeName];
 
-    this.compiler.SetDeclaration(DefaultDeclarations.concat(this.Declarations));
+    this.SetCompilerDeclarations();
   }
 
   private async AddGameModule(

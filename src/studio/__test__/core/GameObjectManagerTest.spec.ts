@@ -328,7 +328,7 @@ describe("GameObjectManagerTest", () => {
     const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
@@ -364,7 +364,7 @@ describe("GameObjectManagerTest", () => {
     newGameObject.AddPrototypeGM(counterModule);
     newGameObject.AddPrototypeGM(countAModule);
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
@@ -388,7 +388,7 @@ describe("GameObjectManagerTest", () => {
     const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
@@ -432,7 +432,7 @@ describe("GameObjectManager Value Injection Test", () => {
       propertyKey: "count",
     });
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
 
     const exposeValue = gameObjectManager.AcquireExposeValue(expose)[0];
 
@@ -497,7 +497,7 @@ describe("GameObjectManager Value Injection Test", () => {
       propertyKey: "invalid_field",
     });
 
-    expect(() => gameObjectManager.GameSetup(gameModuleRegistry)).toThrow(
+    expect(() => gameObjectManager.GameSetup()).toThrow(
       FailedToResolveExposeData
     );
   });
@@ -519,7 +519,7 @@ describe("GameObjectManager Value Injection Test", () => {
 
     gameObjectManager.RemoveInjection(handler);
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
 
     const exposeValue = gameObjectManager.AcquireExposeValue(expose)[0];
 
@@ -604,7 +604,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const obj1CounterModule = GetRuntimeGM(
@@ -670,7 +670,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const obj1CounterModule = GetRuntimeGM(
@@ -731,7 +731,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
@@ -822,7 +822,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    expect(() => gameObjectManager.GameSetup(gameModuleRegistry)).toThrow(
+    expect(() => gameObjectManager.GameSetup()).toThrow(
       FailedToResolveExposeData
     );
   });
@@ -900,7 +900,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    expect(() => gameObjectManager.GameSetup(gameModuleRegistry)).toThrow(
+    expect(() => gameObjectManager.GameSetup()).toThrow(
       FailedToResolveExposeData
     );
   });
@@ -924,7 +924,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const obj1CounterModule = GetRuntimeGM(
@@ -1016,7 +1016,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
@@ -1076,7 +1076,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup(gameModuleRegistry);
+    gameObjectManager.GameSetup();
     gameObjectManager.GameStart();
 
     const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];

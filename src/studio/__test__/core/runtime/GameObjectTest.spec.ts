@@ -161,7 +161,7 @@ describe("GameObjectTest", async () => {
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
-    gameObject.Setup(gameModuleRegistry);
+    gameObject.Setup();
 
     const runtimeGameModule = gameObject.runtimeGameModule;
 
@@ -196,7 +196,7 @@ describe("GameObjectTest", async () => {
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
-    gameObject.Setup(gameModuleRegistry);
+    gameObject.Setup();
 
     const runtimeGameModule = gameObject.runtimeGameModule;
 
@@ -230,7 +230,7 @@ describe("GameObjectTest", async () => {
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
-    gameObject.Setup(gameModuleRegistry);
+    gameObject.Setup();
 
     const runtimeGameModule = gameObject.runtimeGameModule;
 
@@ -260,7 +260,7 @@ describe("GameObjectTest", async () => {
     const instProtoGM1 = gameObject.AddPrototypeGM(counterModule);
     const instProtoGM2 = gameObject.AddPrototypeGM(countAModule);
 
-    gameObject.Setup(gameModuleRegistry);
+    gameObject.Setup();
 
     const runtimeGameModule = gameObject.runtimeGameModule;
 
@@ -318,7 +318,7 @@ describe("GameObjectTest", async () => {
     const expectName = "Expect Name";
     const gameObject = new GameObject(dummyScene, expectName);
 
-    gameObject.Setup(gameModuleRegistry);
+    gameObject.Setup();
 
     expect(gameObject.node.name).toEqual(expectName);
     expect(gameObject.name).toEqual(expectName);
@@ -333,7 +333,7 @@ describe("GameObjectTest", async () => {
   it("Get Node Test successfully", () => {
     const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 
-    gameObject.Setup(gameModuleRegistry);
+    gameObject.Setup();
 
     expect(() => gameObject.node).not.toThrow(GameNotRunningError);
 

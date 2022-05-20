@@ -134,9 +134,7 @@ export default class SceneManager {
     }
 
     if (this._currentScene) {
-      this._currentScene.gameObjectManager.GameSetup(
-        this.gameEngine.gameModuleRegistry
-      );
+      this._currentScene.gameObjectManager.GameSetup();
       this._currentScene.gameObjectManager.GameStart();
     } else {
       throw new CurrentSceneNotExists();
