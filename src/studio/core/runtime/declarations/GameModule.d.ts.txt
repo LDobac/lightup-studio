@@ -1,0 +1,7 @@
+export declare abstract class GameModule {
+    private _gameObject;
+    constructor();
+    abstract Start(): void;
+    abstract Update(deltaTime: number): void;
+    get gameObject(): GameObject;
+}

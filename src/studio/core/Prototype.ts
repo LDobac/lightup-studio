@@ -1,15 +1,10 @@
-import {
-  FreeCamera,
-  HemisphericLight,
-  Mesh,
-  MeshBuilder,
-  Vector3,
-} from "babylonjs";
 import type { Nullable } from "babylonjs";
 import type { CompileMachine } from "./CompileMachine";
 import GameEngine from "./GameEngine";
 import GameModuleRegistry from "./GameModuleRegistry";
 import type SceneManager from "./SceneManager";
+import type PrototypeGameModule from "./PrototypeGameModule";
+import { Lib } from "./runtime/RuntimeLibrary";
 
 export default class Prototype {
   private _gameModuleRegistry: GameModuleRegistry;
@@ -22,6 +17,7 @@ export default class Prototype {
     this._gameModuleRegistry = new GameModuleRegistry(compiler);
 
     this._gameEngine = new GameEngine(canvasOrContext);
+    Lib.gameEngine = this._gameEngine;
 
     // tmp code
     {
@@ -30,42 +26,39 @@ export default class Prototype {
       const scene = sceneManager.NewScene("New Scene");
       sceneManager.defaultScene = scene;
 
-      // const testGameModule = this._gameModuleRegistry.RegisterBySource("TestGameModule", [
-      //   "class  testgamemodule extends Lib.GameModule {",
-      //   "Start() {",
-      //   "}",
-      //   "Update(deltaTime : number) {",
-      //   "}"
-      //   "}",
-      // ].join("\n"));
+      setTimeout(() => {
+        this._gameModuleRegistry
+          .RegisterBySource(
+            "TestGameModule",
+            [
+              "class  testgamemodule extends Lib.GameModule {",
+              " private camera : Lib.BABYLON.FreeCamera;",
+              " private ground : Lib.BABYLON.Mesh",
+              " Start() {",
+              "   const Babylon = Lib.BABYLON;",
+              "   const currentScene = this.gameObject.scene.scene;\n",
+              "   this.camera = new Babylon.FreeCamera('camera1', new Babylon.Vector3(0, 5, -10), currentScene);",
+              "   this.camera.setTarget(Babylon.Vector3.Zero());",
+              "   this.camera.attachControl(Lib.gameEngine.canvasOrContext, false);\n",
+              "   new Babylon.HemisphericLight('light1', new Babylon.Vector3(0, 1, 0), currentScene);\n",
+              "   const sphere = Babylon.MeshBuilder.CreateSphere('sphere1', { segments: 16, diameter: 2, sideOrientation: Babylon.Mesh.FRONTSIDE }, currentScene);",
+              "   sphere.position.y = 1",
+              "   this.ground = Babylon.MeshBuilder.CreateGround('ground1', { width: 6, height: 6, subdivisions: 2, updatable: false }, currentScene)",
+              " }",
+              " Update(deltaTime : number) {",
+              "   this.ground.rotate(Lib.BABYLON.Vector3.Up(), deltaTime);",
+              " }",
+              "}",
+            ].join("\n")
+          )
+          .then((testGameModule: PrototypeGameModule) => {
+            const gameObject =
+              scene.gameObjectManager.CreateGameObject("New GameObject");
+            gameObject.AddPrototypeGM(testGameModule);
 
-      const camera = new FreeCamera(
-        "camera1",
-        new Vector3(0, 5, -10),
-        scene.scene
-      );
-
-      // Target the camera to scene origin
-      camera.setTarget(Vector3.Zero());
-      // Attach the camera to the canvas
-      camera.attachControl(this._gameEngine.canvasOrContext, false);
-
-      // Create a basic light, aiming 0, 1, 0 - meaning, to the sky
-      new HemisphericLight("light1", new Vector3(0, 1, 0), scene.scene);
-      // Create a built-in "sphere" shape using the SphereBuilder
-      const sphere = MeshBuilder.CreateSphere(
-        "sphere1",
-        { segments: 16, diameter: 2, sideOrientation: Mesh.FRONTSIDE },
-        scene.scene
-      );
-      // Move the sphere upward 1/2 of its height
-      sphere.position.y = 1;
-      // Create a built-in "ground" shape;
-      MeshBuilder.CreateGround(
-        "ground1",
-        { width: 6, height: 6, subdivisions: 2, updatable: false },
-        scene.scene
-      );
+            console.log("Init succ");
+          });
+      }, 1000);
     }
   }
 

@@ -1,0 +1,10 @@
+export class SceneManager {
+    private _currentScene?;
+    private constructor();
+    StartSceneById(id: string): void;
+    StartSceneByName(name: string): void;
+    StartScene(scene?: ISceneObject): void;
+    SwapById(id: string): void;
+    SwapByName(name: string): void;
+    get currentScene(): ISceneObject | undefined;
+}

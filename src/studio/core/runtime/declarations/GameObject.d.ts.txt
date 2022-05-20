@@ -1,0 +1,12 @@
+export declare class GameObject {
+    private _id: string;
+    private _name: string;
+    private _gameModule: Array<GameModule>;
+    private _scene: ISceneObject;
+    private _node: Lib.BABYLON.TransformNode | null;
+    private constructor();
+    get id(): string;
+    get name(): string;
+    get node(): Lib.BABYLON.TransformNode;
+    get scene(): ISceneObject;
+}

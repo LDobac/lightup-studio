@@ -6,13 +6,13 @@ import Header from "./components/Header.vue";
 <template>
   <div class="container">
     <div class="header">
-      <!-- <Header /> -->
+      <Header />
     </div>
     <div class="content">
       <RouterView />
     </div>
     <div class="footer">
-      <!-- <footer>Made by yikolden.</footer> -->
+      <footer>Made by yikolden.</footer>
     </div>
   </div>
 </template>

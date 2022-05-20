@@ -1,0 +1,5 @@
+export interface ISceneObject {
+  id: string;
+  name: string;
+  scene: Lib.BABYLON.Scene;
+}

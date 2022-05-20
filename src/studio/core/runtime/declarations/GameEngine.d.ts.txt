@@ -1,0 +1,15 @@
+export class GameEngine {
+    private _isRunning : boolean;
+    private _isEditing : boolean;
+    private _babylonEngine : Lib.BABYLON.Engine;
+    private _sceneManager;
+    private _canvasOrContext;
+    private constructor();
+    get sceneManager(): SceneManager;
+    get babylonEngine(): Engine;
+    get canvasOrContext(): Nullable<HTMLCanvasElement | WebGLRenderingContext>;
+    get isRunning(): boolean;
+    get isEditing(): boolean;
+}
+
+export declare const gameEngine: GameEngine;
