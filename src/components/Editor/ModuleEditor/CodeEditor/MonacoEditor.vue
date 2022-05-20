@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 
+import { usePrototypeStore } from "@/stores/PrototypeStore";
+
 import MonacoEditorManager from "@/studio/editor/MonacoEditorManager";
 import PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 
@@ -14,6 +16,9 @@ onMounted(() => {
     monacoEditorWrapper.value,
     PrototypeGameModule.GetDefaultSource("test_gamemodule")
   );
+
+  const prototype = usePrototypeStore();
+  prototype.SetCompiler(monacoEditorManager);
 });
 
 const HandleClick = async () => {
@@ -21,6 +26,21 @@ const HandleClick = async () => {
     const code = await monacoEditorManager.GetCompiledCode();
 
     console.log(code);
+  }
+};
+
+const HandleStartGame = () => {
+  const store = usePrototypeStore();
+  const prototype = store.prototype;
+
+  if (prototype) {
+    if (prototype.gameEngine.isRunning) {
+      prototype.gameEngine.Finalize();
+    } else {
+      prototype.gameEngine.Start();
+    }
+  } else {
+    console.log("Game not initailize yet");
   }
 };
 
@@ -44,6 +64,7 @@ const HandleClick = async () => {
 <template>
   <div ref="monacoEditorWrapper" class="monaco-editor-wrapper"></div>
   <button @click="HandleClick">Get Code</button>
+  <button @click="HandleStartGame">Start Game</button>
 </template>
 
 <style lang="scss" scoped>

@@ -1,4 +1,4 @@
-import { Engine } from "babylonjs";
+import { Engine, type Nullable } from "babylonjs";
 import SceneManager, { type ISceneObject } from "./SceneManager";
 
 export class GameEngineAlreadyRunning extends Error {
@@ -15,15 +15,17 @@ export default class GameEngine {
 
   private _sceneManager: SceneManager;
 
-  private canvasEl: HTMLCanvasElement | null;
+  private _canvasOrContext: Nullable<HTMLCanvasElement | WebGLRenderingContext>;
 
-  constructor(canvasEl: HTMLCanvasElement | null) {
+  constructor(
+    canvasOrContext: Nullable<HTMLCanvasElement | WebGLRenderingContext>
+  ) {
     this._isRunning = false;
     this._isEditing = false;
 
-    this.canvasEl = canvasEl;
+    this._canvasOrContext = canvasOrContext;
 
-    this._babylonEngine = new Engine(this.canvasEl, true, {
+    this._babylonEngine = new Engine(this._canvasOrContext, true, {
       preserveDrawingBuffer: true,
       stencil: true,
     });
@@ -74,8 +76,10 @@ export default class GameEngine {
     return this._babylonEngine;
   }
 
-  public get canvas(): HTMLCanvasElement | null {
-    return this.canvasEl;
+  public get canvasOrContext(): Nullable<
+    HTMLCanvasElement | WebGLRenderingContext
+  > {
+    return this._canvasOrContext;
   }
 
   public get isRunning(): boolean {

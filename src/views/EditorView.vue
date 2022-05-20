@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from "vue";
 import ModuleEditor from "../components/Editor/ModuleEditor/ModuleEditor.vue";
 import SceneEditor from "../components/Editor/SceneEditor.vue";
+
+/* 
 
 const editorView: Ref<HTMLElement | null> = ref(null);
 const resizeBar: Ref<HTMLElement | null> = ref(null);
@@ -10,17 +11,19 @@ const leftWindowSize = ref(0);
 const rightWindowSize = ref(0);
 
 onMounted(() => {
-  // if (!editorView.value || !resizeBar.value)
-  //   throw "Can't find resize bar and view!";
-  // const editorSize = editorView.value.clientWidth;
-  // leftWindowSize.value =
-  //   ((editorSize / 2 - resizeBar.value.clientWidth / 2) / editorSize) * 100;
-  // rightWindowSize.value = leftWindowSize.value;
+  if (!editorView.value || !resizeBar.value)
+    throw "Can't find resize bar and view!";
+  const editorSize = editorView.value.clientWidth;
+  leftWindowSize.value =
+    ((editorSize / 2 - resizeBar.value.clientWidth / 2) / editorSize) * 100;
+  rightWindowSize.value = leftWindowSize.value;
 });
 
 const GetWidthCSS = (width: number) => {
   return `width: ${width}%;`;
 };
+
+*/
 </script>
 
 <template>
