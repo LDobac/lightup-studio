@@ -1,6 +1,7 @@
+import type IGameFlow from "../IGameFlow";
 import type GameObject from "./GameObject";
 
-export default abstract class GameModule {
+export default abstract class GameModule implements IGameFlow {
   private _prototypeId: string;
   private _uid: string;
 
@@ -11,6 +12,13 @@ export default abstract class GameModule {
 
     this._prototypeId = prototypeId;
     this._uid = uid;
+  }
+
+  public Setup() {
+    throw "Not Implement";
+  }
+  public Finish() {
+    throw "Not Implement";
   }
 
   public abstract Start(): void;

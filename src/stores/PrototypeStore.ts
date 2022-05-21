@@ -35,6 +35,8 @@ export const usePrototypeStore = defineStore({
     CreatePrototypeIfSetUp() {
       if (this.compiler && this.canvasOrContext && !this.prototype) {
         this.prototype = new Prototype(this.canvasOrContext, this.compiler);
+        this.prototype.GenerateTestScene();
+        // this.prototype.GenerateEmptyPrototype();
       } else if (this.prototype && this.compiler && this.canvasOrContext) {
         this.prototype.gameModuleRegistry.SetCompiler(this.compiler);
       }

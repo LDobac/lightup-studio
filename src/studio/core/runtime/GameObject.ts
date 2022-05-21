@@ -2,6 +2,7 @@ import { TransformNode } from "babylonjs";
 import { v4 as uuid } from "uuid";
 import { GameModuleNotFoundError } from "../GameModuleRegistry";
 import { GameNotRunningError } from "../GameObjectManager";
+import type IGameFlow from "../IGameFlow";
 import type PrototypeGameModule from "../PrototypeGameModule";
 import type { ISceneObject } from "../SceneManager";
 import type GameModule from "./GameModule";
@@ -14,7 +15,7 @@ export interface InstantiableProtoGM {
   module: PrototypeGameModule;
 }
 
-export default class GameObject {
+export default class GameObject implements IGameFlow {
   private _id: string;
   private _name: string;
 

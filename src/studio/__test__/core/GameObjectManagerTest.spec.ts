@@ -328,8 +328,8 @@ describe("GameObjectManagerTest", () => {
     const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
 
@@ -364,8 +364,8 @@ describe("GameObjectManagerTest", () => {
     newGameObject.AddPrototypeGM(counterModule);
     newGameObject.AddPrototypeGM(countAModule);
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const exposeList = gameObjectManager.QueryExposeData(Function);
 
@@ -388,8 +388,8 @@ describe("GameObjectManagerTest", () => {
     const newGameObject = gameObjectManager.CreateGameObject("Test GameObject");
     newGameObject.AddPrototypeGM(counterModule);
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const exposeList = gameObjectManager.QueryExposeData(Number);
 
@@ -432,7 +432,7 @@ describe("GameObjectManager Value Injection Test", () => {
       propertyKey: "count",
     });
 
-    gameObjectManager.GameSetup();
+    gameObjectManager.Setup();
 
     const exposeValue = gameObjectManager.AcquireExposeValue(expose)[0];
 
@@ -441,7 +441,7 @@ describe("GameObjectManager Value Injection Test", () => {
     expect(GetCountVal()).toEqual(expectNum);
 
     // Counter 모듈의 Start 함수는 count를 10으로 변경함
-    gameObjectManager.GameStart();
+    gameObjectManager.Start();
 
     expect(GetCountVal()).toEqual(10);
   });
@@ -497,9 +497,7 @@ describe("GameObjectManager Value Injection Test", () => {
       propertyKey: "invalid_field",
     });
 
-    expect(() => gameObjectManager.GameSetup()).toThrow(
-      FailedToResolveExposeData
-    );
+    expect(() => gameObjectManager.Setup()).toThrow(FailedToResolveExposeData);
   });
 
   it("Value Injection Remove Test", () => {
@@ -519,7 +517,7 @@ describe("GameObjectManager Value Injection Test", () => {
 
     gameObjectManager.RemoveInjection(handler);
 
-    gameObjectManager.GameSetup();
+    gameObjectManager.Setup();
 
     const exposeValue = gameObjectManager.AcquireExposeValue(expose)[0];
 
@@ -529,7 +527,7 @@ describe("GameObjectManager Value Injection Test", () => {
     expect(GetCountVal()).toEqual(0);
 
     // Counter 모듈의 Start 함수는 count를 10으로 변경함
-    gameObjectManager.GameStart();
+    gameObjectManager.Start();
     expect(GetCountVal()).toEqual(10);
   });
 });
@@ -604,8 +602,8 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const obj1CounterModule = GetRuntimeGM(
       gameObject1,
@@ -670,8 +668,8 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const obj1CounterModule = GetRuntimeGM(
       gameObject,
@@ -731,8 +729,8 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
     const obj2Count = gameObjectManager.AcquireExposeValue(obj2Expose)[0];
@@ -822,9 +820,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    expect(() => gameObjectManager.GameSetup()).toThrow(
-      FailedToResolveExposeData
-    );
+    expect(() => gameObjectManager.Setup()).toThrow(FailedToResolveExposeData);
   });
 
   it("Dependency Injection Test invalid target game object id test", () => {
@@ -900,9 +896,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    expect(() => gameObjectManager.GameSetup()).toThrow(
-      FailedToResolveExposeData
-    );
+    expect(() => gameObjectManager.Setup()).toThrow(FailedToResolveExposeData);
   });
 
   it("Dependency Injection Remove Test", () => {
@@ -924,8 +918,8 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const obj1CounterModule = GetRuntimeGM(
       gameObject1,
@@ -1016,8 +1010,8 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
     const obj2Count = gameObjectManager.AcquireExposeValue(obj2Expose)[0];
@@ -1076,8 +1070,8 @@ describe("GameObjectManager Dependency Injection Test", () => {
       }
     );
 
-    gameObjectManager.GameSetup();
-    gameObjectManager.GameStart();
+    gameObjectManager.Setup();
+    gameObjectManager.Start();
 
     const obj1Count = gameObjectManager.AcquireExposeValue(obj1Expose)[0];
     const obj2GetDoubledCountFunc =
@@ -1095,7 +1089,7 @@ describe("GameObjectManager Dependency Injection Test", () => {
     expect(obj1Count.GetValue()).toEqual(10);
     expect(obj2GetDoubledCount()).toEqual(20);
 
-    gameObjectManager.GameUpdate(-1);
+    gameObjectManager.Update(-1);
 
     expect(obj1Count.GetValue()).toEqual(11);
     expect(obj2GetDoubledCount()).toEqual(22);

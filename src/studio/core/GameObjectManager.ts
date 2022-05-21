@@ -8,6 +8,7 @@ import type { IExposeMetadata } from "./runtime/ExposeDecorator";
 import GameObject from "./runtime/GameObject";
 import type GameModule from "./runtime/GameModule";
 import type { ISceneObject } from "./SceneManager";
+import type IGameFlow from "./IGameFlow";
 
 export class GameObjectNotFoundError extends Error {
   constructor() {
@@ -79,7 +80,7 @@ export interface IInjectionMetadata {
   >;
 }
 
-export default class GameObjectManager {
+export default class GameObjectManager implements IGameFlow {
   // NOTE : 최적화를 위해서 gameObjects 변수를 Key:Value 컨테이너로 교체?
   private _gameObjects: Array<GameObject>;
 
@@ -334,7 +335,7 @@ export default class GameObjectManager {
     });
   }
 
-  public GameSetup() {
+  public Setup() {
     this.running = true;
 
     this._gameObjects.forEach((go) => {
@@ -345,19 +346,19 @@ export default class GameObjectManager {
     this.SetupValueInjection();
   }
 
-  public GameStart() {
+  public Start() {
     this._gameObjects.forEach((go) => {
       go.Start();
     });
   }
 
-  public GameUpdate(deltaTime: number) {
+  public Update(deltaTime: number) {
     this._gameObjects.forEach((go) => {
       go.Update(deltaTime);
     });
   }
 
-  public GameFinish() {
+  public Finish() {
     this.running = false;
 
     this._gameObjects.forEach((go) => {

@@ -2,12 +2,15 @@ import { v4 as uuid } from "uuid";
 import { Engine, Scene } from "babylonjs";
 import type GameEngine from "./GameEngine";
 import GameObjectManager from "./GameObjectManager";
+import type IGameFlow from "./IGameFlow";
 
-export interface ISceneObject {
+export interface ISceneObject extends IGameFlow {
   id: string;
   name: string;
   scene: Scene;
   gameObjectManager: GameObjectManager;
+
+  Render: () => void;
 }
 
 export class SceneObject implements ISceneObject {
@@ -16,11 +19,39 @@ export class SceneObject implements ISceneObject {
   public scene: Scene;
   public gameObjectManager: GameObjectManager;
 
+  private engine: Engine;
+
   constructor(name: string, engine: Engine) {
     this.id = uuid();
     this.name = name;
     this.scene = new Scene(engine);
     this.gameObjectManager = new GameObjectManager(this);
+
+    this.engine = engine;
+  }
+
+  public Render() {
+    this.scene.render();
+  }
+
+  public Setup() {
+    this.gameObjectManager.Setup();
+  }
+
+  public Start() {
+    this.gameObjectManager.Start();
+  }
+
+  public Update(deltaTime: number) {
+    this.gameObjectManager.Update(deltaTime);
+  }
+  
+  public Finish() {
+    this.gameObjectManager.Finish();
+
+    // this.scene.dispose();
+
+    this.scene = new Scene(this.engine);
   }
 }
 
@@ -116,7 +147,9 @@ export default class SceneManager {
 
   public StartScene(scene?: ISceneObject): void {
     if (this._currentScene) {
-      this._currentScene.gameObjectManager.GameFinish();
+      const tmpCurrentScene = this._currentScene;
+      this.FinishCurrentScene();
+      this._currentScene = tmpCurrentScene;
     }
 
     if (scene) {
@@ -134,8 +167,8 @@ export default class SceneManager {
     }
 
     if (this._currentScene) {
-      this._currentScene.gameObjectManager.GameSetup();
-      this._currentScene.gameObjectManager.GameStart();
+      this._currentScene.Setup();
+      this._currentScene.Start();
     } else {
       throw new CurrentSceneNotExists();
     }
@@ -146,7 +179,7 @@ export default class SceneManager {
       throw new CurrentSceneNotExists();
     }
 
-    this._currentScene.gameObjectManager.GameFinish();
+    this._currentScene.Finish();
 
     this._currentScene = undefined;
   }
@@ -164,7 +197,7 @@ export default class SceneManager {
       throw new CurrentSceneNotExists();
     }
 
-    this._currentScene.scene.render();
+    this._currentScene.Render();
   }
 
   public SceneUpdate(deltaTime: number) {
@@ -172,7 +205,7 @@ export default class SceneManager {
       throw new CurrentSceneNotExists();
     }
 
-    this._currentScene.gameObjectManager.GameUpdate(deltaTime);
+    this._currentScene.Update(deltaTime);
   }
 
   public set defaultScene(scene: ISceneObject | undefined) {

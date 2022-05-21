@@ -37,30 +37,15 @@ onMounted(() => {
   });
 });
 
-const HandleClick = async () => {
-  const prototype = usePrototypeStore();
+// const HandleClick = async () => {
+//   const prototype = usePrototypeStore();
 
-  if (prototype.compiler) {
-    const code = await prototype.compiler.GetCompiledCode();
+//   if (prototype.compiler) {
+//     const code = await prototype.compiler.GetCompiledCode();
 
-    console.log(code);
-  }
-};
-
-const HandleStartGame = () => {
-  const store = usePrototypeStore();
-  const prototype = store.prototype;
-
-  if (prototype) {
-    if (prototype.gameEngine.isRunning) {
-      prototype.gameEngine.Finalize();
-    } else {
-      prototype.gameEngine.Start();
-    }
-  } else {
-    console.log("Game not initailize yet");
-  }
-};
+//     console.log(code);
+//   }
+// };
 
 // const HandleClick2 = () => {
 //   if (!monacoEditorManager) return;

@@ -65,7 +65,9 @@ export default class GameEngine {
     this._isEditing = mode;
 
     // Restart Scene
-    this._sceneManager.StartScene(this._sceneManager.currentScene);
+    if (this._isRunning) {
+      this._sceneManager.StartScene(this._sceneManager.currentScene);
+    }
   }
 
   public get sceneManager(): SceneManager {
