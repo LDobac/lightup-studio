@@ -212,12 +212,11 @@ export default class MonacoEditorManager extends CompileMachine {
     return compiledResult;
   }
 
+  public GetMonacoEditor(): monaco.editor.IStandaloneCodeEditor {
+    return this.monacoEditor;
+  }
+
   private GetDefaultSourceCode(): string {
-    return [
-      "function x(str : string) : void",
-      "{",
-      "\tconsole.log(str);",
-      "}",
-    ].join("\n");
+    return "";
   }
 }

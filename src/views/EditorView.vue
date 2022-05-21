@@ -31,7 +31,7 @@ const GetWidthCSS = (width: number) => {
     <div class="module-editor-wrapper">
       <ModuleEditor class="resizeable module-editor" />
     </div>
-    <div ref="resizeBar" class="resize-bar">Horizontal Spliter</div>
+    <div ref="resizeBar" class="resize-bar"></div>
     <SceneEditor class="resizeable" />
   </main>
 </template>
@@ -50,7 +50,7 @@ const GetWidthCSS = (width: number) => {
 }
 
 .resize-bar {
-  width: 20px;
+  width: 5px;
   height: 100%;
   background-color: black;
   color: white;

@@ -33,8 +33,10 @@ export const usePrototypeStore = defineStore({
       this.CreatePrototypeIfSetUp();
     },
     CreatePrototypeIfSetUp() {
-      if (this.compiler && this.canvasOrContext) {
+      if (this.compiler && this.canvasOrContext && !this.prototype) {
         this.prototype = new Prototype(this.canvasOrContext, this.compiler);
+      } else if (this.prototype && this.compiler && this.canvasOrContext) {
+        this.prototype.gameModuleRegistry.SetCompiler(this.compiler);
       }
     },
   },

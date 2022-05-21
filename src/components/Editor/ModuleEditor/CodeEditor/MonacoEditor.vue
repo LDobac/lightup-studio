@@ -1,29 +1,47 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 
 import { usePrototypeStore } from "@/stores/PrototypeStore";
 
 import MonacoEditorManager from "@/studio/editor/MonacoEditorManager";
-import PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 
 const monacoEditorWrapper = ref<HTMLElement | null>(null);
-let monacoEditorManager: MonacoEditorManager | null = null;
 
 onMounted(() => {
-  if (!monacoEditorWrapper.value) throw "Can't find monaco editor container";
-
-  monacoEditorManager = new MonacoEditorManager(
-    monacoEditorWrapper.value,
-    PrototypeGameModule.GetDefaultSource("test_gamemodule")
-  );
-
   const prototype = usePrototypeStore();
-  prototype.SetCompiler(monacoEditorManager);
+  const CreateEditor = () => {
+    if (!monacoEditorWrapper.value) throw "Can't find monaco editor container";
+
+    const monacoEditorManager = new MonacoEditorManager(
+      monacoEditorWrapper.value,
+      ""
+    );
+
+    monacoEditorManager.GetMonacoEditor().layout();
+
+    prototype.SetCompiler(monacoEditorManager);
+  };
+
+  watchEffect(() => {
+    let oldSource = "";
+
+    if (prototype.compiler) {
+      const monacoEditorManager = prototype.compiler as MonacoEditorManager;
+      oldSource = monacoEditorManager.GetCode();
+
+      monacoEditorManager.GetMonacoEditor().dispose();
+    }
+
+    CreateEditor();
+    prototype.compiler?.SetCode(oldSource);
+  });
 });
 
 const HandleClick = async () => {
-  if (monacoEditorManager) {
-    const code = await monacoEditorManager.GetCompiledCode();
+  const prototype = usePrototypeStore();
+
+  if (prototype.compiler) {
+    const code = await prototype.compiler.GetCompiledCode();
 
     console.log(code);
   }
@@ -63,14 +81,14 @@ const HandleStartGame = () => {
 
 <template>
   <div ref="monacoEditorWrapper" class="monaco-editor-wrapper"></div>
-  <button @click="HandleClick">Get Code</button>
-  <button @click="HandleStartGame">Start Game</button>
+  <!-- <button @click="HandleClick">Get Code</button>
+  <button @click="HandleStartGame">Start Game</button> -->
 </template>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/mixins.scss";
-
 .monaco-editor-wrapper {
-  height: 50%;
+  position: sticky;
+  display: block;
+  height: 100%;
 }
 </style>

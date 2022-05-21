@@ -157,6 +157,14 @@ export default class GameModuleRegistry {
     return Lib.modules[module.safeName];
   }
 
+  public SetCompiler(compiler: CompileMachine) {
+    if (this.compiler !== compiler) {
+      this.compiler = compiler;
+
+      this.SetCompilerDeclarations();
+    }
+  }
+
   private async CompileModule(gameModule: PrototypeGameModule): Promise<void> {
     this.compiler.SetCode(gameModule.originSource);
 

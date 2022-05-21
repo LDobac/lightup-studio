@@ -6,19 +6,16 @@ import CodeModuleEditor from "./CodeEditor/CodeModuleEditor.vue";
 
 <template>
   <div class="module-editor">
-    <n-tabs type="segment" :bar-width="28" style="padding: 0px; height: 100%">
-      <n-tab-pane
-        name="Visual"
-        tab="Visual"
-        style="padding: 0px; height: calc(100% - 40px)"
-      >
+    <n-tabs
+      class="tabs"
+      type="segment"
+      :bar-width="28"
+      style="padding: 0px; height: 100%"
+    >
+      <n-tab-pane class="tab-pane" name="Visual" tab="Visual">
         <VisualModuleEditor />
       </n-tab-pane>
-      <n-tab-pane
-        name="Code"
-        tab="Code"
-        style="padding: 0px; height: calc(100% - 40px)"
-      >
+      <n-tab-pane class="tab-pane" name="Code" tab="Code">
         <CodeModuleEditor />
       </n-tab-pane>
     </n-tabs>
@@ -28,5 +25,15 @@ import CodeModuleEditor from "./CodeEditor/CodeModuleEditor.vue";
 <style lang="scss" scoped>
 .module-editor {
   height: 100%;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+
+  .tab-pane {
+    padding: 0px;
+    height: 100%;
+  }
 }
 </style>

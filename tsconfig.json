@@ -16,6 +16,8 @@
       "babylonjs",
     ],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
   }
 }
