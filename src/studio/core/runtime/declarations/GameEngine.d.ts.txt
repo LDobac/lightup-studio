@@ -6,10 +6,10 @@ export class GameEngine {
     private _canvasOrContext;
     private constructor();
     get sceneManager(): SceneManager;
-    get babylonEngine(): Engine;
+    get babylonEngine(): Lib.BABYLON.Engine;
     get canvasOrContext(): Nullable<HTMLCanvasElement | WebGLRenderingContext>;
     get isRunning(): boolean;
     get isEditing(): boolean;
 }
 
-export declare const gameEngine: GameEngine;
+export const gameEngine: GameEngine;

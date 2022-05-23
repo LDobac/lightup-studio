@@ -1,4 +1,4 @@
-declare module BABYLON {
+module BABYLON {
     /**
      * Defines how the parser contract is defined.
      * These parsers are used to parse a list of specific assets (like particle systems, etc..)
@@ -13252,7 +13252,7 @@ declare module BABYLON {
 
 
 }
-declare module BABYLON.Debug {
+module BABYLON.Debug {
         /**
      * The Axes viewer will show 3 axes in a specific point in space
      * @see https://doc.babylonjs.com/toolsAndResources/utilities/World_Axes
@@ -13309,10 +13309,10 @@ declare module BABYLON.Debug {
 
 
 }
-declare module BABYLON {
+module BABYLON {
 
 }
-declare module BABYLON.Debug {
+module BABYLON.Debug {
         /**
      * The BoneAxesViewer will attach 3 axes to a specific bone of a specific mesh
      * @see demo here: https://www.babylonjs-playground.com/#0DE8F4#8
@@ -13353,7 +13353,7 @@ declare module BABYLON.Debug {
 
 
 }
-declare module BABYLON {
+module BABYLON {
     /**
      * Interface used to define scene explorer extensibility option
      */
@@ -13690,7 +13690,7 @@ declare module BABYLON {
 
 
 }
-declare module BABYLON.Debug {
+module BABYLON.Debug {
         /**
      * Used to show the physics impostor around the specific mesh
      */
@@ -13746,7 +13746,7 @@ declare module BABYLON.Debug {
 
 
 }
-declare module BABYLON {
+module BABYLON {
     /**
      * As raycast might be hard to debug, the RayHelper can help rendering the different rays
      * in order to better appreciate the issue one might have.
@@ -13815,7 +13815,7 @@ declare module BABYLON {
 
 
 }
-declare module BABYLON.Debug {
+module BABYLON.Debug {
         /**
      * Class used to render a debug view of a given skeleton
      * @see http://www.babylonjs-playground.com/#1BZJVJ#8
@@ -13970,7 +13970,7 @@ declare module BABYLON.Debug {
 
 
 }
-declare module BABYLON {
+module BABYLON {
     /**
      * Class to wrap DeviceInputSystem data into an event object
      */
@@ -93873,7 +93873,7 @@ interface OffscreenCanvas extends EventTarget {
     height: number;
 }
 
-declare var OffscreenCanvas: {
+var OffscreenCanvas: {
     prototype: OffscreenCanvas;
     new (width: number, height: number): OffscreenCanvas;
 };
@@ -94119,35 +94119,35 @@ interface ImageBitmap {
 
 interface WebGLQuery {}
 
-declare var WebGLQuery: {
+var WebGLQuery: {
     prototype: WebGLQuery;
     new (): WebGLQuery;
 };
 
 interface WebGLSampler {}
 
-declare var WebGLSampler: {
+var WebGLSampler: {
     prototype: WebGLSampler;
     new (): WebGLSampler;
 };
 
 interface WebGLSync {}
 
-declare var WebGLSync: {
+var WebGLSync: {
     prototype: WebGLSync;
     new (): WebGLSync;
 };
 
 interface WebGLTransformFeedback {}
 
-declare var WebGLTransformFeedback: {
+var WebGLTransformFeedback: {
     prototype: WebGLTransformFeedback;
     new (): WebGLTransformFeedback;
 };
 
 interface WebGLVertexArrayObject {}
 
-declare var WebGLVertexArrayObject: {
+var WebGLVertexArrayObject: {
     prototype: WebGLVertexArrayObject;
     new (): WebGLVertexArrayObject;
 };
@@ -94203,7 +94203,7 @@ interface WorkerNavigator {
     readonly gpu: GPU | undefined;
 }
 
-declare class GPU {
+class GPU {
     private __brand: void;
     requestAdapter(options?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
 }
@@ -94215,7 +94215,7 @@ interface GPURequestAdapterOptions {
 
 type GPUPowerPreference = "low-power" | "high-performance";
 
-declare class GPUAdapter {
+class GPUAdapter {
     // https://michalzalecki.com/nominal-typing-in-typescript/#approach-1-class-with-a-private-property
     private __brand: void;
     readonly name: string;
@@ -94241,7 +94241,7 @@ type GPUFeatureName =
     | "timestamp-query"
     | "indirect-first-instance";
 
-declare class GPUDevice extends EventTarget implements GPUObjectBase {
+class GPUDevice extends EventTarget implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 
@@ -94279,7 +94279,7 @@ declare class GPUDevice extends EventTarget implements GPUObjectBase {
     onuncapturederror: Event | undefined;
 }
 
-declare class GPUBuffer implements GPUObjectBase {
+class GPUBuffer implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 
@@ -94300,7 +94300,7 @@ type GPUBufferUsageFlags = number;
 
 type GPUMapModeFlags = number;
 
-declare class GPUTexture implements GPUObjectBase {
+class GPUTexture implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 
@@ -94322,7 +94322,7 @@ type GPUTextureDimension = "1d" | "2d" | "3d";
 
 type GPUTextureUsageFlags = number;
 
-declare class GPUTextureView implements GPUObjectBase {
+class GPUTextureView implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
@@ -94463,7 +94463,7 @@ type GPUTextureFormat =
     | "astc-12x12-unorm"
     | "astc-12x12-unorm-srgb";
 
-declare class GPUExternalTexture implements GPUObjectBase {
+class GPUExternalTexture implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
@@ -94473,7 +94473,7 @@ interface GPUExternalTextureDescriptor extends GPUObjectDescriptorBase {
     colorSpace?: GPUPredefinedColorSpace /* default="srgb" */;
 }
 
-declare class GPUSampler implements GPUObjectBase {
+class GPUSampler implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
@@ -94497,7 +94497,7 @@ type GPUFilterMode = "nearest" | "linear";
 
 type GPUCompareFunction = "never" | "less" | "equal" | "less-equal" | "greater" | "not-equal" | "greater-equal" | "always";
 
-declare class GPUBindGroupLayout implements GPUObjectBase {
+class GPUBindGroupLayout implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
@@ -94551,7 +94551,7 @@ interface GPUStorageTextureBindingLayout {
 
 interface GPUExternalTextureBindingLayout {}
 
-declare class GPUBindGroup implements GPUObjectBase {
+class GPUBindGroup implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
@@ -94574,7 +94574,7 @@ interface GPUBufferBinding {
     size?: GPUSize64 /* default=size_of_buffer - offset */;
 }
 
-declare class GPUPipelineLayout implements GPUObjectBase {
+class GPUPipelineLayout implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
@@ -94583,7 +94583,7 @@ interface GPUPipelineLayoutDescriptor extends GPUObjectDescriptorBase {
     bindGroupLayouts: GPUBindGroupLayout[];
 }
 
-declare class GPUShaderModule implements GPUObjectBase {
+class GPUShaderModule implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 
@@ -94631,7 +94631,7 @@ interface GPUProgrammableStage {
 
 type GPUPipelineConstantValue = number; // May represent WGSL’s bool, f32, i32, u32.
 
-declare class GPUComputePipeline implements GPUObjectBase, GPUPipelineBase {
+class GPUComputePipeline implements GPUObjectBase, GPUPipelineBase {
     private __brand: void;
     label: string | undefined;
 
@@ -94642,7 +94642,7 @@ interface GPUComputePipelineDescriptor extends GPUPipelineDescriptorBase {
     compute: GPUProgrammableStage;
 }
 
-declare class GPURenderPipeline implements GPUObjectBase, GPUPipelineBase {
+class GPURenderPipeline implements GPUObjectBase, GPUPipelineBase {
     private __brand: void;
     label: string | undefined;
 
@@ -94798,7 +94798,7 @@ interface GPUVertexAttribute {
     shaderLocation: GPUIndex32;
 }
 
-declare class GPUCommandBuffer implements GPUObjectBase {
+class GPUCommandBuffer implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
@@ -94807,7 +94807,7 @@ interface GPUCommandBufferDescriptor extends GPUObjectDescriptorBase {}
 
 interface GPUCommandsMixin {}
 
-declare class GPUCommandEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin {
+class GPUCommandEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin {
     private __brand: void;
     label: string | undefined;
 
@@ -94876,7 +94876,7 @@ interface GPUDebugCommandsMixin {
     insertDebugMarker(markerLabel: string): void;
 }
 
-declare class GPUComputePassEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUProgrammablePassEncoder {
+class GPUComputePassEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUProgrammablePassEncoder {
     private __brand: void;
     label: string | undefined;
 
@@ -94927,7 +94927,7 @@ interface GPURenderEncoderBase {
     drawIndexedIndirect(indirectBuffer: GPUBuffer, indirectOffset: GPUSize64): void;
 }
 
-declare class GPURenderPassEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUProgrammablePassEncoder, GPURenderEncoderBase {
+class GPURenderPassEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUProgrammablePassEncoder, GPURenderEncoderBase {
     private __brand: void;
     label: string | undefined;
 
@@ -95019,14 +95019,14 @@ interface GPURenderPassLayout extends GPUObjectDescriptorBase {
     sampleCount?: GPUSize32 /* default=1 */;
 }
 
-declare class GPURenderBundle implements GPUObjectBase {
+class GPURenderBundle implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 }
 
 interface GPURenderBundleDescriptor extends GPUObjectDescriptorBase {}
 
-declare class GPURenderBundleEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUProgrammablePassEncoder, GPURenderEncoderBase {
+class GPURenderBundleEncoder implements GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUProgrammablePassEncoder, GPURenderEncoderBase {
     private __brand: void;
     label: string | undefined;
 
@@ -95062,7 +95062,7 @@ interface GPURenderBundleEncoderDescriptor extends GPURenderPassLayout {
     stencilReadOnly?: boolean /* default=false */;
 }
 
-declare class GPUQueue implements GPUObjectBase {
+class GPUQueue implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 
@@ -95077,7 +95077,7 @@ declare class GPUQueue implements GPUObjectBase {
     copyExternalImageToTexture(source: GPUImageCopyExternalImage, destination: GPUImageCopyTextureTagged, copySize: GPUExtent3D): void;
 }
 
-declare class GPUQuerySet implements GPUObjectBase {
+class GPUQuerySet implements GPUObjectBase {
     private __brand: void;
     label: string | undefined;
 
@@ -95091,7 +95091,7 @@ interface GPUQuerySetDescriptor extends GPUObjectDescriptorBase {
 
 type GPUQueryType = "occlusion" | "timestamp";
 
-declare class GPUCanvasContext {
+class GPUCanvasContext {
     private __brand: void;
 
     readonly canvas: HTMLCanvasElement | OffscreenCanvas;
@@ -95117,7 +95117,7 @@ interface GPUCanvasConfiguration extends GPUObjectDescriptorBase {
 
 type GPUDeviceLostReason = "destroyed";
 
-declare class GPUDeviceLostInfo {
+class GPUDeviceLostInfo {
     private __brand: void;
     readonly reason?: GPUDeviceLostReason;
     readonly message: string;
@@ -95125,12 +95125,12 @@ declare class GPUDeviceLostInfo {
 
 type GPUErrorFilter = "out-of-memory" | "validation";
 
-declare class GPUOutOfMemoryError {
+class GPUOutOfMemoryError {
     private __brand: void;
     constructor();
 }
 
-declare class GPUValidationError {
+class GPUValidationError {
     private __brand: void;
     constructor(message: string);
     readonly message: string;
@@ -95138,7 +95138,7 @@ declare class GPUValidationError {
 
 type GPUError = GPUOutOfMemoryError | GPUValidationError;
 
-declare class GPUUncapturedErrorEvent extends Event {
+class GPUUncapturedErrorEvent extends Event {
     private __brand: void;
     constructor(type: string, gpuUncapturedErrorEventInitDict: GPUUncapturedErrorEventInit);
     readonly error: GPUError;
@@ -95325,7 +95325,7 @@ interface VRDisplay extends EventTarget {
     submitFrame(pose?: VRPose): void;
 }
 
-declare var VRDisplay: {
+var VRDisplay: {
     prototype: VRDisplay;
     new (): VRDisplay;
 };
@@ -95402,7 +95402,7 @@ interface Gamepad {
     readonly displayId: number;
 }
 
-declare var VRFrameData: any;
+var VRFrameData: any;
 
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -95514,7 +95514,7 @@ interface XRWebGLLayerInit {
 }
 
 // https://www.w3.org/TR/webxrlayers-1/#XRWebGLBindingtype
-declare class XRWebGLBinding {
+class XRWebGLBinding {
     constructor(xrSession: XRSession, context: WebGLRenderingContext | WebGL2RenderingContext);
     getReflectionCubeMap: (lightProbe: XRLightProbe) => WebGLTexture;
 
@@ -95524,7 +95524,7 @@ declare class XRWebGLBinding {
     getViewSubImage(layer: XRProjectionLayer, view: XRView): XRWebGLSubImage;
 }
 
-declare class XRWebGLLayer implements XRLayer {
+class XRWebGLLayer implements XRLayer {
     static getNativeFramebufferScaleFactor(session: XRSession): number;
     constructor(session: XRSession, context: WebGLRenderingContext | WebGL2RenderingContext, layerInit?: XRWebGLLayerInit);
     readonly antialias: boolean;
@@ -95783,7 +95783,7 @@ interface XRViewerPose extends XRPose {
     readonly views: Array<XRView>;
 }
 
-declare class XRRigidTransform {
+class XRRigidTransform {
     constructor(position?: DOMPointInit, direction?: DOMPointInit);
     position: DOMPointReadOnly;
     orientation: DOMPointReadOnly;
@@ -95806,14 +95806,14 @@ interface XRInputSourceChangeEvent extends Event {
 }
 
 // Experimental/Draft features
-declare class XRRay {
+class XRRay {
     constructor(transformOrOrigin: XRRigidTransform | DOMPointInit, direction?: DOMPointInit);
     origin: DOMPointReadOnly;
     direction: DOMPointReadOnly;
     matrix: Float32Array;
 }
 
-declare enum XRHitTestTrackableType {
+enum XRHitTestTrackableType {
     "point",
     "plane",
     "mesh",

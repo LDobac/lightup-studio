@@ -1,4 +1,3 @@
-export default interface ISerializable
-{
-    Serialize() : string 
+export default interface ISerializable {
+  Serialize(): string;
 }

@@ -1,1 +1,1 @@
-export declare function Expose(): (target: Object, propertyKey: string) => void;
+export function Expose(): (target: Object, propertyKey: string) => void;

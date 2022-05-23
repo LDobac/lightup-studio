@@ -1,7 +1,3 @@
-// import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
-// import "monaco-editor/esm/vs/editor/editor.all.js";
-// import "monaco-editor/esm/vs/editor/editor.main.js";
-
 import { createProject, ts } from "@ts-morph/bootstrap";
 
 import {
@@ -9,36 +5,6 @@ import {
   type ICompileResult,
   type ITypeDeclaration,
 } from "@/studio/core/CompileMachine";
-import { DefaultDeclarations } from "@/studio/core/runtime/RuntimeLibrary";
-
-DefaultDeclarations.splice(0, DefaultDeclarations.length);
-DefaultDeclarations.push({
-  uri: "ts:filename/runtime_objects.d.ts",
-  text: [
-    "namespace Lib {",
-
-    // Class or Objects
-    "export declare class GameObject {",
-    "  private gameModule;",
-    "  constructor();",
-    "  Start(): void;",
-    "  Update(deltaTime: number): void;",
-    "}",
-
-    "export declare abstract class GameModule {",
-    "    private _gameObject;",
-    "    constructor(gameObject: GameObject, prototypeId: string, uid: string);",
-    "    abstract Start(): void;",
-    "    abstract Update(deltaTime: number): void;",
-    "    get gameObject(): GameObject;",
-    "}",
-
-    // Decorators
-    "export declare function Expose(): (target: Object, propertyKey: string) => void;",
-
-    "}",
-  ].join("\n"),
-});
 
 export default class MockCompiler extends CompileMachine {
   private source: string;

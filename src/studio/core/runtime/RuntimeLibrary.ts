@@ -5,6 +5,7 @@ import { Expose } from "./ExposeDecorator";
 import GameModule from "./GameModule";
 import GameObject from "./GameObject";
 
+import UtilsDtxt from "./declarations/utils.d.ts.txt?raw";
 import BabylonDtxt from "./declarations/babylon.d.ts.txt?raw";
 import ExposeDtxt from "./declarations/Expose.d.ts.txt?raw";
 import GameEngineDtxt from "./declarations/GameEngine.d.ts.txt?raw";
@@ -53,31 +54,35 @@ export const Lib: RuntimeLibrary = {
 
 export const DefaultDeclarations: RuntimeDeclarations = [
   {
+    uri: "ts:filename/utils.d.ts",
+    text: ["declare module Lib {", UtilsDtxt, "}"].join("\n"),
+  },
+  {
     uri: "ts:filename/babylon.d.ts",
-    text: ["namespace Lib {", BabylonDtxt, "}"].join("\n"),
+    text: ["declare module Lib {", BabylonDtxt, "}"].join("\n"),
   },
   {
     uri: "ts:filename/ExposeDtxt.d.ts",
-    text: ["namespace Lib {", ExposeDtxt, "}"].join("\n"),
+    text: ["declare module Lib {", ExposeDtxt, "}"].join("\n"),
   },
   {
     uri: "ts:filename/GameEngineDtxt.d.ts",
-    text: ["namespace Lib {", GameEngineDtxt, "}"].join("\n"),
+    text: ["declare module Lib {", GameEngineDtxt, "}"].join("\n"),
   },
   {
     uri: "ts:filename/GameModuleDtxt.d.ts",
-    text: ["namespace Lib {", GameModuleDtxt, "}"].join("\n"),
+    text: ["declare module Lib {", GameModuleDtxt, "}"].join("\n"),
   },
   {
     uri: "ts:filename/GameObjectDtxt.d.ts",
-    text: ["namespace Lib {", GameObjectDtxt, "}"].join("\n"),
+    text: ["declare module Lib {", GameObjectDtxt, "}"].join("\n"),
   },
   {
     uri: "ts:filename/ISceneObjectDtxt.d.ts",
-    text: ["namespace Lib {", ISceneObjectDtxt, "}"].join("\n"),
+    text: ["declare module Lib {", ISceneObjectDtxt, "}"].join("\n"),
   },
   {
     uri: "ts:filename/SceneManager.d.ts",
-    text: ["namespace Lib {", SceneManagerDtxt, "}"].join("\n"),
+    text: ["declare module Lib {", SceneManagerDtxt, "}"].join("\n"),
   },
 ];

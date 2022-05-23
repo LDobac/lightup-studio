@@ -45,7 +45,7 @@ export class SceneObject implements ISceneObject {
   public Update(deltaTime: number) {
     this.gameObjectManager.Update(deltaTime);
   }
-  
+
   public Finish() {
     this.gameObjectManager.Finish();
 
@@ -90,13 +90,13 @@ export class CannotStartScene extends Error {
 export default class SceneManager {
   private gameEngine: GameEngine;
 
-  private scenes: Array<ISceneObject>;
+  private _scenes: Array<ISceneObject>;
 
   private _defaultScene?: ISceneObject;
   private _currentScene?: ISceneObject;
 
   constructor(gameEngine: GameEngine) {
-    this.scenes = [];
+    this._scenes = [];
 
     this.gameEngine = gameEngine;
   }
@@ -224,8 +224,8 @@ export default class SceneManager {
     return this._currentScene;
   }
 
-  public get _scenes(): ISceneObject[] {
-    return this.scenes;
+  public get scenes(): ISceneObject[] {
+    return this._scenes;
   }
 
   private RemoveScene(index: number) {

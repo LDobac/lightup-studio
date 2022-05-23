@@ -165,12 +165,17 @@ export default class GameModuleRegistry {
     }
   }
 
+  public get prototypeGameModules(): Array<PrototypeGameModule> {
+    return this.modules;
+  }
+
   private async CompileModule(gameModule: PrototypeGameModule): Promise<void> {
     this.compiler.SetCode(gameModule.originSource);
 
     const result = await this.compiler.GetCompiledCode();
 
-    if (result.diagnostic.length > 0) {
+    // Ignore not critical errors
+    if (result.diagnostic.length > 0 && !result.declaration && !result.js) {
       throw new CompileError(result.diagnostic);
     }
 

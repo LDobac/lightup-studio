@@ -1,4 +1,4 @@
-export declare class GameObject {
+export class GameObject {
     private _id: string;
     private _name: string;
     private _gameModule: Array<GameModule>;

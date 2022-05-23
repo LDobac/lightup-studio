@@ -22,7 +22,7 @@ describe("SceneManager Test", () => {
     const sceneName = "New Scene Name";
     const sceneObj = sceneManager.NewScene(sceneName);
 
-    expect(sceneManager._scenes.length).toEqual(1);
+    expect(sceneManager.scenes.length).toEqual(1);
 
     expect(sceneObj).toBeDefined();
     expect(sceneObj.name).toEqual(sceneName);
@@ -55,12 +55,12 @@ describe("SceneManager Test", () => {
     expect(() => sceneManager.RemoveSceneById(scene1.id)).not.toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(1);
+    expect(sceneManager.scenes.length).toEqual(1);
 
     expect(() => sceneManager.RemoveSceneById(scene2.id)).not.toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(0);
+    expect(sceneManager.scenes.length).toEqual(0);
   });
 
   it("RemoveSceneById have to throw when not exists id", () => {
@@ -70,12 +70,12 @@ describe("SceneManager Test", () => {
     expect(() => sceneManager.RemoveSceneById(scene1.id)).not.toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(1);
+    expect(sceneManager.scenes.length).toEqual(1);
 
     expect(() => sceneManager.RemoveSceneById("Not Exists Id")).toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(1);
+    expect(sceneManager.scenes.length).toEqual(1);
   });
 
   it("RemoveSceneByName Successfully", () => {
@@ -85,12 +85,12 @@ describe("SceneManager Test", () => {
     expect(() => sceneManager.RemoveSceneByName("Scene1")).not.toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(1);
+    expect(sceneManager.scenes.length).toEqual(1);
 
     expect(() => sceneManager.RemoveSceneByName("Scene2")).not.toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(0);
+    expect(sceneManager.scenes.length).toEqual(0);
   });
 
   it("RemoveSceneByName have to throw when not exists id", () => {
@@ -100,12 +100,12 @@ describe("SceneManager Test", () => {
     expect(() => sceneManager.RemoveSceneByName("Scene1")).not.toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(1);
+    expect(sceneManager.scenes.length).toEqual(1);
 
     expect(() => sceneManager.RemoveSceneByName("Not Exists Name")).toThrow(
       SceneNotFoundError
     );
-    expect(sceneManager._scenes.length).toEqual(1);
+    expect(sceneManager.scenes.length).toEqual(1);
   });
 
   it("StartSceneById have to throw when not exists id passed - 1", () => {
