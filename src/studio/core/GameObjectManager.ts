@@ -8,7 +8,7 @@ import type { IExposeMetadata } from "./runtime/ExposeDecorator";
 import GameObject from "./runtime/GameObject";
 import type GameModule from "./runtime/GameModule";
 import type { ISceneObject } from "./SceneManager";
-import type IGameFlow from "./IGameFlow";
+import type IGameFlow from "../utils/IGameFlow";
 
 export class GameObjectNotFoundError extends Error {
   constructor() {

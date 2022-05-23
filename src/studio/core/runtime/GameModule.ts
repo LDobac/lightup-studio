@@ -1,4 +1,4 @@
-import type IGameFlow from "../IGameFlow";
+import type IGameFlow from "../../utils/IGameFlow";
 import type GameObject from "./GameObject";
 
 export default abstract class GameModule implements IGameFlow {

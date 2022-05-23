@@ -2,7 +2,7 @@ import { v4 as uuid } from "uuid";
 import { Engine, Scene } from "babylonjs";
 import type GameEngine from "./GameEngine";
 import GameObjectManager from "./GameObjectManager";
-import type IGameFlow from "./IGameFlow";
+import type IGameFlow from "../utils/IGameFlow";
 
 export interface ISceneObject extends IGameFlow {
   id: string;

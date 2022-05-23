@@ -2,7 +2,7 @@ import { TransformNode } from "babylonjs";
 import { v4 as uuid } from "uuid";
 import { GameModuleNotFoundError } from "../GameModuleRegistry";
 import { GameNotRunningError } from "../GameObjectManager";
-import type IGameFlow from "../IGameFlow";
+import type IGameFlow from "../../utils/IGameFlow";
 import type PrototypeGameModule from "../PrototypeGameModule";
 import type { ISceneObject } from "../SceneManager";
 import type GameModule from "./GameModule";
