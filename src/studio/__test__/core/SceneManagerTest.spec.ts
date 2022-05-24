@@ -3,15 +3,16 @@ import { describe, it, expect, afterEach } from "vitest";
 import SceneManager, {
   CannotStartScene,
   CurrentSceneNotExists,
-  SceneNameDuplicated,
+  SceneDuplicated,
   SceneNameEmpty,
   SceneNotFoundError,
+  SceneObject,
 } from "@/studio/core/SceneManager";
 import GameEngine from "@/studio/core/GameEngine";
 
-describe("SceneManager Test", () => {
-  const gameEngine = new GameEngine(null);
+const gameEngine = new GameEngine(null);
 
+describe("SceneManager Test", () => {
   let sceneManager = new SceneManager(gameEngine);
 
   afterEach(() => {
@@ -41,10 +42,10 @@ describe("SceneManager Test", () => {
 
   it("NewScene have to throw when name is duplicated", () => {
     expect(() => sceneManager.NewScene("Duplicated")).not.toThrow(
-      SceneNameDuplicated
+      SceneDuplicated
     );
     expect(() => sceneManager.NewScene("Duplicated")).toThrow(
-      SceneNameDuplicated
+      SceneDuplicated
     );
   });
 
@@ -321,5 +322,80 @@ describe("SceneManager Test", () => {
     expect(() => (sceneManager.defaultScene = scene1)).toThrow(
       SceneNotFoundError
     );
+  });
+
+  it("Clear Test", () => {
+    // Setup test environment
+    const scene1 = sceneManager.NewScene("Scene1");
+    const scene2 = sceneManager.NewScene("Scene2");
+
+    scene1.gameObjectManager.CreateGameObject("a");
+
+    scene2.gameObjectManager.CreateGameObject("b");
+    scene2.gameObjectManager.CreateGameObject("c");
+
+    sceneManager.defaultScene = scene2;
+
+    expect(sceneManager.defaultScene).toEqual(scene2);
+    expect(sceneManager.scenes.length).toEqual(2);
+
+    expect(scene1.gameObjectManager.gameObjects.length).toEqual(1);
+    expect(scene2.gameObjectManager.gameObjects.length).toEqual(2);
+
+    // Do
+    sceneManager.Clear();
+
+    // Check
+    expect(sceneManager.defaultScene).toBeUndefined();
+    expect(sceneManager.scenes.length).toEqual(0);
+
+    expect(scene1.gameObjectManager.gameObjects.length).toEqual(0);
+    expect(scene2.gameObjectManager.gameObjects.length).toEqual(0);
+  });
+
+  it("Add Scene successfully", () => {
+    const newScene = new SceneObject("New Scene", gameEngine.babylonEngine);
+    sceneManager.AddScene(newScene);
+
+    expect(sceneManager.scenes[0]).toEqual(newScene);
+  });
+
+  it("Add Scene Failed cause name length too short", () => {
+    const newScene = new SceneObject("", gameEngine.babylonEngine);
+    expect(() => sceneManager.AddScene(newScene)).toThrow(SceneNameEmpty);
+  });
+
+  it("Add Scene Failed cause name duplicated", () => {
+    sceneManager.NewScene("New Scene");
+
+    const newScene = new SceneObject("New Scene", gameEngine.babylonEngine);
+
+    expect(() => sceneManager.AddScene(newScene)).toThrow(SceneDuplicated);
+  });
+});
+
+describe("SceneObject Test", () => {
+  it("SceneObject create with default parameters", () => {
+    const expectName = "TestName";
+
+    const scene = new SceneObject(expectName, gameEngine.babylonEngine);
+
+    expect(scene.name).toEqual(expectName);
+    expect(scene.gameObjectManager.gameObjects.length).toEqual(0);
+  });
+
+  it("SceneObject create with id", () => {
+    const expectName = "TestName";
+    const expectId = "Thisisid";
+
+    const scene = new SceneObject(
+      expectName,
+      gameEngine.babylonEngine,
+      expectId
+    );
+
+    expect(scene.name).toEqual(expectName);
+    expect(scene.id).toEqual(expectId);
+    expect(scene.gameObjectManager.gameObjects.length).toEqual(0);
   });
 });

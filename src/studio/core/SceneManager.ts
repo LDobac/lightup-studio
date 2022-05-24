@@ -21,11 +21,18 @@ export class SceneObject implements ISceneObject {
 
   private engine: Engine;
 
-  constructor(name: string, engine: Engine) {
-    this.id = uuid();
+  constructor(
+    name: string,
+    engine: Engine,
+    id = "",
+    gameObjectManager: GameObjectManager | null = null
+  ) {
+    this.id = id.length > 0 ? id : uuid();
     this.name = name;
     this.scene = new Scene(engine);
-    this.gameObjectManager = new GameObjectManager(this);
+    this.gameObjectManager = gameObjectManager
+      ? gameObjectManager
+      : new GameObjectManager(this);
 
     this.engine = engine;
   }
@@ -61,7 +68,7 @@ export class SceneNotFoundError extends Error {
   }
 }
 
-export class SceneNameDuplicated extends Error {
+export class SceneDuplicated extends Error {
   constructor() {
     super("Scene name has duplicated");
   }
@@ -107,7 +114,7 @@ export default class SceneManager {
     }
 
     if (this.scenes.find((s) => s.name === name)) {
-      throw new SceneNameDuplicated();
+      throw new SceneDuplicated();
     }
 
     const newSceneObj = new SceneObject(name, this.gameEngine.babylonEngine);
@@ -115,6 +122,20 @@ export default class SceneManager {
     this.scenes.push(newSceneObj);
 
     return newSceneObj;
+  }
+
+  public AddScene(scene: ISceneObject): ISceneObject {
+    if (scene.name.length < 1) {
+      throw new SceneNameEmpty();
+    }
+
+    if (this.scenes.find((s) => (s.name === scene.name) || (s.id === scene.id))) {
+      throw new SceneDuplicated();
+    }
+
+    this.scenes.push(scene);
+
+    return scene;
   }
 
   public RemoveSceneById(id: string): void {
@@ -206,6 +227,18 @@ export default class SceneManager {
     }
 
     this._currentScene.Update(deltaTime);
+  }
+
+  public Clear() {
+    this._defaultScene = undefined;
+    this._currentScene = undefined;
+
+    this._scenes.forEach((scene) => {
+      scene.gameObjectManager.Clear();
+
+      scene.Finish();
+    });
+    this._scenes = [];
   }
 
   public set defaultScene(scene: ISceneObject | undefined) {

@@ -4,7 +4,7 @@ import GameModuleRegistry, {
 } from "@/studio/core/GameModuleRegistry";
 import GameModule from "@/studio/core/runtime/GameModule";
 import GameObject from "@/studio/core/runtime/GameObject";
-import MockCompiler from "../MockCompiler";
+import MockCompiler from "../../Mock/MockCompiler";
 import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
 import { Engine } from "babylonjs";
 import { GameNotRunningError } from "@/studio/core/GameObjectManager";

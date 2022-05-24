@@ -2,10 +2,11 @@ import { describe, it, expect, afterEach } from "vitest";
 import { Engine } from "babylonjs";
 import type { CompileMachine } from "@/studio/core/CompileMachine";
 import GameModuleRegistry, {
+  GameModuleIdDuplicatedError,
   GameModuleNameDuplicatedError,
   GameModuleNotFoundError,
 } from "@/studio/core/GameModuleRegistry";
-import MockCompiler from "./MockCompiler";
+import MockCompiler from "../Mock/MockCompiler";
 import PrototypeGameModule, {
   SourceNotValidError,
 } from "@/studio/core/PrototypeGameModule";
@@ -312,6 +313,29 @@ describe("GameModuleRegistry Test", () => {
 
     await expect(gameModuleRegistry.RegisterByModule(module2)).rejects.toThrow(
       GameModuleNameDuplicatedError
+    );
+
+    expect(Object.keys(Lib.modules).length).toEqual(1);
+    expect(gameModuleRegistry.Declarations.length).toEqual(1);
+  });
+
+  it("Register By Module Test Duplicated id test", async () => {
+    const module1 = new PrototypeGameModule("", "Test GameModule1");
+    const module2 = new PrototypeGameModule(module1.id, "Test GameModule2");
+
+    module1.originSource = PrototypeGameModule.GetDefaultSource(
+      module1.safeName
+    );
+    module2.originSource = PrototypeGameModule.GetDefaultSource(
+      module2.safeName
+    );
+
+    await expect(gameModuleRegistry.RegisterByModule(module1)).resolves.toEqual(
+      module1
+    );
+
+    await expect(gameModuleRegistry.RegisterByModule(module2)).rejects.toThrow(
+      GameModuleIdDuplicatedError
     );
 
     expect(Object.keys(Lib.modules).length).toEqual(1);
@@ -985,6 +1009,20 @@ describe("GameModuleRegistry Test", () => {
         modifiedSource
       )
     ).rejects.toThrow(SourceNotValidError);
+  });
+
+  it("Clear Test", async () => {
+    await gameModuleRegistry.RegisterNewModule("m1");
+    await gameModuleRegistry.RegisterNewModule("m2");
+    await gameModuleRegistry.RegisterNewModule("m3");
+
+    expect(gameModuleRegistry.Declarations.length).toEqual(3);
+    expect(gameModuleRegistry.prototypeGameModules.length).toEqual(3);
+
+    gameModuleRegistry.Clear();
+
+    expect(gameModuleRegistry.Declarations.length).toEqual(0);
+    expect(gameModuleRegistry.prototypeGameModules.length).toEqual(0);
   });
 });
 

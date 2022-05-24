@@ -25,6 +25,12 @@ export class GameModuleNotFoundError extends Error {
   }
 }
 
+export class GameModuleIdDuplicatedError extends Error {
+  constructor() {
+    super("GameModule id duplicated!");
+  }
+}
+
 export default class GameModuleRegistry {
   // NOTE : 현재 모듈, Lib 등 Array 타입으로 되어 있어 탐색시 O(n)임.
   // 추가적인 최적화가 필요하면 Key:Value 타입으로 변경
@@ -165,6 +171,15 @@ export default class GameModuleRegistry {
     }
   }
 
+  public Clear() {
+    this.modules = [];
+    this.Declarations = [];
+
+    this.compiler.SetCode("");
+
+    this.SetCompilerDeclarations();
+  }
+
   public get prototypeGameModules(): Array<PrototypeGameModule> {
     return this.modules;
   }
@@ -268,6 +283,8 @@ export default class GameModuleRegistry {
     for (const prototypeGameModule of this.modules) {
       if (prototypeGameModule.name === gameModule.name) {
         throw new GameModuleNameDuplicatedError();
+      } else if (prototypeGameModule.id === gameModule.id) {
+        throw new GameModuleIdDuplicatedError();
       }
     }
 

@@ -1,28 +1,23 @@
 import type { Nullable } from "babylonjs";
 import { v4 as uuid } from "uuid";
 import type { CompileMachine } from "./CompileMachine";
-import GameEngine from "./GameEngine";
+import GameEngine, { GameEngineAlreadyRunning } from "./GameEngine";
 import GameModuleRegistry from "./GameModuleRegistry";
 import type SceneManager from "./SceneManager";
-import type PrototypeGameModule from "./PrototypeGameModule";
 import { Lib } from "./runtime/RuntimeLibrary";
-import type ISerializable from "../utils/ISerializable";
-import type { ISceneObject } from "./SceneManager";
-import type GameObject from "./runtime/GameObject";
-import type { InstantiableProtoGM } from "./runtime/GameObject";
-import type GameObjectManager from "./GameObjectManager";
-import type {
-  ISerializedGameModuleRegistry,
-  ISerializedGameObject,
-  ISerializedGameObjectManager,
-  ISerializedInstantiableProtoGM,
-  ISerializedPrototype,
-  ISerializedPrototypeGameModule,
-  ISerializedScene,
-  ISerializedSceneManager,
-} from "../utils/SerializedStructures";
+import type { Serializer } from "../utils/ISerializable";
+import PrototypeSerializer from "../utils/PrototypeSerializer";
+import type { ISerializedPrototype } from "../utils/SerializedStructures";
+import PrototypeGameModule from "./PrototypeGameModule";
+import { SceneNotFoundError, SceneObject } from "./SceneManager";
+import GameObject from "./runtime/GameObject";
 
-export default class Prototype implements ISerializable {
+export interface PrototypeFile {
+  name: string;
+  content: string;
+}
+
+export default class Prototype implements Serializer<ISerializedPrototype> {
   private _id: string;
   private _name: string;
 
@@ -112,78 +107,91 @@ export default class Prototype implements ISerializable {
     return this._gameEngine.sceneManager;
   }
 
+  public Clear() {
+    if (this.gameEngine.isRunning) {
+      throw new GameEngineAlreadyRunning();
+    }
+
+    this.gameEngine.Finalize();
+    this.gameEngine.sceneManager.Clear();
+
+    this.gameModuleRegistry.Clear();
+  }
+
+  public Save(): PrototypeFile {
+    return {
+      name: this.name + ".lup",
+      content: this.Serialize(),
+    };
+  }
+
+  public async Load(file: PrototypeFile) {
+    this.Clear();
+
+    const deserialized = this.Deserialize(file.content);
+
+    this._id = deserialized.id;
+    this._name = deserialized.name;
+
+    for (const module of deserialized.gameModuleRegistry.modules) {
+      const prototypeModule = new PrototypeGameModule(module.id, module.name);
+      prototypeModule.originSource = module.source;
+
+      await this.gameModuleRegistry.RegisterByModule(prototypeModule);
+    }
+
+    for (const scene of deserialized.sceneManager.scenes) {
+      const loadedScene = new SceneObject(
+        scene.name,
+        this.gameEngine.babylonEngine,
+        scene.id
+      );
+
+      const gameObjectManager = loadedScene.gameObjectManager;
+      for (const gameObject of scene.gameObjectManager.gameObjects) {
+        const loadedGameObject = new GameObject(
+          loadedScene,
+          gameObject.name,
+          gameObject.id
+        );
+
+        for (const gameModule of gameObject.instantiableProtoGMs) {
+          loadedGameObject.prototypeGameModule.push({
+            uid: gameModule.uid,
+            module: this.gameModuleRegistry.GetPrototypeGameModuleById(
+              gameModule.moduleId
+            ),
+          });
+        }
+
+        gameObjectManager.AddGameObject(loadedGameObject);
+      }
+
+      this.sceneManager.AddScene(loadedScene);
+    }
+
+    if (deserialized.sceneManager.defaultSceneId) {
+      const defaultScene = this.sceneManager.scenes.find(
+        (s) => s.id === deserialized.sceneManager.defaultSceneId
+      );
+
+        if (!defaultScene) {
+          throw new SceneNotFoundError();
+        }
+
+      this.sceneManager.defaultScene = defaultScene;
+    }
+  }
+
   public Serialize(): string {
-    const SerializeInstantiableProtoGM = (
-      module: InstantiableProtoGM
-    ): ISerializedInstantiableProtoGM => {
-      return {
-        uid: module.uid,
-        moduleId: module.module.id,
-      };
-    };
+    const serializer = new PrototypeSerializer(this);
 
-    const SerializeGameObject = (
-      gameObject: GameObject
-    ): ISerializedGameObject => {
-      return {
-        id: gameObject.id,
-        name: gameObject.name,
-        instantiableProtoGMs: gameObject.prototypeGameModule.map((module) =>
-          SerializeInstantiableProtoGM(module)
-        ),
-      };
-    };
+    return serializer.Serialize();
+  }
 
-    const SerializeGameObjectManager = (
-      gameObjectManager: GameObjectManager
-    ): ISerializedGameObjectManager => {
-      return {
-        gameObjects: gameObjectManager.gameObjects.map(
-          (gameObject: GameObject) => SerializeGameObject(gameObject)
-        ),
-      };
-    };
+  public Deserialize(serialized: string): ISerializedPrototype {
+    const serializer = new PrototypeSerializer(this);
 
-    const SerializeScene = (scene: ISceneObject): ISerializedScene => {
-      return {
-        id: scene.id,
-        name: scene.name,
-        gameObjectManager: SerializeGameObjectManager(scene.gameObjectManager),
-      };
-    };
-
-    const sceneManager: ISerializedSceneManager = {
-      defaultSceneId: this.sceneManager.defaultScene
-        ? this.sceneManager.defaultScene.id
-        : null,
-      scenes: this.sceneManager.scenes.map((scene: ISceneObject) =>
-        SerializeScene(scene)
-      ),
-    };
-
-    const SerializePrototypeGameModule = (
-      module: PrototypeGameModule
-    ): ISerializedPrototypeGameModule => {
-      return {
-        id: module.id,
-        name: module.name,
-        source: module.originSource,
-      };
-    };
-
-    const gameModuleRegistry: ISerializedGameModuleRegistry = {
-      modules: this._gameModuleRegistry.prototypeGameModules.map((module) =>
-        SerializePrototypeGameModule(module)
-      ),
-    };
-
-    const serializedPrototype: ISerializedPrototype = {
-      id: this.id,
-      name: this.name,
-      sceneManager: sceneManager,
-      gameModuleRegistry: gameModuleRegistry,
-    };
-
-    return JSON.stringify(serializedPrototype);
+    return serializer.Deserialize(serialized);
   }
 }

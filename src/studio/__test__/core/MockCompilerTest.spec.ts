@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import MockCompiler from "./MockCompiler";
+import MockCompiler from "../Mock/MockCompiler";
 
 describe("MockCompiler Test", () => {
   let compiler = new MockCompiler();

@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { Engine } from "babylonjs";
 
 import GameModuleRegistry from "@/studio/core/GameModuleRegistry";
-import MockCompiler from "../MockCompiler";
+import MockCompiler from "../../Mock/MockCompiler";
 import {
   KEY_EXPOSE_META,
   type IExposeMetadata,

@@ -1,0 +1,41 @@
+{
+  "id": "prototype_id",
+  "name": "prototype_name",
+  "sceneManager": {
+    "defaultSceneId": "incorrect_scene_id",
+    "scenes": [
+      {
+        "id": "default_scene_id",
+        "name": "New Scene",
+        "gameObjectManager": {
+          "gameObjects": [
+            {
+              "id": "same_game_object_id",
+              "name": "New GameObject1",
+              "instantiableProtoGMs": [
+                {
+                  "uid": "f4e899a4-ad1f-48b6-acac-52719d52a974",
+                  "moduleId": "same_module_id"
+                }
+              ]
+            },
+            {
+              "id": "same_game_object_id_2",
+              "name": "New GameObject2",
+              "instantiableProtoGMs": []
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "gameModuleRegistry": {
+    "modules": [
+      {
+        "id": "same_module_id",
+        "name": "TestGameModule",
+        "source": "class testgamemodule extends Lib.GameModule {\\n private camera : Lib.BABYLON.FreeCamera;\\n private ground : Lib.BABYLON.Mesh\\n Start() {\\n   const Babylon = Lib.BABYLON;\\n   const currentScene = this.gameObject.scene.scene;\\n\\n   this.camera = new Babylon.FreeCamera('camera1', new Babylon.Vector3(0, 5, -10), currentScene);\\n   this.camera.setTarget(Babylon.Vector3.Zero());\\n   this.camera.attachControl(Lib.gameEngine.canvasOrContext, false);\\n\\n   new Babylon.HemisphericLight('light1', new Babylon.Vector3(0, 1, 0), currentScene);\\n\\n   const sphere = Babylon.MeshBuilder.CreateSphere('sphere1', { segments: 16, diameter: 2, sideOrientation: Babylon.Mesh.FRONTSIDE }, currentScene);\\n   sphere.position.y = 1\\n   this.ground = Babylon.MeshBuilder.CreateGround('ground1', { width: 6, height: 6, subdivisions: 2, updatable: false }, currentScene)\\n }\\n Update(deltaTime : number) {\\n   this.ground.rotate(Lib.BABYLON.Vector3.Up(), deltaTime);\\n }\\n}"
+      }
+    ]
+  }
+}

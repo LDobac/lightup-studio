@@ -3,7 +3,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import GameModuleRegistry, {
   GameModuleNotFoundError,
 } from "@/studio/core/GameModuleRegistry";
-import MockCompiler from "./MockCompiler";
+import MockCompiler from "../Mock/MockCompiler";
 import GameObjectManager, {
   FailedToResolveExposeData,
   GameNotRunningError,
