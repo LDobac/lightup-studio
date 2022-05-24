@@ -10,8 +10,8 @@ onMounted(() => {
     throw "Cannot find canvas element!";
   }
 
-  const prototype = usePrototypeStore();
-  prototype.SetCanvasElement(canvas.value);
+  const store = usePrototypeStore();
+  store.SetCanvasElement(canvas.value);
 });
 </script>
 

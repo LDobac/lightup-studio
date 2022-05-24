@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
+import { onMounted, ref } from "vue";
 
 import { usePrototypeStore } from "@/stores/PrototypeStore";
 
@@ -19,22 +19,22 @@ onMounted(() => {
 
     monacoEditorManager.GetMonacoEditor().layout();
 
-    prototype.SetCompiler(monacoEditorManager);
+    // Waiting for register typescript compiler
+    setTimeout(() => {
+      let oldSource = prototype.compiler?.GetCode();
+
+      prototype.SetCompiler(monacoEditorManager);
+
+      if (oldSource && prototype.compiler) {
+        const monacoEditor = prototype.compiler as MonacoEditorManager;
+        monacoEditor.GetMonacoEditor().dispose();
+
+        prototype.compiler.SetCode(oldSource);
+      }
+    }, 1000);
   };
 
-  watchEffect(() => {
-    let oldSource = "";
-
-    if (prototype.compiler) {
-      const monacoEditorManager = prototype.compiler as MonacoEditorManager;
-      oldSource = monacoEditorManager.GetCode();
-
-      monacoEditorManager.GetMonacoEditor().dispose();
-    }
-
-    CreateEditor();
-    prototype.compiler?.SetCode(oldSource);
-  });
+  CreateEditor();
 });
 
 // const HandleClick = async () => {

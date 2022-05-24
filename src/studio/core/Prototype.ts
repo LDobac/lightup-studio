@@ -175,9 +175,9 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
         (s) => s.id === deserialized.sceneManager.defaultSceneId
       );
 
-        if (!defaultScene) {
-          throw new SceneNotFoundError();
-        }
+      if (!defaultScene) {
+        throw new SceneNotFoundError();
+      }
 
       this.sceneManager.defaultScene = defaultScene;
     }

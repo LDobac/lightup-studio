@@ -1,10 +1,15 @@
 import { ref } from "vue";
 
+interface Position {
+  x: number;
+  y: number;
+}
+
 export function useMovable(inverse = false) {
   const hold = ref(false);
 
-  const lastPosition = ref({ x: 0, y: 0 });
-  const curPosition = ref({ x: 0, y: 0 });
+  const lastPosition = ref<Position>({ x: 0, y: 0 });
+  const curPosition = ref<Position>({ x: 0, y: 0 });
 
   const HandleMouseDown = (e: MouseEvent) => {
     e.preventDefault();

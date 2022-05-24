@@ -129,7 +129,7 @@ export default class SceneManager {
       throw new SceneNameEmpty();
     }
 
-    if (this.scenes.find((s) => (s.name === scene.name) || (s.id === scene.id))) {
+    if (this.scenes.find((s) => s.name === scene.name || s.id === scene.id)) {
       throw new SceneDuplicated();
     }
 

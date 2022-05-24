@@ -12,10 +12,20 @@ import CodeModuleEditor from "./CodeEditor/CodeModuleEditor.vue";
       :bar-width="28"
       style="padding: 0px; height: 100%"
     >
-      <n-tab-pane class="tab-pane" name="Visual" tab="Visual">
+      <n-tab-pane
+        class="tab-pane"
+        name="Visual"
+        tab="Visual"
+        display-directive="show"
+      >
         <VisualModuleEditor />
       </n-tab-pane>
-      <n-tab-pane class="tab-pane" name="Code" tab="Code">
+      <n-tab-pane
+        class="tab-pane"
+        name="Code"
+        tab="Code"
+        display-directive="show"
+      >
         <CodeModuleEditor />
       </n-tab-pane>
     </n-tabs>

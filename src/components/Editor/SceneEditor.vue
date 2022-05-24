@@ -6,16 +6,15 @@ import { ref, watch } from "vue";
 import { usePrototypeStore } from "@/stores/PrototypeStore";
 
 const store = usePrototypeStore();
+const isEditing = ref(false);
 
 const HandleToggleEdit = () => {
-  if (store.prototype && store.prototype.gameEngine) {
+  if (store.prototype && store.prototype.gameEngine && store.isLoaded) {
     store.prototype.gameEngine.SetEditMode(!isEditing.value);
 
     isEditing.value = store.prototype.gameEngine.isEditing;
   }
 };
-
-const isEditing = ref(false);
 
 watch(
   () => store.prototype,

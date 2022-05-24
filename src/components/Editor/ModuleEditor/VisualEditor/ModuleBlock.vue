@@ -17,9 +17,9 @@ const {
 <template>
   <div
     class="module-block"
-    :style="`top: ${curPosition.y}px; left: ${curPosition.x}px; cursor: ${
-      hold ? 'move' : 'default'
-    }`"
+    :style="`transform: translate(${curPosition.x}px, ${
+      curPosition.y
+    }px);cursor: ${hold ? 'move' : 'default'}`"
     @mousedown.stop="HandleMouseDown"
     @touchstart.stop="HandleTouchStart"
     @mousemove.stop="HandleMouseMove"

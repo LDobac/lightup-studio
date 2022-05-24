@@ -32,9 +32,9 @@ const {
       :style="`transform: translate(${curPosition.x}px, ${curPosition.y}px);`"
     >
       <ModuleBlock />
-      <!-- <ModuleBlock />
       <ModuleBlock />
-      <ModuleBlock /> -->
+      <ModuleBlock />
+      <ModuleBlock />
     </div>
   </div>
 </template>

@@ -44,9 +44,7 @@ describe("SceneManager Test", () => {
     expect(() => sceneManager.NewScene("Duplicated")).not.toThrow(
       SceneDuplicated
     );
-    expect(() => sceneManager.NewScene("Duplicated")).toThrow(
-      SceneDuplicated
-    );
+    expect(() => sceneManager.NewScene("Duplicated")).toThrow(SceneDuplicated);
   });
 
   it("RemoveSceneById Successfully", () => {

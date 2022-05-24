@@ -1,6 +1,26 @@
 <script setup lang="ts">
+import { usePrototypeStore } from "@/stores/PrototypeStore";
+import { watch } from "vue";
 import ModuleEditor from "../components/Editor/ModuleEditor/ModuleEditor.vue";
 import SceneEditor from "../components/Editor/SceneEditor.vue";
+
+const store = usePrototypeStore();
+
+watch(
+  () => store.isLoaded,
+  async (isLoaded) => {
+    if (isLoaded) {
+      if (store.prototype) {
+        await store.prototype.GenerateTestScene();
+
+        store.prototype.gameEngine.SetEditMode(true);
+        store.prototype.gameEngine.Start();
+
+        console.log("Init success");
+      }
+    }
+  }
+);
 
 /* 
 

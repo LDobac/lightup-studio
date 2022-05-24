@@ -16,7 +16,10 @@ import {
   GameModuleNotFoundError,
 } from "@/studio/core/GameModuleRegistry";
 import { GameObjectDuplicatedError } from "@/studio/core/GameObjectManager";
-import { SceneDuplicated, SceneNotFoundError } from "@/studio/core/SceneManager";
+import {
+  SceneDuplicated,
+  SceneNotFoundError,
+} from "@/studio/core/SceneManager";
 
 describe("Prototype Test", () => {
   const compiler = new MockCompiler();

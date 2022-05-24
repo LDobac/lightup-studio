@@ -9,6 +9,7 @@ export interface PrototypeState {
   prototype: ShallowRef<Nullable<Prototype>>;
   compiler: ShallowRef<Nullable<CompileMachine>>;
   canvasOrContext: Nullable<HTMLCanvasElement | WebGLRenderingContext>;
+  isLoaded: boolean;
 }
 
 export const usePrototypeStore = defineStore({
@@ -17,6 +18,7 @@ export const usePrototypeStore = defineStore({
     prototype: shallowRef<Nullable<Prototype>>(null),
     compiler: shallowRef<Nullable<CompileMachine>>(null),
     canvasOrContext: null,
+    isLoaded: false,
   }),
   getters: {},
   actions: {
@@ -35,8 +37,8 @@ export const usePrototypeStore = defineStore({
     CreatePrototypeIfSetUp() {
       if (this.compiler && this.canvasOrContext && !this.prototype) {
         this.prototype = new Prototype(this.canvasOrContext, this.compiler);
-        this.prototype.GenerateTestScene();
-        // this.prototype.GenerateEmptyPrototype();
+
+        this.isLoaded = true;
       } else if (this.prototype && this.compiler && this.canvasOrContext) {
         this.prototype.gameModuleRegistry.SetCompiler(this.compiler);
       }
