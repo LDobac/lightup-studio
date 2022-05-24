@@ -33,7 +33,7 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
     this._id = id;
     this._name = name;
 
-    this._gameModuleRegistry = new GameModuleRegistry(compiler);
+    this._gameModuleRegistry = new GameModuleRegistry();
 
     this._gameEngine = new GameEngine(canvasOrContext);
     this._gameEngine.SetEditMode(true);
@@ -50,7 +50,7 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
     sceneManager.defaultScene = scene;
   }
 
-  public async GenerateTestScene() {
+  public async GenerateTestScene(compiler: CompileMachine) {
     this._id = uuid();
 
     const sceneManager = this._gameEngine.sceneManager;
@@ -79,7 +79,8 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
         "   this.ground.rotate(Lib.BABYLON.Vector3.Up(), deltaTime);",
         " }",
         "}",
-      ].join("\n")
+      ].join("\n"),
+      compiler
     );
 
     const gameObject =
@@ -107,7 +108,7 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
     return this._gameEngine.sceneManager;
   }
 
-  public Clear() {
+  public Clear(compiler: CompileMachine) {
     if (this.gameEngine.isRunning) {
       throw new GameEngineAlreadyRunning();
     }
@@ -115,7 +116,7 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
     this.gameEngine.Finalize();
     this.gameEngine.sceneManager.Clear();
 
-    this.gameModuleRegistry.Clear();
+    this.gameModuleRegistry.Clear(compiler);
   }
 
   public Save(): PrototypeFile {
@@ -125,8 +126,8 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
     };
   }
 
-  public async Load(file: PrototypeFile) {
-    this.Clear();
+  public async Load(file: PrototypeFile, compiler: CompileMachine) {
+    this.Clear(compiler);
 
     const deserialized = this.Deserialize(file.content);
 
@@ -137,7 +138,7 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
       const prototypeModule = new PrototypeGameModule(module.id, module.name);
       prototypeModule.originSource = module.source;
 
-      await this.gameModuleRegistry.RegisterByModule(prototypeModule);
+      await this.gameModuleRegistry.RegisterByModule(prototypeModule, compiler);
     }
 
     for (const scene of deserialized.sceneManager.scenes) {

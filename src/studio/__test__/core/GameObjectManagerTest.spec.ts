@@ -18,7 +18,7 @@ import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 import { SceneObject, type ISceneObject } from "@/studio/core/SceneManager";
 
 const compiler = new MockCompiler();
-const gameModuleRegistry = new GameModuleRegistry(compiler);
+const gameModuleRegistry = new GameModuleRegistry();
 
 const dummyScene: ISceneObject = new SceneObject(
   "DummyScene",
@@ -36,7 +36,8 @@ const counterModule = await gameModuleRegistry.RegisterBySource(
     "   @Lib.Expose()",
     "   public Count() : number {this.count++; return this.count;}",
     "}",
-  ].join("\n")
+  ].join("\n"),
+  compiler
 );
 
 const countAModule = await gameModuleRegistry.RegisterBySource(
@@ -50,7 +51,8 @@ const countAModule = await gameModuleRegistry.RegisterBySource(
     "   @Lib.Expose()",
     "   public GetA() : string {this.a += 'a'; return this.a;}",
     "}",
-  ].join("\n")
+  ].join("\n"),
+  compiler
 );
 
 const doublingModule = await gameModuleRegistry.RegisterBySource(
@@ -64,7 +66,8 @@ const doublingModule = await gameModuleRegistry.RegisterBySource(
     "   @Lib.Expose()",
     "   public GetDouble() : number { return this.doublingNumber * 2; }",
     "}",
-  ].join("\n")
+  ].join("\n"),
+  compiler
 );
 
 describe("GameObjectManagerTest", () => {

@@ -6,7 +6,7 @@ import type { CompileMachine } from "@/studio/core/CompileMachine";
 import Prototype from "@/studio/core/Prototype";
 
 export interface PrototypeState {
-  prototype: ShallowRef<Nullable<Prototype>>;
+  prototype: Nullable<Prototype>;
   compiler: ShallowRef<Nullable<CompileMachine>>;
   canvasOrContext: Nullable<HTMLCanvasElement | WebGLRenderingContext>;
   isLoaded: boolean;
@@ -15,7 +15,7 @@ export interface PrototypeState {
 export const usePrototypeStore = defineStore({
   id: "prototype_store",
   state: (): PrototypeState => ({
-    prototype: shallowRef<Nullable<Prototype>>(null),
+    prototype: null,
     compiler: shallowRef<Nullable<CompileMachine>>(null),
     canvasOrContext: null,
     isLoaded: false,
@@ -39,8 +39,6 @@ export const usePrototypeStore = defineStore({
         this.prototype = new Prototype(this.canvasOrContext, this.compiler);
 
         this.isLoaded = true;
-      } else if (this.prototype && this.compiler && this.canvasOrContext) {
-        this.prototype.gameModuleRegistry.SetCompiler(this.compiler);
       }
     },
   },

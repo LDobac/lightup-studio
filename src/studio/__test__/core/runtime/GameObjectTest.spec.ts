@@ -16,7 +16,7 @@ const dummyScene: ISceneObject = new SceneObject(
 
 describe("GameObjectTest", async () => {
   const compiler = new MockCompiler();
-  const gameModuleRegistry = new GameModuleRegistry(compiler);
+  const gameModuleRegistry = new GameModuleRegistry();
 
   class class_counter extends GameModule {
     public count = 0;
@@ -40,7 +40,8 @@ describe("GameObjectTest", async () => {
       "   public Update(deltaTime : number) { this.Count(); }",
       "   public Count() : number {this.count++; return this.count;}",
       "}",
-    ].join("\n")
+    ].join("\n"),
+    compiler
   );
 
   class class_counta extends GameModule {
@@ -65,7 +66,8 @@ describe("GameObjectTest", async () => {
       "   public Update(deltaTime : number) { this.GetA() }",
       "   public GetA() : string {this.a += 'a'; return this.a;}",
       "}",
-    ].join("\n")
+    ].join("\n"),
+    compiler
   );
 
   it("AddPrototypeGM Test add one module", () => {

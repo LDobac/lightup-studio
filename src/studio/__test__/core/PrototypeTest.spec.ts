@@ -40,7 +40,7 @@ describe("Prototype Test", () => {
   it("Serialize Test with test scene", async () => {
     const prototype = new Prototype(null, compiler);
 
-    await prototype.GenerateTestScene();
+    await prototype.GenerateTestScene(compiler);
 
     const serialized = prototype.Serialize();
 
@@ -76,7 +76,7 @@ describe("Prototype Test", () => {
   it("Deserialize with test scene", async () => {
     const prototype = new Prototype(null, compiler);
 
-    await prototype.GenerateTestScene();
+    await prototype.GenerateTestScene(compiler);
 
     const serialized = prototype.Serialize();
     const deserializedPrototype = prototype.Deserialize(serialized);
@@ -91,7 +91,7 @@ describe("Prototype Test", () => {
   it("Save Test", async () => {
     const prototype = new Prototype(null, compiler);
 
-    await prototype.GenerateTestScene();
+    await prototype.GenerateTestScene(compiler);
 
     const serialized = prototype.Serialize();
 
@@ -103,11 +103,11 @@ describe("Prototype Test", () => {
   it("Load Test", async () => {
     const prototype = new Prototype(null, compiler);
 
-    await prototype.GenerateTestScene();
+    await prototype.GenerateTestScene(compiler);
     const serialized = prototype.Serialize();
 
     const newProto = new Prototype(null, compiler);
-    await newProto.Load({ name: "", content: serialized });
+    await newProto.Load({ name: "", content: serialized }, compiler);
 
     expect(prototype.id).toEqual(newProto.id);
     expect(prototype.name).toEqual(newProto.name);
@@ -162,10 +162,13 @@ describe("Prototype Test", () => {
   it("Load failed cause duplicated prototype module name", async () => {
     const newProto = new Prototype(null, compiler);
     const Load = async () =>
-      await newProto.Load({
-        name: "",
-        content: duplicatedModuleNamePrototypeFile,
-      });
+      await newProto.Load(
+        {
+          name: "",
+          content: duplicatedModuleNamePrototypeFile,
+        },
+        compiler
+      );
 
     await expect(Load).rejects.toThrow(GameModuleNameDuplicatedError);
   });
@@ -173,10 +176,13 @@ describe("Prototype Test", () => {
   it("Load failed cause deuplicated prototype module id", async () => {
     const newProto = new Prototype(null, compiler);
     const Load = async () =>
-      await newProto.Load({
-        name: "",
-        content: duplicatedModuleIdPrototypeFile,
-      });
+      await newProto.Load(
+        {
+          name: "",
+          content: duplicatedModuleIdPrototypeFile,
+        },
+        compiler
+      );
 
     await expect(Load).rejects.toThrow(GameModuleIdDuplicatedError);
   });
@@ -184,10 +190,13 @@ describe("Prototype Test", () => {
   it("Load failed cause duplicated scene id", async () => {
     const newProto = new Prototype(null, compiler);
     const Load = async () =>
-      await newProto.Load({
-        name: "",
-        content: duplicatedSceneIdPrototypeFile,
-      });
+      await newProto.Load(
+        {
+          name: "",
+          content: duplicatedSceneIdPrototypeFile,
+        },
+        compiler
+      );
 
     await expect(Load).rejects.toThrow(SceneDuplicated);
   });
@@ -195,10 +204,13 @@ describe("Prototype Test", () => {
   it("Load failed cause duplicated scene name", async () => {
     const newProto = new Prototype(null, compiler);
     const Load = async () =>
-      await newProto.Load({
-        name: "",
-        content: duplicatedSceneNamePrototypeFile,
-      });
+      await newProto.Load(
+        {
+          name: "",
+          content: duplicatedSceneNamePrototypeFile,
+        },
+        compiler
+      );
 
     await expect(Load).rejects.toThrow(SceneDuplicated);
   });
@@ -206,10 +218,13 @@ describe("Prototype Test", () => {
   it("Load failed cause duplicated gameobject id", async () => {
     const newProto = new Prototype(null, compiler);
     const Load = async () =>
-      await newProto.Load({
-        name: "",
-        content: duplicatedGameObjectIdPrototypeFile,
-      });
+      await newProto.Load(
+        {
+          name: "",
+          content: duplicatedGameObjectIdPrototypeFile,
+        },
+        compiler
+      );
 
     await expect(Load).rejects.toThrow(GameObjectDuplicatedError);
   });
@@ -217,10 +232,13 @@ describe("Prototype Test", () => {
   it("Load failed cause game module not found", async () => {
     const newProto = new Prototype(null, compiler);
     const Load = async () =>
-      await newProto.Load({
-        name: "",
-        content: incorrectGameModuleIdPrototypeFile,
-      });
+      await newProto.Load(
+        {
+          name: "",
+          content: incorrectGameModuleIdPrototypeFile,
+        },
+        compiler
+      );
 
     await expect(Load).rejects.toThrow(GameModuleNotFoundError);
   });
@@ -228,10 +246,13 @@ describe("Prototype Test", () => {
   it("Load failed cause default scene id incorrect", async () => {
     const newProto = new Prototype(null, compiler);
     const Load = async () =>
-      await newProto.Load({
-        name: "",
-        content: incorrectDefaultSceneIdPrototypeFile,
-      });
+      await newProto.Load(
+        {
+          name: "",
+          content: incorrectDefaultSceneIdPrototypeFile,
+        },
+        compiler
+      );
 
     await expect(Load).rejects.toThrow(SceneNotFoundError);
   });

@@ -123,5 +123,3 @@ const expandIcon = () => {
     </n-layout-sider>
   </n-layout>
 </template>
-
-<script setup lang="ts"></script>

@@ -18,7 +18,7 @@ const dummyScene: ISceneObject = new SceneObject(
 
 describe("Expose decorator test", async () => {
   const compiler = new MockCompiler();
-  const gameModuleRegistry = new GameModuleRegistry(compiler);
+  const gameModuleRegistry = new GameModuleRegistry();
 
   const counterModule = await gameModuleRegistry.RegisterBySource(
     "Counter",
@@ -31,7 +31,8 @@ describe("Expose decorator test", async () => {
       "   @Lib.Expose()",
       "   public Count() : number {this.count++; return this.count;}",
       "}",
-    ].join("\n")
+    ].join("\n"),
+    compiler
   );
 
   const countAModule = await gameModuleRegistry.RegisterBySource(
@@ -45,7 +46,8 @@ describe("Expose decorator test", async () => {
       "   @Lib.Expose()",
       "   public GetA() : string {this.a += 'a'; return this.a;}",
       "}",
-    ].join("\n")
+    ].join("\n"),
+    compiler
   );
 
   class NewType {
@@ -63,7 +65,8 @@ describe("Expose decorator test", async () => {
       "   public Start() { }",
       "   public Update(deltaTime : number) { }",
       "}",
-    ].join("\n")
+    ].join("\n"),
+    compiler
   );
 
   it("Test Metadata generate successfully By Constructor 1", () => {

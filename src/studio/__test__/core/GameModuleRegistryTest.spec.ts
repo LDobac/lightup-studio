@@ -85,18 +85,19 @@ function CheckDeclaration(
 
 describe("GameModuleRegistry Test", () => {
   const compiler: CompileMachine = new MockCompiler();
-  let gameModuleRegistry = new GameModuleRegistry(compiler);
+  let gameModuleRegistry = new GameModuleRegistry();
 
   afterEach(() => {
     Lib.modules = {};
     gameModuleRegistry.Declarations = [];
 
-    gameModuleRegistry = new GameModuleRegistry(compiler);
+    gameModuleRegistry = new GameModuleRegistry();
   });
 
   it("Register New Model Test", async () => {
     const module = await gameModuleRegistry.RegisterNewModule(
-      "Test GameModule"
+      "Test GameModule",
+      compiler
     );
 
     expect(module.originSource).toEqual(
@@ -114,7 +115,8 @@ describe("GameModuleRegistry Test", () => {
 
     for (let index = 0; index < 10; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test GameModule${index}`
+        `Test GameModule${index}`,
+        compiler
       );
 
       expect(module.originSource).toEqual(
@@ -133,10 +135,10 @@ describe("GameModuleRegistry Test", () => {
   it("Register New Model Name duplicated test", async () => {
     const moduleName = "Test GameModule";
 
-    await gameModuleRegistry.RegisterNewModule(moduleName);
+    await gameModuleRegistry.RegisterNewModule(moduleName, compiler);
 
     await expect(
-      gameModuleRegistry.RegisterNewModule(moduleName)
+      gameModuleRegistry.RegisterNewModule(moduleName, compiler)
     ).rejects.toThrow(new GameModuleNameDuplicatedError());
   });
 
@@ -157,7 +159,8 @@ describe("GameModuleRegistry Test", () => {
 
     const module = await gameModuleRegistry.RegisterBySource(
       moduleName,
-      source
+      source,
+      compiler
     );
 
     expect(module.originSource).toEqual(source);
@@ -186,7 +189,8 @@ describe("GameModuleRegistry Test", () => {
     for (let index = 0; index < 10; index++) {
       const module = await gameModuleRegistry.RegisterBySource(
         `Test GameModule${index}`,
-        source.replace("?", index.toString())
+        source.replace("?", index.toString()),
+        compiler
       );
 
       expect(module.originSource).toEqual(
@@ -218,7 +222,7 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
 
     await expect(
-      gameModuleRegistry.RegisterBySource(moduleName, source)
+      gameModuleRegistry.RegisterBySource(moduleName, source, compiler)
     ).rejects.toThrow(SourceNotValidError);
 
     expect(Object.keys(Lib.modules).length).toEqual(0);
@@ -240,10 +244,10 @@ describe("GameModuleRegistry Test", () => {
       "}",
     ].join("\n");
 
-    await gameModuleRegistry.RegisterBySource(moduleName, source);
+    await gameModuleRegistry.RegisterBySource(moduleName, source, compiler);
 
     await expect(
-      gameModuleRegistry.RegisterBySource(moduleName, source)
+      gameModuleRegistry.RegisterBySource(moduleName, source, compiler)
     ).rejects.toThrow(new GameModuleNameDuplicatedError());
   });
 
@@ -253,7 +257,10 @@ describe("GameModuleRegistry Test", () => {
       module.GetSafeName()
     );
 
-    const returnedModel = await gameModuleRegistry.RegisterByModule(module);
+    const returnedModel = await gameModuleRegistry.RegisterByModule(
+      module,
+      compiler
+    );
 
     expect(module).toEqual(returnedModel);
 
@@ -272,7 +279,10 @@ describe("GameModuleRegistry Test", () => {
         module.GetSafeName()
       );
 
-      const returnedModel = await gameModuleRegistry.RegisterByModule(module);
+      const returnedModel = await gameModuleRegistry.RegisterByModule(
+        module,
+        compiler
+      );
 
       expect(module).toEqual(returnedModel);
 
@@ -288,9 +298,9 @@ describe("GameModuleRegistry Test", () => {
   it("Register By Module Test With empty source", async () => {
     const module = new PrototypeGameModule("", "Test GameModule");
 
-    await expect(gameModuleRegistry.RegisterByModule(module)).rejects.toThrow(
-      SourceNotValidError
-    );
+    await expect(
+      gameModuleRegistry.RegisterByModule(module, compiler)
+    ).rejects.toThrow(SourceNotValidError);
 
     expect(Object.keys(Lib.modules).length).toEqual(0);
     expect(gameModuleRegistry.Declarations.length).toEqual(0);
@@ -307,13 +317,13 @@ describe("GameModuleRegistry Test", () => {
       module2.safeName
     );
 
-    await expect(gameModuleRegistry.RegisterByModule(module1)).resolves.toEqual(
-      module1
-    );
+    await expect(
+      gameModuleRegistry.RegisterByModule(module1, compiler)
+    ).resolves.toEqual(module1);
 
-    await expect(gameModuleRegistry.RegisterByModule(module2)).rejects.toThrow(
-      GameModuleNameDuplicatedError
-    );
+    await expect(
+      gameModuleRegistry.RegisterByModule(module2, compiler)
+    ).rejects.toThrow(GameModuleNameDuplicatedError);
 
     expect(Object.keys(Lib.modules).length).toEqual(1);
     expect(gameModuleRegistry.Declarations.length).toEqual(1);
@@ -330,13 +340,13 @@ describe("GameModuleRegistry Test", () => {
       module2.safeName
     );
 
-    await expect(gameModuleRegistry.RegisterByModule(module1)).resolves.toEqual(
-      module1
-    );
+    await expect(
+      gameModuleRegistry.RegisterByModule(module1, compiler)
+    ).resolves.toEqual(module1);
 
-    await expect(gameModuleRegistry.RegisterByModule(module2)).rejects.toThrow(
-      GameModuleIdDuplicatedError
-    );
+    await expect(
+      gameModuleRegistry.RegisterByModule(module2, compiler)
+    ).rejects.toThrow(GameModuleIdDuplicatedError);
 
     expect(Object.keys(Lib.modules).length).toEqual(1);
     expect(gameModuleRegistry.Declarations.length).toEqual(1);
@@ -354,7 +364,11 @@ describe("GameModuleRegistry Test", () => {
       ` CustomFunc(str:string) { return str + '${returnMessage}'; }`,
       "}",
     ].join("\n");
-    await gameModuleRegistry.RegisterBySource("lib_gamemodule", moduleSource1);
+    await gameModuleRegistry.RegisterBySource(
+      "lib_gamemodule",
+      moduleSource1,
+      compiler
+    );
 
     const moduleSource2 = [
       "class test_gamemodule extends Lib.GameModule {",
@@ -367,7 +381,8 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
     const prototypeModule = await gameModuleRegistry.RegisterBySource(
       "test_gamemodule",
-      moduleSource2
+      moduleSource2,
+      compiler
     );
 
     const TestGamemodule =
@@ -385,13 +400,16 @@ describe("GameModuleRegistry Test", () => {
   });
 
   it("RemoveGameModuleByModule Test", async () => {
-    const module = await gameModuleRegistry.RegisterNewModule("Test Module");
+    const module = await gameModuleRegistry.RegisterNewModule(
+      "Test Module",
+      compiler
+    );
 
     CheckModuleExists(gameModuleRegistry, module);
     CheckLib(gameModuleRegistry, [module]);
     CheckDeclaration(gameModuleRegistry, [module]);
 
-    gameModuleRegistry.RemoveGameModuleByModule(module);
+    gameModuleRegistry.RemoveGameModuleByModule(module, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, module);
     CheckLib(gameModuleRegistry, []);
@@ -402,7 +420,8 @@ describe("GameModuleRegistry Test", () => {
     const modules = Array<PrototypeGameModule>();
     for (let index = 0; index < 10; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test Module ${index}`
+        `Test Module ${index}`,
+        compiler
       );
 
       modules.push(module);
@@ -416,9 +435,9 @@ describe("GameModuleRegistry Test", () => {
     const deletedModule2 = modules.splice(4, 1)[0];
     const deletedModule3 = modules.splice(7, 1)[0];
 
-    gameModuleRegistry.RemoveGameModuleByModule(deletedModule1);
-    gameModuleRegistry.RemoveGameModuleByModule(deletedModule2);
-    gameModuleRegistry.RemoveGameModuleByModule(deletedModule3);
+    gameModuleRegistry.RemoveGameModuleByModule(deletedModule1, compiler);
+    gameModuleRegistry.RemoveGameModuleByModule(deletedModule2, compiler);
+    gameModuleRegistry.RemoveGameModuleByModule(deletedModule3, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, deletedModule1);
     CheckModuleNotExists(gameModuleRegistry, deletedModule2);
@@ -432,7 +451,8 @@ describe("GameModuleRegistry Test", () => {
     const modules = Array<PrototypeGameModule>();
     for (let index = 0; index < 5; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test Module ${index}`
+        `Test Module ${index}`,
+        compiler
       );
 
       modules.push(module);
@@ -449,20 +469,23 @@ describe("GameModuleRegistry Test", () => {
 
     CheckModuleNotExists(gameModuleRegistry, notExistsModule);
 
-    gameModuleRegistry.RemoveGameModuleByModule(notExistsModule);
+    gameModuleRegistry.RemoveGameModuleByModule(notExistsModule, compiler);
 
     CheckLib(gameModuleRegistry, modules);
     CheckDeclaration(gameModuleRegistry, modules);
   });
 
   it("RemoveGameModuleByName Test", async () => {
-    const module = await gameModuleRegistry.RegisterNewModule("Test Module");
+    const module = await gameModuleRegistry.RegisterNewModule(
+      "Test Module",
+      compiler
+    );
 
     CheckModuleExists(gameModuleRegistry, module);
     CheckLib(gameModuleRegistry, [module]);
     CheckDeclaration(gameModuleRegistry, [module]);
 
-    gameModuleRegistry.RemoveGameModuleByName("Test Module");
+    gameModuleRegistry.RemoveGameModuleByName("Test Module", compiler);
 
     CheckModuleNotExists(gameModuleRegistry, module);
     CheckLib(gameModuleRegistry, []);
@@ -473,7 +496,8 @@ describe("GameModuleRegistry Test", () => {
     const modules = Array<PrototypeGameModule>();
     for (let index = 0; index < 10; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test Module ${index}`
+        `Test Module ${index}`,
+        compiler
       );
 
       modules.push(module);
@@ -487,9 +511,9 @@ describe("GameModuleRegistry Test", () => {
     const deletedModule2 = modules.splice(4, 1)[0];
     const deletedModule3 = modules.splice(7, 1)[0];
 
-    gameModuleRegistry.RemoveGameModuleByName(deletedModule1.name);
-    gameModuleRegistry.RemoveGameModuleByName(deletedModule2.name);
-    gameModuleRegistry.RemoveGameModuleByName(deletedModule3.name);
+    gameModuleRegistry.RemoveGameModuleByName(deletedModule1.name, compiler);
+    gameModuleRegistry.RemoveGameModuleByName(deletedModule2.name, compiler);
+    gameModuleRegistry.RemoveGameModuleByName(deletedModule3.name, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, deletedModule1);
     CheckModuleNotExists(gameModuleRegistry, deletedModule2);
@@ -503,7 +527,8 @@ describe("GameModuleRegistry Test", () => {
     const modules = Array<PrototypeGameModule>();
     for (let index = 0; index < 5; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test Module ${index}`
+        `Test Module ${index}`,
+        compiler
       );
 
       modules.push(module);
@@ -520,20 +545,23 @@ describe("GameModuleRegistry Test", () => {
 
     CheckModuleNotExists(gameModuleRegistry, notExistsModule);
 
-    gameModuleRegistry.RemoveGameModuleByName(notExistsModule.name);
+    gameModuleRegistry.RemoveGameModuleByName(notExistsModule.name, compiler);
 
     CheckLib(gameModuleRegistry, modules);
     CheckDeclaration(gameModuleRegistry, modules);
   });
 
   it("RemoveGameModuleById Test", async () => {
-    const module = await gameModuleRegistry.RegisterNewModule("Test Module");
+    const module = await gameModuleRegistry.RegisterNewModule(
+      "Test Module",
+      compiler
+    );
 
     CheckModuleExists(gameModuleRegistry, module);
     CheckLib(gameModuleRegistry, [module]);
     CheckDeclaration(gameModuleRegistry, [module]);
 
-    gameModuleRegistry.RemoveGameModuleById(module.id);
+    gameModuleRegistry.RemoveGameModuleById(module.id, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, module);
     CheckLib(gameModuleRegistry, []);
@@ -544,7 +572,8 @@ describe("GameModuleRegistry Test", () => {
     const modules = Array<PrototypeGameModule>();
     for (let index = 0; index < 10; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test Module ${index}`
+        `Test Module ${index}`,
+        compiler
       );
 
       modules.push(module);
@@ -558,9 +587,9 @@ describe("GameModuleRegistry Test", () => {
     const deletedModule2 = modules.splice(4, 1)[0];
     const deletedModule3 = modules.splice(7, 1)[0];
 
-    gameModuleRegistry.RemoveGameModuleById(deletedModule1.id);
-    gameModuleRegistry.RemoveGameModuleById(deletedModule2.id);
-    gameModuleRegistry.RemoveGameModuleById(deletedModule3.id);
+    gameModuleRegistry.RemoveGameModuleById(deletedModule1.id, compiler);
+    gameModuleRegistry.RemoveGameModuleById(deletedModule2.id, compiler);
+    gameModuleRegistry.RemoveGameModuleById(deletedModule3.id, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, deletedModule1);
     CheckModuleNotExists(gameModuleRegistry, deletedModule2);
@@ -574,7 +603,8 @@ describe("GameModuleRegistry Test", () => {
     const modules = Array<PrototypeGameModule>();
     for (let index = 0; index < 5; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test Module ${index}`
+        `Test Module ${index}`,
+        compiler
       );
 
       modules.push(module);
@@ -591,7 +621,7 @@ describe("GameModuleRegistry Test", () => {
 
     CheckModuleNotExists(gameModuleRegistry, notExistsModule);
 
-    gameModuleRegistry.RemoveGameModuleById(notExistsModule.id);
+    gameModuleRegistry.RemoveGameModuleById(notExistsModule.id, compiler);
 
     CheckLib(gameModuleRegistry, modules);
     CheckDeclaration(gameModuleRegistry, modules);
@@ -601,7 +631,8 @@ describe("GameModuleRegistry Test", () => {
     const modules = Array<PrototypeGameModule>();
     for (let index = 0; index < 5; index++) {
       const module = await gameModuleRegistry.RegisterNewModule(
-        `Test Module ${index}`
+        `Test Module ${index}`,
+        compiler
       );
 
       modules.push(module);
@@ -613,7 +644,7 @@ describe("GameModuleRegistry Test", () => {
 
     const deletedModule1 = modules.splice(1, 1)[0];
 
-    gameModuleRegistry.RemoveGameModuleById(deletedModule1.id);
+    gameModuleRegistry.RemoveGameModuleById(deletedModule1.id, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, deletedModule1);
     CheckLib(gameModuleRegistry, modules);
@@ -621,7 +652,7 @@ describe("GameModuleRegistry Test", () => {
 
     const deletedModule2 = modules.splice(1, 1)[0];
 
-    gameModuleRegistry.RemoveGameModuleByModule(deletedModule2);
+    gameModuleRegistry.RemoveGameModuleByModule(deletedModule2, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, deletedModule2);
     CheckLib(gameModuleRegistry, modules);
@@ -629,7 +660,7 @@ describe("GameModuleRegistry Test", () => {
 
     const deletedModule3 = modules.splice(1, 1)[0];
 
-    gameModuleRegistry.RemoveGameModuleByName(deletedModule3.name);
+    gameModuleRegistry.RemoveGameModuleByName(deletedModule3.name, compiler);
 
     CheckModuleNotExists(gameModuleRegistry, deletedModule3);
     CheckLib(gameModuleRegistry, modules);
@@ -651,7 +682,8 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
     const prototypeModule = await gameModuleRegistry.RegisterBySource(
       "lib_gamemodule",
-      originSource
+      originSource,
+      compiler
     );
 
     let lib_gamemodule =
@@ -679,7 +711,8 @@ describe("GameModuleRegistry Test", () => {
 
     await gameModuleRegistry.ModifyGameModuleByModule(
       prototypeModule,
-      modifiedSource
+      modifiedSource,
+      compiler
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
@@ -707,7 +740,8 @@ describe("GameModuleRegistry Test", () => {
     await expect(
       gameModuleRegistry.ModifyGameModuleByModule(
         notExistsModule,
-        modifiedSource
+        modifiedSource,
+        compiler
       )
     ).rejects.toThrow(GameModuleNotFoundError);
   });
@@ -727,7 +761,8 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
     const prototypeModule = await gameModuleRegistry.RegisterBySource(
       "lib_gamemodule",
-      originSource
+      originSource,
+      compiler
     );
 
     const lib_gamemodule =
@@ -756,7 +791,8 @@ describe("GameModuleRegistry Test", () => {
     await expect(
       gameModuleRegistry.ModifyGameModuleByModule(
         prototypeModule,
-        modifiedSource
+        modifiedSource,
+        compiler
       )
     ).rejects.toThrow(SourceNotValidError);
   });
@@ -776,7 +812,8 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
     const prototypeModule = await gameModuleRegistry.RegisterBySource(
       "lib_gamemodule",
-      originSource
+      originSource,
+      compiler
     );
 
     let lib_gamemodule =
@@ -804,7 +841,8 @@ describe("GameModuleRegistry Test", () => {
 
     await gameModuleRegistry.ModifyGameModuleByName(
       prototypeModule.name,
-      modifiedSource
+      modifiedSource,
+      compiler
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
@@ -832,7 +870,8 @@ describe("GameModuleRegistry Test", () => {
     await expect(
       gameModuleRegistry.ModifyGameModuleByName(
         notExistsModule.name,
-        modifiedSource
+        modifiedSource,
+        compiler
       )
     ).rejects.toThrow(GameModuleNotFoundError);
   });
@@ -852,7 +891,8 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
     const prototypeModule = await gameModuleRegistry.RegisterBySource(
       "lib_gamemodule",
-      originSource
+      originSource,
+      compiler
     );
 
     const lib_gamemodule =
@@ -881,7 +921,8 @@ describe("GameModuleRegistry Test", () => {
     await expect(
       gameModuleRegistry.ModifyGameModuleByName(
         prototypeModule.name,
-        modifiedSource
+        modifiedSource,
+        compiler
       )
     ).rejects.toThrow(SourceNotValidError);
   });
@@ -901,7 +942,8 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
     const prototypeModule = await gameModuleRegistry.RegisterBySource(
       "lib_gamemodule",
-      originSource
+      originSource,
+      compiler
     );
 
     let lib_gamemodule =
@@ -929,7 +971,8 @@ describe("GameModuleRegistry Test", () => {
 
     await gameModuleRegistry.ModifyGameModuleById(
       prototypeModule.id,
-      modifiedSource
+      modifiedSource,
+      compiler
     );
     lib_gamemodule =
       gameModuleRegistry.GetGameModuleConstructorByName("lib_gamemodule");
@@ -957,7 +1000,8 @@ describe("GameModuleRegistry Test", () => {
     await expect(
       gameModuleRegistry.ModifyGameModuleById(
         notExistsModule.id,
-        modifiedSource
+        modifiedSource,
+        compiler
       )
     ).rejects.toThrow(GameModuleNotFoundError);
   });
@@ -977,7 +1021,8 @@ describe("GameModuleRegistry Test", () => {
     ].join("\n");
     const prototypeModule = await gameModuleRegistry.RegisterBySource(
       "lib_gamemodule",
-      originSource
+      originSource,
+      compiler
     );
 
     const lib_gamemodule =
@@ -1006,20 +1051,21 @@ describe("GameModuleRegistry Test", () => {
     await expect(
       gameModuleRegistry.ModifyGameModuleById(
         prototypeModule.id,
-        modifiedSource
+        modifiedSource,
+        compiler
       )
     ).rejects.toThrow(SourceNotValidError);
   });
 
   it("Clear Test", async () => {
-    await gameModuleRegistry.RegisterNewModule("m1");
-    await gameModuleRegistry.RegisterNewModule("m2");
-    await gameModuleRegistry.RegisterNewModule("m3");
+    await gameModuleRegistry.RegisterNewModule("m1", compiler);
+    await gameModuleRegistry.RegisterNewModule("m2", compiler);
+    await gameModuleRegistry.RegisterNewModule("m3", compiler);
 
     expect(gameModuleRegistry.Declarations.length).toEqual(3);
     expect(gameModuleRegistry.prototypeGameModules.length).toEqual(3);
 
-    gameModuleRegistry.Clear();
+    gameModuleRegistry.Clear(compiler);
 
     expect(gameModuleRegistry.Declarations.length).toEqual(0);
     expect(gameModuleRegistry.prototypeGameModules.length).toEqual(0);
@@ -1028,18 +1074,19 @@ describe("GameModuleRegistry Test", () => {
 
 describe("GameModuleRegistry GameModule ExposeMetadata inject Test", async () => {
   const compiler: CompileMachine = new MockCompiler();
-  let gameModuleRegistry = new GameModuleRegistry(compiler);
+  let gameModuleRegistry = new GameModuleRegistry();
 
   afterEach(() => {
     Lib.modules = {};
     gameModuleRegistry.Declarations = [];
 
-    gameModuleRegistry = new GameModuleRegistry(compiler);
+    gameModuleRegistry = new GameModuleRegistry();
   });
 
   it("Test Empty GameModule expose metadata value", async () => {
     const module = await gameModuleRegistry.RegisterNewModule(
-      "Test GameModule"
+      "Test GameModule",
+      compiler
     );
 
     expect(module.exposeMetadata).toEqual({});
@@ -1057,7 +1104,8 @@ describe("GameModuleRegistry GameModule ExposeMetadata inject Test", async () =>
         "   @Lib.Expose()",
         "   public Count() : number {this.count++; return this.count;}",
         "}",
-      ].join("\n")
+      ].join("\n"),
+      compiler
     );
 
     expect(counterModule.exposeMetadata).not.toEqual({});
