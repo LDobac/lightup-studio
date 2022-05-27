@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import ModuleBlock from "./ModuleBlock.vue";
 import { useMovable } from "@/composables/Moveable";
+import { useGameModuleDrag } from "@/composables/GameModuleDrag";
 
 const {
   hold,
@@ -12,6 +14,14 @@ const {
   HandleTouchEnd,
   HandleMouseUp,
 } = useMovable();
+
+const { Drop, DragOver } = useGameModuleDrag();
+
+const gameModules = ref<Array<string>>([]);
+
+const HandleGameModuleDrop = (prototypeGameModuleId: string) => {
+  gameModules.value.push(prototypeGameModuleId);
+};
 </script>
 
 <template>
@@ -20,6 +30,8 @@ const {
     :style="`background-position: ${curPosition.x}px ${
       curPosition.y
     }px; cursor: ${hold ? 'move' : 'default'}`"
+    @dragover="DragOver"
+    v-on:drop="Drop($event, HandleGameModuleDrop)"
     @mousedown.stop="HandleMouseDown"
     @touchstart.stop="HandleTouchStart"
     @mousemove.stop="HandleMouseMove"
@@ -31,10 +43,9 @@ const {
       class="module-list"
       :style="`transform: translate(${curPosition.x}px, ${curPosition.y}px);`"
     >
-      <ModuleBlock />
-      <ModuleBlock />
-      <ModuleBlock />
-      <ModuleBlock />
+      <div class="item" v-for="gameModule in gameModules" :key="gameModule">
+        <ModuleBlock :x="0" :y="0" />
+      </div>
     </div>
   </div>
 </template>

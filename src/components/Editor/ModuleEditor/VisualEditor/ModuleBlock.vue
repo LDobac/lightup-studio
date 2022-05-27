@@ -1,6 +1,18 @@
 <script setup lang="ts">
 import { NCard } from "naive-ui";
 import { useMovable } from "@/composables/Moveable";
+import { onMounted } from "vue";
+
+const props = withDefaults(
+  defineProps<{
+    x: number;
+    y: number;
+  }>(),
+  {
+    x: 0,
+    y: 0,
+  }
+);
 
 const {
   hold,
@@ -12,6 +24,11 @@ const {
   HandleTouchEnd,
   HandleMouseUp,
 } = useMovable();
+
+onMounted(() => {
+  curPosition.value.x = props.x;
+  curPosition.value.y = props.y;
+});
 </script>
 
 <template>

@@ -10,6 +10,7 @@ export function useMovable(inverse = false) {
 
   const lastPosition = ref<Position>({ x: 0, y: 0 });
   const curPosition = ref<Position>({ x: 0, y: 0 });
+  const mousePosition = ref<Position>({ x: 0, y: 0 });
 
   const HandleMouseDown = (e: MouseEvent) => {
     e.preventDefault();
@@ -56,6 +57,9 @@ export function useMovable(inverse = false) {
   };
 
   const HandleMove = (x: number, y: number) => {
+    mousePosition.value.x = x;
+    mousePosition.value.y = y;
+
     if (hold.value) {
       const deltaX = x - lastPosition.value.x;
       const deltaY = y - lastPosition.value.y;
@@ -82,6 +86,7 @@ export function useMovable(inverse = false) {
     hold,
     lastPosition,
     curPosition,
+    mousePosition,
     HandleClick,
     HandleMove,
     HandleRelease,
