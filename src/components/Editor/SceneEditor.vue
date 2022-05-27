@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { NButton } from "naive-ui";
-
-import Canvas from "@/components/Canvas.vue";
 import { ref, watch } from "vue";
+import { NButton } from "naive-ui";
+import Canvas from "@/components/Canvas.vue";
 import { usePrototypeStore } from "@/stores/PrototypeStore";
 
 const store = usePrototypeStore();
@@ -33,6 +32,7 @@ watch(
     <Canvas class="scene-canvas" />
 
     <n-button
+      class="btn-start"
       :type="isEditing ? 'success' : 'error'"
       @click="HandleToggleEdit"
       >{{ isEditing ? "Start Game" : "Finish Game" }}</n-button
@@ -40,4 +40,17 @@ watch(
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.scene-editor {
+  position: relative;
+}
+
+.btn-start {
+  position: absolute;
+  display: inline-block;
+
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+</style>

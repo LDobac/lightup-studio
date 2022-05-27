@@ -3,6 +3,7 @@ import { usePrototypeStore } from "@/stores/PrototypeStore";
 import { watch } from "vue";
 import ModuleEditor from "../components/Editor/ModuleEditor/ModuleEditor.vue";
 import SceneEditor from "../components/Editor/SceneEditor.vue";
+import InformationTabs from "../components/Editor/InformationTabs.vue";
 
 const store = usePrototypeStore();
 
@@ -52,7 +53,10 @@ const GetWidthCSS = (width: number) => {
       <ModuleEditor class="resizeable module-editor" />
     </div>
     <div ref="resizeBar" class="resize-bar"></div>
-    <SceneEditor class="resizeable" />
+    <div class="right resizeable">
+      <SceneEditor />
+      <InformationTabs />
+    </div>
   </main>
 </template>
 

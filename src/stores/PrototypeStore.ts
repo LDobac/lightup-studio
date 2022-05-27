@@ -4,6 +4,7 @@ import type { Nullable } from "babylonjs";
 
 import type { CompileMachine } from "@/studio/core/CompileMachine";
 import Prototype from "@/studio/core/Prototype";
+import type GameObjectManager from "@/studio/core/GameObjectManager";
 
 export interface PrototypeState {
   prototype: Nullable<Prototype>;
@@ -20,7 +21,13 @@ export const usePrototypeStore = defineStore({
     canvasOrContext: null,
     isLoaded: false,
   }),
-  getters: {},
+  getters: {
+    currentGameObjectManager(): GameObjectManager | undefined {
+      return this.prototype?.sceneManager?.currentScene?.gameObjectManager as
+        | GameObjectManager
+        | undefined;
+    },
+  },
   actions: {
     SetCompiler(compiler: CompileMachine) {
       this.compiler = compiler;
