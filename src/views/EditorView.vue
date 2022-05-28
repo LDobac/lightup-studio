@@ -94,4 +94,10 @@ const GetWidthCSS = (width: number) => {
     flex-grow: 1;
   }
 }
+
+.right {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 </style>

@@ -939,6 +939,11 @@ cli-truncate@^2.1.0:
     slice-ansi "^3.0.0"
     string-width "^4.2.0"
 
+click-outside-vue3@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/click-outside-vue3/-/click-outside-vue3-4.0.1.tgz#81a6ac01696b301764b42db6fdbdf28e7cd8ef95"
+  integrity sha512-sbplNecrup5oGqA3o4bo8XmvHRT6q9fvw21Z67aDbTqB9M6LF7CuYLTlLvNtOgKU6W3zst5H5zJuEh4auqA34g==
+
 color-convert@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-2.0.1.tgz#72d3a68d598c9bdb3af2ad1e84f21d896abd4de3"
@@ -3539,6 +3544,13 @@ vue-router@^4.0.12:
   integrity sha512-wAO6zF9zxA3u+7AkMPqw9LjoUCjSxfFvINQj3E/DceTt6uEz1XZLraDhdg2EYmvVwTBSGlLYsUw8bDmx0754Mw==
   dependencies:
     "@vue/devtools-api" "^6.0.0"
+
+vue-simple-context-menu@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/vue-simple-context-menu/-/vue-simple-context-menu-4.0.4.tgz#97aff25ee0ae0f82c0049797fdd60abbc3460b8d"
+  integrity sha512-Kn6rTXzKHpdTsPoKpBUQC4K+iZxpYiDU04BbGOgLuX/jLFIA7arzIstOp3+tFoV5JaWrjxGPLAuj2BAf8/G4pQ==
+  dependencies:
+    click-outside-vue3 "^4.0.1"
 
 vue-tsc@^0.31.4:
   version "0.31.4"
