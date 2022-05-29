@@ -4,7 +4,7 @@
       class="tabs"
       type="segment"
       :bar-width="28"
-      :value="editorStore.editMode"
+      v-model:value="editorStore.editMode"
       style="padding: 0px; height: 100%"
     >
       <n-tab-pane
