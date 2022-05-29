@@ -326,6 +326,25 @@ describe("GameObjectTest", async () => {
     expect(gameObject.name).toEqual(expectName);
   });
 
+  it("GameObject Set name test", () => {
+    const expectName = "Expect Name";
+    const gameObject = new GameObject(dummyScene, expectName);
+
+    gameObject.Setup();
+
+    expect(gameObject.node.name).toEqual(expectName);
+    expect(gameObject.name).toEqual(expectName);
+
+    gameObject.Finish();
+
+    gameObject.name = "NewName";
+
+    gameObject.Setup();
+
+    expect(gameObject.node.name).toEqual("NewName");
+    expect(gameObject.name).toEqual("NewName");
+  });
+
   it("Get Node Test when game not started", () => {
     const gameObject = new GameObject(dummyScene, "GameObject Test Name");
 

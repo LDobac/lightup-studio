@@ -118,6 +118,10 @@ export default class GameObject implements IGameFlow {
     return this._name;
   }
 
+  public set name(v: string) {
+    this._name = v;
+  }
+
   public get runtimeGameModule(): Array<GameModule> {
     return this._gameModule;
   }

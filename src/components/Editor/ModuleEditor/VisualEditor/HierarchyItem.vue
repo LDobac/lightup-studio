@@ -12,14 +12,21 @@
       :src="iconGameObject"
       :preview-disabled="true"
     />
-    <p>
-      {{ props.gameObject.name }}
-    </p>
+    <div class="field-name">
+      <n-input
+        v-if="isEditName"
+        v-model:value="newName"
+        @keyup.enter.prevent="HandleChangeName"
+      ></n-input>
+      <p v-else>
+        {{ gameObject.name }}
+      </p>
+    </div>
   </li>
 
   <VueSimpleContextMenu
     ref="contextMenu"
-    element-id="hierarchy-item-context-menu"
+    :element-id="gameObject.id + '-context-menu'"
     @option-clicked="HandleOptionClicked"
     :options="options"
   />
@@ -27,7 +34,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { NImage } from "naive-ui";
+import { NImage, NInput } from "naive-ui";
 import iconGameObject from "@/assets/images/icon/icon_gameobject.png";
 import type GameObject from "@/studio/core/runtime/GameObject";
 
@@ -43,12 +50,18 @@ const props = defineProps<{
   gameObject: GameObject;
 }>();
 
+const gameObject = ref(props.gameObject);
+
 const prototypeStore = usePrototypeStore();
 const contextMenu = ref<typeof VueSimpleContextMenu | null>(null);
 
 const options = ref<Array<IOption>>([
   {
-    name: "Delete",
+    name: "이름 변경",
+    slug: "modify_name",
+  },
+  {
+    name: "삭제",
     slug: "delete_gameobject",
   },
 ]);
@@ -59,14 +72,25 @@ const HandleContextMenu = (event: MouseEvent) => {
   }
 };
 
+const isEditName = ref(false);
+const newName = ref("");
+
 const HandleOptionClicked = (event: OptionEvent<GameObject>) => {
   if (event.option.slug === "delete_gameobject") {
     if (prototypeStore.currentGameObjectManager) {
       prototypeStore.currentGameObjectManager.RemoveGameObject(
-        props.gameObject
+        gameObject.value as GameObject
       );
     }
+  } else if (event.option.slug === "modify_name") {
+    isEditName.value = true;
+    newName.value = gameObject.value.name;
   }
+};
+
+const HandleChangeName = () => {
+  gameObject.value.name = newName.value;
+  isEditName.value = false;
 };
 
 const selected = ref(false);
@@ -94,6 +118,7 @@ const HandleDoubleClick = () => {
   display: flex;
   flex-direction: row;
   user-select: none;
+  padding: 8px 0 8px 8px;
 
   &.selected {
     background-color: aqua;
