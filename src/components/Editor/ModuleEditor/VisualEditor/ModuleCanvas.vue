@@ -1,8 +1,65 @@
+<template>
+  <div
+    class="module-canvas"
+    :class="isEnable ? '' : 'disable'"
+    :style="`background-position: ${curPosition.x}px ${
+      curPosition.y
+    }px; cursor: ${hold ? 'move' : 'default'}`"
+    @dragover="DragOver"
+    v-on:drop="Drop($event, HandleGameModuleDrop)"
+    @mousedown.stop="HandleMouseDown"
+    @touchstart.stop="HandleTouchStart"
+    @mousemove.stop="HandleMouseMove"
+    @touchmove.stop="HandleTouchMove"
+    @mouseup.stop="HandleMouseUp"
+    @touchend.stop="HandleTouchEnd"
+  >
+    <div
+      v-if="isEnable"
+      class="module-list"
+      :style="`transform: translate(${curPosition.x}px, ${curPosition.y}px);`"
+    >
+      <div
+        class="visual-only-gameobject"
+        v-if="prototypeStore.selectedGameObject"
+      >
+        <ModuleBlock
+          v-for="gameModuleId in visualOnlyGameObjects[
+            prototypeStore.selectedGameObject.id
+          ]"
+          :key="gameModuleId"
+          class="item"
+          :x="0"
+          :y="0"
+          :module-id="gameModuleId"
+        />
+      </div>
+
+      <ModuleBlock
+        v-for="gameModule in prototypeStore.selectedGameObject
+          ?.prototypeGameModule"
+        :key="gameModule.uid"
+        class="item"
+        :x="0"
+        :y="0"
+        :module-id="gameModule.module.id"
+      />
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import ModuleBlock from "./ModuleBlock.vue";
 import { useMovable } from "@/composables/Moveable";
 import { useGameModuleDrag } from "@/composables/GameModuleDrag";
+import { usePrototypeStore } from "@/stores/PrototypeStore";
+
+const prototypeStore = usePrototypeStore();
+
+const isEnable = computed(() => {
+  return prototypeStore.selectedGameObject ? true : false;
+});
 
 const {
   hold,
@@ -17,38 +74,26 @@ const {
 
 const { Drop, DragOver } = useGameModuleDrag();
 
-const gameModules = ref<Array<string>>([]);
+const visualOnlyGameObjects = ref<Record<string, Array<string>>>({});
 
 const HandleGameModuleDrop = (prototypeGameModuleId: string) => {
-  gameModules.value.push(prototypeGameModuleId);
-};
-</script>
+  if (isEnable.value && prototypeStore.selectedGameObject) {
+    const gameObjectId = prototypeStore.selectedGameObject.id;
 
-<template>
-  <div
-    class="module-canvas"
-    :style="`background-position: ${curPosition.x}px ${
-      curPosition.y
-    }px; cursor: ${hold ? 'move' : 'default'}`"
-    @dragover="DragOver"
-    v-on:drop="Drop($event, HandleGameModuleDrop)"
-    @mousedown.stop="HandleMouseDown"
-    @touchstart.stop="HandleTouchStart"
-    @mousemove.stop="HandleMouseMove"
-    @touchmove.stop="HandleTouchMove"
-    @mouseup.stop="HandleMouseUp"
-    @touchend.stop="HandleTouchEnd"
-  >
-    <div
-      class="module-list"
-      :style="`transform: translate(${curPosition.x}px, ${curPosition.y}px);`"
-    >
-      <div class="item" v-for="gameModule in gameModules" :key="gameModule">
-        <ModuleBlock :x="0" :y="0" />
-      </div>
-    </div>
-  </div>
-</template>
+    if (!visualOnlyGameObjects.value[gameObjectId]) {
+      visualOnlyGameObjects.value[gameObjectId] = [];
+    }
+
+    visualOnlyGameObjects.value[gameObjectId].push(prototypeGameModuleId);
+  }
+};
+
+watch(isEnable, (newValue: boolean) => {
+  if (!newValue) {
+    curPosition.value = { x: 0, y: 0 };
+  }
+});
+</script>
 
 <style lang="scss" scoped>
 .module-canvas {
@@ -58,9 +103,13 @@ const HandleGameModuleDrop = (prototypeGameModuleId: string) => {
   cursor: move;
 
   background-repeat: repeat;
-  background-image: url("https://cookieshq.co.uk/images/2016/06/28/background-image.jpg");
+  // background-image: url("https://cookieshq.co.uk/images/2016/06/28/background-image.jpg");
 
   z-index: 1;
+
+  &.disable {
+    background-color: #444444;
+  }
 }
 
 .module-list {
