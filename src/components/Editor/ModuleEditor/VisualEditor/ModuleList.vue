@@ -1,17 +1,3 @@
-<script setup lang="ts">
-import { ref } from "vue";
-import { NLayout, NLayoutSider, NScrollbar } from "naive-ui";
-import { BookmarkOutline } from "@vicons/ionicons5";
-import { usePrototypeStore } from "@/stores/PrototypeStore";
-import { useGameModuleDrag } from "@/composables/GameModuleDrag";
-import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
-
-const collapsed = ref(true);
-
-const prototypeStore = usePrototypeStore();
-const { DragStart } = useGameModuleDrag();
-</script>
-
 <template>
   <n-layout has-sider style="height: 100%; flex-grow: 0; flex-shrink: 0">
     <n-layout-sider
@@ -31,6 +17,7 @@ const { DragStart } = useGameModuleDrag();
               .gameModuleRegistry.prototypeGameModules"
             :key="prototypeGameModule.id"
             class="item"
+            @dblclick="HandleDoubleClick(prototypeGameModule as PrototypeGameModule)"
             @dragstart="DragStart($event, prototypeGameModule as PrototypeGameModule)"
             draggable="true"
           >
@@ -42,3 +29,24 @@ const { DragStart } = useGameModuleDrag();
     </n-layout-sider>
   </n-layout>
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { NLayout, NLayoutSider, NScrollbar } from "naive-ui";
+import { BookmarkOutline } from "@vicons/ionicons5";
+import { usePrototypeStore } from "@/stores/PrototypeStore";
+import { useGameModuleDrag } from "@/composables/GameModuleDrag";
+import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
+import { useEditorStore } from "@/stores/EditorStore";
+
+const collapsed = ref(true);
+
+const prototypeStore = usePrototypeStore();
+const { DragStart } = useGameModuleDrag();
+
+const editorStore = useEditorStore();
+
+const HandleDoubleClick = (gameModule : PrototypeGameModule) => {
+  editorStore.GoCodeEditor(gameModule);
+};
+</script>

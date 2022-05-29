@@ -37,6 +37,7 @@ import VueSimpleContextMenu, {
 } from "vue-simple-context-menu";
 import "vue-simple-context-menu/dist/vue-simple-context-menu.css";
 import { usePrototypeStore } from "@/stores/PrototypeStore";
+import { useEditorStore } from "@/stores/EditorStore";
 
 const props = defineProps<{
   gameObject: GameObject;
@@ -70,8 +71,10 @@ const HandleOptionClicked = (event: OptionEvent<GameObject>) => {
 
 const selected = ref(false);
 
+const editorStore = useEditorStore();
+
 watch<GameObject | null>(
-  () => prototypeStore.selectedGameObject as GameObject | null,
+  () => editorStore.selectedGameObject as GameObject | null,
   (gameObject: GameObject | null) => {
     if (gameObject && props.gameObject.id === gameObject.id) {
       selected.value = true;
@@ -82,7 +85,7 @@ watch<GameObject | null>(
 );
 
 const HandleDoubleClick = () => {
-  prototypeStore.selectedGameObject = props.gameObject;
+  editorStore.GoVisualEditor(props.gameObject);
 };
 </script>
 

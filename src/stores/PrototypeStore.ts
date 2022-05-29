@@ -5,14 +5,12 @@ import type { Nullable } from "babylonjs";
 import type { CompileMachine } from "@/studio/core/CompileMachine";
 import Prototype from "@/studio/core/Prototype";
 import type GameObjectManager from "@/studio/core/GameObjectManager";
-import type GameObject from "@/studio/core/runtime/GameObject";
 
 export interface PrototypeState {
   prototype: Nullable<Prototype>;
   compiler: ShallowRef<Nullable<CompileMachine>>;
   canvasOrContext: Nullable<HTMLCanvasElement | WebGLRenderingContext>;
   isLoaded: boolean;
-  selectedGameObject: Nullable<GameObject>;
 }
 
 export const usePrototypeStore = defineStore({
@@ -22,7 +20,6 @@ export const usePrototypeStore = defineStore({
     compiler: shallowRef<Nullable<CompileMachine>>(null),
     canvasOrContext: null,
     isLoaded: false,
-    selectedGameObject: null,
   }),
   getters: {
     currentGameObjectManager(): GameObjectManager | undefined {

@@ -1,15 +1,10 @@
-<script setup lang="ts">
-import { NTabs, NTabPane } from "naive-ui";
-import VisualModuleEditor from "./VisualEditor/VisualModuleEditor.vue";
-import CodeModuleEditor from "./CodeEditor/CodeModuleEditor.vue";
-</script>
-
 <template>
   <div class="module-editor">
     <n-tabs
       class="tabs"
       type="segment"
       :bar-width="28"
+      :value="editorStore.editMode"
       style="padding: 0px; height: 100%"
     >
       <n-tab-pane
@@ -31,6 +26,15 @@ import CodeModuleEditor from "./CodeEditor/CodeModuleEditor.vue";
     </n-tabs>
   </div>
 </template>
+
+<script setup lang="ts">
+import { NTabs, NTabPane } from "naive-ui";
+import VisualModuleEditor from "./VisualEditor/VisualModuleEditor.vue";
+import CodeModuleEditor from "./CodeEditor/CodeModuleEditor.vue";
+import { useEditorStore } from "@/stores/EditorStore";
+
+const editorStore = useEditorStore();
+</script>
 
 <style lang="scss" scoped>
 .module-editor {

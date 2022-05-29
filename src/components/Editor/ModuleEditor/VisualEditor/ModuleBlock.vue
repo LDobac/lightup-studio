@@ -23,6 +23,7 @@ import { NCard } from "naive-ui";
 import { useMovable } from "@/composables/Moveable";
 import { computed, onMounted } from "vue";
 import { usePrototypeStore } from "@/stores/PrototypeStore";
+import { useEditorStore } from "@/stores/EditorStore";
 
 const props = withDefaults(
   defineProps<{
@@ -64,8 +65,10 @@ const prototypeGameModule = computed(() => {
   throw "Game not initailized!";
 });
 
-const HandleDBClick = (event: MouseEvent) => {
-  console.log(event);
+const editorStore = useEditorStore();
+
+const HandleDBClick = () => {
+  editorStore.GoCodeEditor(prototypeGameModule.value);
 };
 </script>
 

@@ -19,13 +19,10 @@
       class="module-list"
       :style="`transform: translate(${curPosition.x}px, ${curPosition.y}px);`"
     >
-      <div
-        class="visual-only-gameobject"
-        v-if="prototypeStore.selectedGameObject"
-      >
+      <div class="visual-only-gameobject" v-if="editorStore.selectedGameObject">
         <ModuleBlock
           v-for="gameModuleId in visualOnlyGameObjects[
-            prototypeStore.selectedGameObject.id
+            editorStore.selectedGameObject.id
           ]"
           :key="gameModuleId"
           class="item"
@@ -36,7 +33,7 @@
       </div>
 
       <ModuleBlock
-        v-for="gameModule in prototypeStore.selectedGameObject
+        v-for="gameModule in editorStore.selectedGameObject
           ?.prototypeGameModule"
         :key="gameModule.uid"
         class="item"
@@ -53,12 +50,12 @@ import { computed, ref, watch } from "vue";
 import ModuleBlock from "./ModuleBlock.vue";
 import { useMovable } from "@/composables/Moveable";
 import { useGameModuleDrag } from "@/composables/GameModuleDrag";
-import { usePrototypeStore } from "@/stores/PrototypeStore";
+import { useEditorStore } from "@/stores/EditorStore";
 
-const prototypeStore = usePrototypeStore();
+const editorStore = useEditorStore();
 
 const isEnable = computed(() => {
-  return prototypeStore.selectedGameObject ? true : false;
+  return editorStore.selectedGameObject ? true : false;
 });
 
 const {
@@ -77,8 +74,8 @@ const { Drop, DragOver } = useGameModuleDrag();
 const visualOnlyGameObjects = ref<Record<string, Array<string>>>({});
 
 const HandleGameModuleDrop = (prototypeGameModuleId: string) => {
-  if (isEnable.value && prototypeStore.selectedGameObject) {
-    const gameObjectId = prototypeStore.selectedGameObject.id;
+  if (isEnable.value && editorStore.selectedGameObject) {
+    const gameObjectId = editorStore.selectedGameObject.id;
 
     if (!visualOnlyGameObjects.value[gameObjectId]) {
       visualOnlyGameObjects.value[gameObjectId] = [];
