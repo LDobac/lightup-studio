@@ -164,6 +164,39 @@ describe("PrototypeGameModule Unit Test", () => {
     );
   });
 
+  it("originSource have to change when name has changed", () => {
+    const gm = new PrototypeGameModule("", "GameModule 1");
+
+    const expectCode = [
+      `class ${gm.GetSafeName()} extends Lib.GameModule`,
+      "{",
+      "\tStart() { console.log('Start'); }",
+      "\tUpdate(deltaTime : number) { console.log(deltaTime); }",
+      "}",
+    ].join("\n");
+
+    expect(() => OriginCodePassTest(gm, expectCode)).not.toThrow(
+      new SourceNotValidError()
+    );
+
+    gm.name = "New Name";
+    const matchClassRegex = new RegExp(
+      `\\s*(class)\\s*(${gm.GetSafeName()})`,
+      "gmi"
+    );
+
+    const matches = gm.originSource.matchAll(matchClassRegex);
+    let isPass = false;
+
+    for (const match of matches) {
+      if (match.includes(gm.GetSafeName())) {
+        isPass = true;
+      }
+    }
+
+    expect(isPass).toBeTruthy();
+  });
+
   it("originSource Getter/Setter Validate Test Failed 1", () => {
     // Does not have class
     const gm = new PrototypeGameModule("", "GameModule 5");

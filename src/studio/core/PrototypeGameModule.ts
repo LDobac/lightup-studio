@@ -72,7 +72,13 @@ export default class PrototypeGameModule {
   }
 
   public set name(newName: string) {
+    const oldSafeName = this.safeName;
+
     this._name = newName;
+
+    const newSafeName = this.safeName;
+
+    this.originSource = this.originSource.replace(oldSafeName, newSafeName);
   }
 
   public get originSource(): string {
