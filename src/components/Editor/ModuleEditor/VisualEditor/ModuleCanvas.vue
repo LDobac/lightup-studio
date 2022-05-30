@@ -29,6 +29,7 @@
           :x="0"
           :y="0"
           :module-id="gameModuleId"
+          @delete="HandleVisualModuleDelete"
         />
       </div>
 
@@ -40,6 +41,7 @@
         :x="0"
         :y="0"
         :module-id="gameModule.module.id"
+        @delete="() => HandleModuleDelete(gameModule.uid)"
       />
     </div>
   </div>
@@ -90,6 +92,25 @@ watch(isEnable, (newValue: boolean) => {
     curPosition.value = { x: 0, y: 0 };
   }
 });
+
+const HandleVisualModuleDelete = (moduleId: string) => {
+  if (isEnable.value && editorStore.selectedGameObject) {
+    const gameObjectId = editorStore.selectedGameObject.id;
+
+    const index = visualOnlyGameObjects.value[gameObjectId].findIndex(
+      (v) => v === moduleId
+    );
+    if (index > -1) {
+      visualOnlyGameObjects.value[gameObjectId].splice(index, 1);
+    }
+  }
+};
+
+const HandleModuleDelete = (uid: string) => {
+  if (editorStore.selectedGameObject) {
+    editorStore.selectedGameObject.RemoveProtoGMByUid(uid);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
