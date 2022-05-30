@@ -3,6 +3,7 @@ import { Engine, Scene } from "babylonjs";
 import type GameEngine from "./GameEngine";
 import GameObjectManager from "./GameObjectManager";
 import type IGameFlow from "../utils/IGameFlow";
+import type { PropagateType } from "./GameEngine";
 
 export interface ISceneObject extends IGameFlow {
   id: string;
@@ -239,6 +240,15 @@ export default class SceneManager {
       scene.Finish();
     });
     this._scenes = [];
+  }
+
+  public PropagateModuleChange(
+    msgType: PropagateType,
+    prototypeModuleId: string
+  ) {
+    this.scenes.forEach((scene) => {
+      scene.gameObjectManager.PropagateModuleChange(msgType, prototypeModuleId);
+    });
   }
 
   public set defaultScene(scene: ISceneObject | undefined) {

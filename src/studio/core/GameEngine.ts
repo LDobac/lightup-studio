@@ -1,6 +1,8 @@
 import { Engine, type Nullable } from "babylonjs";
 import SceneManager, { type ISceneObject } from "./SceneManager";
 
+export type PropagateType = "deleted" | "modified";
+
 export class GameEngineAlreadyRunning extends Error {
   constructor() {
     super("Game Engine already running.");
@@ -68,6 +70,13 @@ export default class GameEngine {
     if (this._isRunning) {
       this._sceneManager.StartScene(this._sceneManager.currentScene);
     }
+  }
+
+  public PropagateModuleChange(
+    msgType: PropagateType,
+    prototypeModuleId: string
+  ) {
+    this.sceneManager.PropagateModuleChange(msgType, prototypeModuleId);
   }
 
   public get sceneManager(): SceneManager {

@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { CompileError, CompileMachine } from "./CompileMachine";
+import type GameEngine from "./GameEngine";
 import PrototypeGameModule, {
   type GameModuleConstructor,
 } from "./PrototypeGameModule";
@@ -37,10 +38,14 @@ export default class GameModuleRegistry {
 
   private modules: Array<PrototypeGameModule>;
 
+  private gameEngine: GameEngine | null;
+
   public Declarations: RuntimeDeclarations = [];
 
-  constructor() {
+  constructor(gameEngine: GameEngine | null = null) {
     this.modules = [];
+
+    this.gameEngine = gameEngine;
   }
 
   public async RegisterNewModule(
@@ -320,6 +325,10 @@ export default class GameModuleRegistry {
     const deletedModule = this.modules.splice(index, 1)[0];
 
     this.RemoveLibAndDeclaration(deletedModule, compiler);
+
+    if (this.gameEngine) {
+      this.gameEngine.PropagateModuleChange("deleted", deletedModule.id);
+    }
   }
 
   private async ModifyGameModule(

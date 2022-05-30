@@ -26,19 +26,18 @@ export default class Prototype implements Serializer<ISerializedPrototype> {
 
   constructor(
     canvasOrContext: Nullable<HTMLCanvasElement | WebGLRenderingContext>,
-    compiler: CompileMachine,
     id = "",
     name = ""
   ) {
     this._id = id;
     this._name = name;
 
-    this._gameModuleRegistry = new GameModuleRegistry();
-
     this._gameEngine = new GameEngine(canvasOrContext);
     this._gameEngine.SetEditMode(true);
 
     Lib.gameEngine = this._gameEngine;
+
+    this._gameModuleRegistry = new GameModuleRegistry(this._gameEngine);
   }
 
   public async GenerateEmptyPrototype() {

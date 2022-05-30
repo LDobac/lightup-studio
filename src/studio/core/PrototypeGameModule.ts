@@ -78,7 +78,10 @@ export default class PrototypeGameModule {
 
     const newSafeName = this.safeName;
 
-    this.originSource = this.originSource.replace(oldSafeName, newSafeName);
+    // If source does not set, ignore it
+    if (this.originSource.length > 0) {
+      this.originSource = this.originSource.replace(oldSafeName, newSafeName);
+    }
   }
 
   public get originSource(): string {

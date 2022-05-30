@@ -43,7 +43,7 @@ export const usePrototypeStore = defineStore({
     },
     CreatePrototypeIfSetUp() {
       if (this.compiler && this.canvasOrContext && !this.prototype) {
-        this.prototype = new Prototype(this.canvasOrContext, this.compiler);
+        this.prototype = new Prototype(this.canvasOrContext);
 
         this.isLoaded = true;
       }

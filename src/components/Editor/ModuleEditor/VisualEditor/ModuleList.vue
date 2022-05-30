@@ -16,18 +16,12 @@
       >
         <div class="container">
           <div class="game-module-list" v-if="prototypeStore.prototype">
-            <div
+            <ModuleListItem
               v-for="prototypeGameModule in prototypeStore.prototype
                 .gameModuleRegistry.prototypeGameModules"
               :key="prototypeGameModule.id"
-              class="item"
-              @dblclick="HandleDoubleClick(prototypeGameModule as PrototypeGameModule)"
-              @dragstart="DragStart($event, prototypeGameModule as PrototypeGameModule)"
-              draggable="true"
-            >
-              <BookmarkOutline />
-              <p>{{ prototypeGameModule.name }}</p>
-            </div>
+              :prototype-game-module="(prototypeGameModule as PrototypeGameModule)"
+            />
           </div>
           <n-button @click="HandleOpenModal">New GameModule</n-button>
         </div>
@@ -71,22 +65,13 @@ import {
   NFormItem,
   NInput,
 } from "naive-ui";
-import { BookmarkOutline } from "@vicons/ionicons5";
 import { usePrototypeStore } from "@/stores/PrototypeStore";
-import { useGameModuleDrag } from "@/composables/GameModuleDrag";
 import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
-import { useEditorStore } from "@/stores/EditorStore";
+import ModuleListItem from "./ModuleListItem.vue";
 
 const collapsed = ref(true);
 
 const prototypeStore = usePrototypeStore();
-const { DragStart } = useGameModuleDrag();
-
-const editorStore = useEditorStore();
-
-const HandleDoubleClick = (gameModule: PrototypeGameModule) => {
-  editorStore.GoCodeEditor(gameModule);
-};
 
 const showCreateModal = ref(false);
 

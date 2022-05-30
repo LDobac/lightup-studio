@@ -9,6 +9,7 @@ import GameObject from "./runtime/GameObject";
 import type GameModule from "./runtime/GameModule";
 import type { ISceneObject } from "./SceneManager";
 import type IGameFlow from "../utils/IGameFlow";
+import type { PropagateType } from "./GameEngine";
 
 export class GameObjectNotFoundError extends Error {
   constructor() {
@@ -364,6 +365,27 @@ export default class GameObjectManager implements IGameFlow {
     this._gameObjects.forEach((go) => {
       go.Finish();
     });
+  }
+
+  public PropagateModuleChange(
+    msgType: PropagateType,
+    prototypeModuleId: string
+  ) {
+    switch (msgType) {
+      case "deleted":
+        this.gameObjects.forEach((gameObject) => {
+          const iModule = gameObject.prototypeGameModule.find(
+            (v) => v.module.id === prototypeModuleId
+          );
+          if (iModule) {
+            gameObject.RemoveProtoGMByUid(iModule.uid);
+          }
+        });
+        break;
+
+      default:
+        break;
+    }
   }
 
   public get gameObjects(): Array<GameObject> {
