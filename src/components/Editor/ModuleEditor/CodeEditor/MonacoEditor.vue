@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-
+import { onMounted, ref, watch } from "vue";
+import { useMessage } from "naive-ui";
 import { usePrototypeStore } from "@/stores/PrototypeStore";
-
 import MonacoEditorManager from "@/studio/editor/MonacoEditorManager";
+import { useEditorStore } from "@/stores/EditorStore";
 
 const monacoEditorWrapper = ref<HTMLElement | null>(null);
 
+const prototype = usePrototypeStore();
+
 onMounted(() => {
-  const prototype = usePrototypeStore();
   const CreateEditor = () => {
     if (!monacoEditorWrapper.value) throw "Can't find monaco editor container";
 
@@ -37,37 +38,50 @@ onMounted(() => {
   CreateEditor();
 });
 
-// const HandleClick = async () => {
-//   const prototype = usePrototypeStore();
+const editorStore = useEditorStore();
 
-//   if (prototype.compiler) {
-//     const code = await prototype.compiler.GetCompiledCode();
+watch(
+  () => editorStore.selectedGameModule,
+  (gameModule) => {
+    if (prototype.compiler && gameModule) {
+      prototype.compiler.SetCode(gameModule.originSource);
+    }
+  }
+);
 
-//     console.log(code);
-//   }
-// };
+const message = useMessage();
 
-// const HandleClick2 = () => {
-//   if (!monacoEditorManager) return;
+const HandleCtrlDown = async (event: KeyboardEvent) => {
+  if (event.ctrlKey && event.key === "s") {
+    if (prototype.compiler && editorStore.selectedGameModule) {
+      const selectedModule = editorStore.selectedGameModule;
+      const compiler = prototype.compiler;
 
-//   // extra libraries
-//   const libSource = [
-//     "declare class Facts {",
-//     "    /**",
-//     "     * Returns the next fact",
-//     "     */",
-//     "    static next():string",
-//     "}",
-//   ].join("\n");
-//   const libUri = "ts:filename/facts.d.ts";
-//   monacoEditorManager.AddLibrary(libSource, libUri);
-// };
+      const code = await compiler.GetCompiledCode();
+
+      if (!code.js || !code.declaration) {
+        message.error("Failed to compile!");
+        console.error(code.diagnostic);
+      } else if (code.diagnostic.length > 0) {
+        message.warning("Success to compile but some warnings.");
+        console.warn(code.diagnostic);
+      } else {
+        selectedModule.originSource = compiler.GetCode();
+        selectedModule.SetCompiledSource(code.js, code.declaration);
+
+        message.success("Success to compile!");
+      }
+    }
+  }
+};
 </script>
 
 <template>
-  <div ref="monacoEditorWrapper" class="monaco-editor-wrapper"></div>
-  <!-- <button @click="HandleClick">Get Code</button>
-  <button @click="HandleStartGame">Start Game</button> -->
+  <div
+    @keydown.ctrl.prevent="HandleCtrlDown"
+    ref="monacoEditorWrapper"
+    class="monaco-editor-wrapper"
+  ></div>
 </template>
 
 <style lang="scss" scoped>

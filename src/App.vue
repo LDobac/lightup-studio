@@ -1,21 +1,24 @@
+<template>
+  <n-message-provider>
+    <div class="container">
+      <div class="header">
+        <Header />
+      </div>
+      <div class="content">
+        <RouterView />
+      </div>
+      <div class="footer">
+        <footer>Made by yikolden.</footer>
+      </div>
+    </div>
+  </n-message-provider>
+</template>
+
 <script setup lang="ts">
+import { NMessageProvider } from "naive-ui";
 import { RouterView } from "vue-router";
 import Header from "./components/Header.vue";
 </script>
-
-<template>
-  <div class="container">
-    <div class="header">
-      <Header />
-    </div>
-    <div class="content">
-      <RouterView />
-    </div>
-    <div class="footer">
-      <footer>Made by yikolden.</footer>
-    </div>
-  </div>
-</template>
 
 <style>
 @import "@/assets/styles/reset.css";

@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import type { Nullable } from "babylonjs";
 import type GameObject from "@/studio/core/runtime/GameObject";
 import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
-import { usePrototypeStore } from "./PrototypeStore";
 
 export interface EditorStoreState {
   editMode: "Code" | "Visual";
@@ -23,11 +22,6 @@ export const useEditorStore = defineStore({
     GoCodeEditor(gameModule: PrototypeGameModule) {
       this.selectedGameModule = gameModule;
       this.editMode = "Code";
-
-      const prototypeStore = usePrototypeStore();
-      if (prototypeStore.compiler) {
-        prototypeStore.compiler.SetCode(this.selectedGameModule.originSource);
-      }
     },
     GoVisualEditor(gameObject: GameObject) {
       this.selectedGameObject = gameObject;
