@@ -8,18 +8,21 @@ const store = usePrototypeStore();
 const isEditing = ref(false);
 
 const HandleToggleEdit = () => {
-  if (store.prototype && store.prototype.gameEngine && store.isLoaded) {
-    store.prototype.gameEngine.SetEditMode(!isEditing.value);
+  if (store.isPrototypeOpen && store.isLoaded) {
+    if (store.prototype.gameEngine) {
+      store.prototype.gameEngine.SetEditMode(!isEditing.value);
 
-    isEditing.value = store.prototype.gameEngine.isEditing;
+      isEditing.value = store.prototype.gameEngine.isEditing;
+    }
   }
 };
 
 watch(
-  () => store.prototype,
-  (prototype) => {
-    if (prototype && prototype.gameEngine) {
-      isEditing.value = prototype.gameEngine.isEditing;
+  () => store.isPrototypeOpen,
+  (isOpen) => {
+    const gameEngine = store.prototype.gameEngine;
+    if (isOpen && gameEngine) {
+      isEditing.value = gameEngine.isEditing;
     } else {
       isEditing.value = false;
     }

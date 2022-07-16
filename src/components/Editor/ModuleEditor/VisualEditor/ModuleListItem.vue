@@ -79,7 +79,7 @@ const newName = ref("");
 
 const HandleOptionClicked = (event: OptionEvent<PrototypeGameModule>) => {
   if (event.option.slug === "delete") {
-    if (prototypeStore.prototype && prototypeStore.compiler) {
+    if (prototypeStore.isPrototypeOpen && prototypeStore.compiler) {
       prototypeStore.prototype.gameModuleRegistry.RemoveGameModuleById(
         prototypeGameModule.value.id,
         prototypeStore.compiler

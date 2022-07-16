@@ -7,7 +7,7 @@ import Prototype from "@/studio/core/Prototype";
 import type GameObjectManager from "@/studio/core/GameObjectManager";
 
 export interface PrototypeState {
-  prototype: Nullable<Prototype>;
+  _prototype: Nullable<Prototype>;
   compiler: ShallowRef<Nullable<CompileMachine>>;
   canvasOrContext: Nullable<HTMLCanvasElement | WebGLRenderingContext>;
   isLoaded: boolean;
@@ -16,16 +16,31 @@ export interface PrototypeState {
 export const usePrototypeStore = defineStore({
   id: "prototype_store",
   state: (): PrototypeState => ({
-    prototype: null,
+    _prototype: null,
     compiler: shallowRef<Nullable<CompileMachine>>(null),
     canvasOrContext: null,
     isLoaded: false,
   }),
   getters: {
-    currentGameObjectManager(): GameObjectManager | undefined {
-      return this.prototype?.sceneManager?.currentScene?.gameObjectManager as
-        | GameObjectManager
-        | undefined;
+    currentGameObjectManager(): GameObjectManager | null {
+      if (!this._prototype) return null;
+      if (!this._prototype.sceneManager) return null;
+      if (!this._prototype.sceneManager.currentScene) return null;
+      if (!this._prototype.sceneManager.currentScene.gameObjectManager)
+        return null;
+
+      return this._prototype.sceneManager.currentScene
+        .gameObjectManager as GameObjectManager;
+    },
+    prototype(): Prototype {
+      if (this._prototype) {
+        return this._prototype as Prototype;
+      }
+
+      throw "Prototype not opened!";
+    },
+    isPrototypeOpen(): boolean {
+      return this._prototype !== null;
     },
   },
   actions: {
@@ -42,8 +57,8 @@ export const usePrototypeStore = defineStore({
       this.CreatePrototypeIfSetUp();
     },
     CreatePrototypeIfSetUp() {
-      if (this.compiler && this.canvasOrContext && !this.prototype) {
-        this.prototype = new Prototype(this.canvasOrContext);
+      if (this.compiler && this.canvasOrContext && !this._prototype) {
+        this._prototype = new Prototype(this.canvasOrContext);
 
         this.isLoaded = true;
       }

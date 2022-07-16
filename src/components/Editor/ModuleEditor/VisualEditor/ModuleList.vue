@@ -15,12 +15,12 @@
         style="max-height: 100%; height: 100%"
       >
         <div class="container">
-          <div class="game-module-list" v-if="prototypeStore.prototype">
+          <div class="game-module-list" v-if="prototypeStore.isPrototypeOpen">
             <ModuleListItem
               v-for="prototypeGameModule in prototypeStore.prototype
                 .gameModuleRegistry.prototypeGameModules"
               :key="prototypeGameModule.id"
-              :prototype-game-module="(prototypeGameModule as PrototypeGameModule)"
+              :prototype-game-module="prototypeGameModule"
             />
           </div>
           <n-button @click="HandleOpenModal">New GameModule</n-button>
@@ -66,7 +66,6 @@ import {
   NInput,
 } from "naive-ui";
 import { usePrototypeStore } from "@/stores/PrototypeStore";
-import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 import ModuleListItem from "./ModuleListItem.vue";
 
 const collapsed = ref(true);
@@ -86,7 +85,7 @@ const HandleCancel = () => {
 const newGameModuleName = ref("");
 
 const HandleCreateGameModule = async () => {
-  if (prototypeStore.prototype && prototypeStore.compiler) {
+  if (prototypeStore.isPrototypeOpen && prototypeStore.compiler) {
     const registry = prototypeStore.prototype.gameModuleRegistry;
 
     await registry.RegisterNewModule(

@@ -11,7 +11,7 @@ watch(
   () => store.isLoaded,
   async (isLoaded) => {
     if (isLoaded) {
-      if (store.prototype && store.compiler) {
+      if (store.isPrototypeOpen && store.compiler) {
         await store.prototype.GenerateTestScene(store.compiler);
 
         store.prototype.gameEngine.SetEditMode(true);

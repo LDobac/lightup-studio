@@ -78,7 +78,7 @@ onMounted(() => {
 const prototypeStore = usePrototypeStore();
 
 const prototypeGameModule = computed(() => {
-  if (prototypeStore.prototype) {
+  if (prototypeStore.isPrototypeOpen) {
     const registry = prototypeStore.prototype.gameModuleRegistry;
 
     return registry.GetPrototypeGameModuleById(props.moduleId);
