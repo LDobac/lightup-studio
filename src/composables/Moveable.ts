@@ -14,6 +14,7 @@ export function useMovable(inverse = false) {
 
   const HandleMouseDown = (e: MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     if (e.button === 0) {
       HandleClick(e.x, e.y);
@@ -22,30 +23,35 @@ export function useMovable(inverse = false) {
 
   const HandleMouseMove = (e: MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     HandleMove(e.x, e.y);
   };
 
   const HandleMouseUp = (e: MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     HandleRelease();
   };
 
   const HandleTouchStart = (e: TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     HandleClick(e.touches[0].clientX, e.touches[0].clientY);
   };
 
   const HandleTouchMove = (e: TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     HandleClick(e.touches[0].clientX, e.touches[0].clientY);
   };
 
   const HandleTouchEnd = (e: TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
 
     HandleRelease();
   };

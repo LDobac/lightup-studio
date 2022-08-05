@@ -97,9 +97,9 @@ const selected = ref(false);
 
 const editorStore = useEditorStore();
 
-watch<GameObject | null>(
-  () => editorStore.selectedGameObject as GameObject | null,
-  (gameObject: GameObject | null) => {
+watch(
+  () => editorStore.selectedGameObject,
+  (gameObject) => {
     if (gameObject && props.gameObject.id === gameObject.id) {
       selected.value = true;
     } else {

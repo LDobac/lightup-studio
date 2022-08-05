@@ -2,6 +2,11 @@ import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 
 const DRAG_MODULE_DATA_ID_KEY = "text/plain";
 
+export type DropDelegate = (
+  event: DragEvent,
+  prototypeModuleId: string
+) => void;
+
 export function useGameModuleDrag() {
   function DragStart(
     event: DragEvent,
@@ -17,16 +22,13 @@ export function useGameModuleDrag() {
     event.preventDefault();
   }
 
-  function Drop(
-    event: DragEvent,
-    callback: (prototypeModuleId: string) => void
-  ) {
+  function Drop(event: DragEvent, callback: DropDelegate) {
     event.preventDefault();
     if (!event.dataTransfer) throw "Failed to get game module drag data!";
 
     const prototypeId = event.dataTransfer.getData(DRAG_MODULE_DATA_ID_KEY);
 
-    callback(prototypeId);
+    callback(event, prototypeId);
   }
 
   return {

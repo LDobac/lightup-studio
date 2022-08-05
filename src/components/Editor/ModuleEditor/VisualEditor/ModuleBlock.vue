@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="module-block-wrapper">
     <div
       class="module-block"
       :style="`transform: translate(${curPosition.x}px, ${
@@ -116,7 +116,12 @@ const HandleOptionClicked = (event: OptionEvent<null>) => {
 </script>
 
 <style lang="scss" scoped>
+.module-block-wrapper {
+  position: absolute;
+}
+
 .module-block {
+  position: absolute;
   width: 200px;
   height: 100px;
 

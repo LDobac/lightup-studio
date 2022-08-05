@@ -5,8 +5,8 @@ import type PrototypeGameModule from "@/studio/core/PrototypeGameModule";
 
 export interface EditorStoreState {
   editMode: "Code" | "Visual";
-  selectedGameObject: Nullable<GameObject>;
-  selectedGameModule: Nullable<PrototypeGameModule>;
+  _selectedGameObject: Nullable<GameObject>;
+  _selectedGameModule: Nullable<PrototypeGameModule>;
 }
 
 export const useEditorStore = defineStore({
@@ -14,17 +14,25 @@ export const useEditorStore = defineStore({
   state: (): EditorStoreState => {
     return {
       editMode: "Visual",
-      selectedGameObject: null,
-      selectedGameModule: null,
+      _selectedGameObject: null,
+      _selectedGameModule: null,
     };
+  },
+  getters: {
+    selectedGameObject(): Nullable<GameObject> {
+      return this._selectedGameObject as Nullable<GameObject>;
+    },
+    selectedGameModule(): Nullable<PrototypeGameModule> {
+      return this._selectedGameModule as Nullable<PrototypeGameModule>;
+    },
   },
   actions: {
     GoCodeEditor(gameModule: PrototypeGameModule) {
-      this.selectedGameModule = gameModule;
+      this._selectedGameModule = gameModule;
       this.editMode = "Code";
     },
     GoVisualEditor(gameObject: GameObject) {
-      this.selectedGameObject = gameObject;
+      this._selectedGameObject = gameObject;
       this.editMode = "Visual";
     },
   },
